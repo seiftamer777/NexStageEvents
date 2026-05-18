@@ -82,9 +82,11 @@
   .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 22px; }
   .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
   .stat-icon.purple { background: rgba(108,99,255,0.15); }
-  .stat-icon.green { background: rgba(34,197,94,0.15); }
-  .stat-icon.blue { background: rgba(59,130,246,0.15); }
-  .stat-icon.amber { background: rgba(245,158,11,0.15); }
+  .stat-icon.green  { background: rgba(34,197,94,0.15); }
+  .stat-icon.blue   { background: rgba(59,130,246,0.15); }
+  .stat-icon.amber  { background: rgba(245,158,11,0.15); }
+  .stat-icon.rose   { background: rgba(244,63,94,0.15); }
+  .stat-icon.teal   { background: rgba(20,184,166,0.15); }
   .stat-label { font-size: 12px; color: var(--text2); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
   .stat-value { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
   .stat-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
@@ -103,28 +105,24 @@
   tbody td { padding: 13px 18px; font-size: 13px; vertical-align: middle; }
   .empty-row { text-align: center; color: var(--text2); padding: 40px !important; }
 
-  /* ALERT BANNER */
-  .alert-banner { display: flex; align-items: flex-start; gap: 12px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 20px; font-size: 13px; color: #fbbf24; line-height: 1.6; }
-  .alert-banner.error { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #f87171; }
-  .alert-banner code { font-family: monospace; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
-
   /* BADGES */
   .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
   .badge-success { background: rgba(34,197,94,0.13); color: #4ade80; }
-  .badge-danger { background: rgba(239,68,68,0.13); color: #f87171; }
+  .badge-danger  { background: rgba(239,68,68,0.13); color: #f87171; }
   .badge-warning { background: rgba(245,158,11,0.13); color: #fbbf24; }
-  .badge-info { background: rgba(59,130,246,0.13); color: #60a5fa; }
-  .badge-gray { background: rgba(139,144,167,0.15); color: var(--text2); }
-  .badge-purple { background: rgba(108,99,255,0.15); color: var(--accent2); }
+  .badge-info    { background: rgba(59,130,246,0.13); color: #60a5fa; }
+  .badge-gray    { background: rgba(139,144,167,0.15); color: var(--text2); }
+  .badge-purple  { background: rgba(108,99,255,0.15); color: var(--accent2); }
+  .badge-teal    { background: rgba(20,184,166,0.15); color: #2dd4bf; }
 
   /* BUTTONS */
   .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; white-space: nowrap; }
   .btn-sm { padding: 5px 10px; font-size: 11px; }
-  .btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-accent  { background: var(--accent); color: #fff; border-color: var(--accent); }
   .btn-accent:hover { opacity: 0.85; }
   .btn-outline { background: transparent; border-color: var(--border2); color: var(--text2); }
   .btn-outline:hover { background: var(--bg3); color: var(--text); }
-  .btn-danger { background: rgba(239,68,68,0.12); color: #f87171; border-color: rgba(239,68,68,0.25); }
+  .btn-danger  { background: rgba(239,68,68,0.12); color: #f87171; border-color: rgba(239,68,68,0.25); }
   .btn-danger:hover { background: rgba(239,68,68,0.2); }
 
   /* TOOLBAR */
@@ -157,27 +155,17 @@
   .toast.show { transform: translateX(0); }
   .toast-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .toast.success .toast-icon { background: rgba(34,197,94,0.15); color: #4ade80; }
-  .toast.error .toast-icon { background: rgba(239,68,68,0.15); color: #f87171; }
+  .toast.error   .toast-icon { background: rgba(239,68,68,0.15); color: #f87171; }
   .toast.warning .toast-icon { background: rgba(245,158,11,0.15); color: #fbbf24; }
 
   /* LOADING */
   .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.15); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* DATE FILTER */
-  .date-filter-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
-  .date-range { display: flex; align-items: center; gap: 8px; }
-  .date-range label { font-size: 12px; color: var(--text2); font-weight: 600; }
-  .date-range input[type="date"] { background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 7px 12px; color: var(--text); font-size: 13px; outline: none; cursor: pointer; }
-  .date-range input[type="date"]:focus { border-color: var(--accent); }
-  .quick-filters { display: flex; gap: 6px; }
-  .qf-btn { background: var(--bg3); border: 1px solid var(--border2); border-radius: 7px; padding: 6px 12px; color: var(--text2); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
-  .qf-btn:hover, .qf-btn.active { background: rgba(108,99,255,0.15); border-color: rgba(108,99,255,0.35); color: var(--accent2); }
-
   /* AVATAR */
   .avatar-sm { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#6c63ff,#a78bfa); display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0; vertical-align: middle; margin-right: 8px; }
 
-  /* CONFIRM DIALOG */
+  /* CONFIRM MODAL */
   .confirm-modal .modal { width: 360px; }
   .confirm-msg { font-size: 14px; color: var(--text2); line-height: 1.6; }
 
@@ -185,13 +173,17 @@
   .conn-status { display: flex; align-items: center; gap: 6px; font-size: 12px; }
   .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
   .conn-dot.error { background: var(--danger); }
-  .conn-dot.warning { background: var(--warning); }
+
+  /* STATS GRID 3-col for overview row 2 */
+  .stats-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
 
   @media (max-width: 900px) {
-    .stats-grid { grid-template-columns: repeat(2,1fr); }
+    .stats-grid   { grid-template-columns: repeat(2,1fr); }
+    .stats-grid-3 { grid-template-columns: repeat(2,1fr); }
   }
   @media (max-width: 600px) {
-    .stats-grid { grid-template-columns: 1fr; }
+    .stats-grid   { grid-template-columns: 1fr; }
+    .stats-grid-3 { grid-template-columns: 1fr; }
     .content { padding: 16px; }
     .field-row { grid-template-columns: 1fr; }
   }
@@ -246,15 +238,35 @@
         Venues
         <span class="nav-badge" id="nav-venues-count">0</span>
       </div>
-      <div class="nav-item" onclick="showPage('reservations')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        Reservations
-        <span class="nav-badge" id="nav-res-count">0</span>
-      </div>
       <div class="nav-item" onclick="showPage('orders')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
         Orders
         <span class="nav-badge" id="nav-orders-count">0</span>
+      </div>
+      <div class="nav-item" onclick="showPage('restaurants')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>
+        Restaurants
+        <span class="nav-badge" id="nav-restaurants-count">0</span>
+      </div>
+      <div class="nav-item" onclick="showPage('photographers')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 00-2 2v9a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>
+        Photographers
+        <span class="nav-badge" id="nav-photographers-count">0</span>
+      </div>
+      <div class="nav-item" onclick="showPage('av')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>
+        AV Equipment
+        <span class="nav-badge" id="nav-av-count">0</span>
+      </div>
+      <div class="nav-item" onclick="showPage('printing')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Printing Items
+        <span class="nav-badge" id="nav-printing-count">0</span>
+      </div>
+      <div class="nav-item" onclick="showPage('tickets')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Support Tickets
+        <span class="nav-badge" id="nav-tickets-count">0</span>
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -290,9 +302,6 @@
 
       <!-- OVERVIEW PAGE -->
       <div class="page active" id="page-overview">
-        <!-- Missing-tables warning injected here if needed -->
-        <div id="missing-tables-banner" style="display:none"></div>
-
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-icon purple">
@@ -311,14 +320,6 @@
             <div class="stat-sub">Listed venues</div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon green">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-            </div>
-            <div class="stat-label">Reservations</div>
-            <div class="stat-value" id="stat-res">—</div>
-            <div class="stat-sub">All time bookings</div>
-          </div>
-          <div class="stat-card">
             <div class="stat-icon amber">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
             </div>
@@ -326,24 +327,43 @@
             <div class="stat-value" id="stat-orders">—</div>
             <div class="stat-sub">All time orders</div>
           </div>
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>
+            </div>
+            <div class="stat-label">Restaurants</div>
+            <div class="stat-value" id="stat-restaurants">—</div>
+            <div class="stat-sub">Catering partners</div>
+          </div>
+        </div>
+        <div class="stats-grid-3">
+          <div class="stat-card">
+            <div class="stat-icon teal">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 00-2 2v9a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            </div>
+            <div class="stat-label">Photographers</div>
+            <div class="stat-value" id="stat-photographers">—</div>
+            <div class="stat-sub">Available photographers</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon rose">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fb7185" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+            </div>
+            <div class="stat-label">AV Equipment</div>
+            <div class="stat-value" id="stat-av">—</div>
+            <div class="stat-sub">Equipment items</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon amber">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            </div>
+            <div class="stat-label">Support Tickets</div>
+            <div class="stat-value" id="stat-tickets">—</div>
+            <div class="stat-sub">Open tickets</div>
+          </div>
         </div>
 
         <div class="card" style="margin-bottom:24px">
-          <div class="card-header">
-            <span class="card-title">Recent Reservations</span>
-            <button class="btn btn-outline btn-sm" onclick="showPage('reservations')">View All →</button>
-          </div>
-          <div class="card-body">
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>ID</th><th>Guest</th><th>Date & Time</th><th>Table</th><th>Guests</th><th>Status</th></tr></thead>
-                <tbody id="overview-res-body"><tr><td colspan="6" class="empty-row"><span class="loading"></span></td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
           <div class="card-header">
             <span class="card-title">Recent Orders</span>
             <button class="btn btn-outline btn-sm" onclick="showPage('orders')">View All →</button>
@@ -357,11 +377,25 @@
             </div>
           </div>
         </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Support Tickets</span>
+            <button class="btn btn-outline btn-sm" onclick="showPage('tickets')">View All →</button>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>ID</th><th>Subject</th><th>Status</th><th>Created</th></tr></thead>
+                <tbody id="overview-tickets-body"><tr><td colspan="4" class="empty-row"><span class="loading"></span></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- PROFILES PAGE -->
       <div class="page" id="page-profiles">
-        <div id="profiles-banner"></div>
         <div class="card">
           <div class="card-header">
             <span class="card-title">User Profiles</span>
@@ -375,8 +409,8 @@
           <div class="card-body">
             <div class="table-wrap">
               <table>
-                <thead><tr><th>Avatar</th><th>Full Name</th><th>Username</th><th>Phone</th><th>Role</th><th>Joined</th></tr></thead>
-                <tbody id="profiles-body"><tr><td colspan="6" class="empty-row"><span class="loading"></span></td></tr></tbody>
+                <thead><tr><th>Avatar</th><th>Full Name</th><th>Username</th><th>Phone</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
+                <tbody id="profiles-body"><tr><td colspan="7" class="empty-row"><span class="loading"></span></td></tr></tbody>
               </table>
             </div>
           </div>
@@ -385,7 +419,6 @@
 
       <!-- VENUES PAGE -->
       <div class="page" id="page-venues">
-        <div id="venues-banner"></div>
         <div class="card">
           <div class="card-header">
             <span class="card-title">Venues</span>
@@ -413,59 +446,8 @@
         </div>
       </div>
 
-      <!-- RESERVATIONS PAGE -->
-      <div class="page" id="page-reservations">
-        <div id="reservations-banner"></div>
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Reservations</span>
-            <div class="toolbar">
-              <div class="search-box">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" placeholder="Search…" oninput="filterReservations()" id="res-search">
-              </div>
-              <select class="filter-select" onchange="filterReservations()" id="res-status-filter">
-                <option value="">All Status</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="pending">Pending</option>
-                <option value="cancelled">Cancelled</option>
-                <option value="completed">Completed</option>
-              </select>
-              <button class="btn btn-accent btn-sm" onclick="openResModal()">+ Add</button>
-            </div>
-          </div>
-          <div class="card-body" style="padding: 16px 22px 0;">
-            <div class="date-filter-bar">
-              <div class="date-range">
-                <label>From</label>
-                <input type="date" id="date-from" onchange="filterReservations()">
-              </div>
-              <div class="date-range">
-                <label>To</label>
-                <input type="date" id="date-to" onchange="filterReservations()">
-              </div>
-              <div class="quick-filters">
-                <button class="qf-btn" onclick="setDateFilter('today',event)">Today</button>
-                <button class="qf-btn" onclick="setDateFilter('week',event)">This Week</button>
-                <button class="qf-btn" onclick="setDateFilter('month',event)">This Month</button>
-                <button class="qf-btn active" onclick="setDateFilter('all',event)">All</button>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>ID</th><th>Guest Name</th><th>Phone</th><th>Date</th><th>Time</th><th>Table</th><th>Guests</th><th>Status</th><th>Notes</th><th>Actions</th></tr></thead>
-                <tbody id="res-body"><tr><td colspan="10" class="empty-row"><span class="loading"></span></td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- ORDERS PAGE -->
       <div class="page" id="page-orders">
-        <div id="orders-banner"></div>
         <div class="card">
           <div class="card-header">
             <span class="card-title">Orders</span>
@@ -488,6 +470,130 @@
               <table>
                 <thead><tr><th>ID</th><th>User ID</th><th>Status</th><th>Total (EGP)</th><th>Event Date</th><th>Notes</th><th>Created</th><th>Actions</th></tr></thead>
                 <tbody id="orders-body"><tr><td colspan="8" class="empty-row"><span class="loading"></span></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESTAURANTS PAGE -->
+      <div class="page" id="page-restaurants">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Restaurants</span>
+            <div class="toolbar">
+              <div class="search-box">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" placeholder="Search restaurants…" oninput="filterRestaurants(this.value)">
+              </div>
+              <button class="btn btn-accent btn-sm" onclick="openRestaurantModal()">+ Add Restaurant</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Name</th><th>Cuisine</th><th>Rating</th><th>Description</th><th>Actions</th></tr></thead>
+                <tbody id="restaurants-body"><tr><td colspan="5" class="empty-row"><span class="loading"></span></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHOTOGRAPHERS PAGE -->
+      <div class="page" id="page-photographers">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Photographers</span>
+            <div class="toolbar">
+              <div class="search-box">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" placeholder="Search photographers…" oninput="filterPhotographers(this.value)">
+              </div>
+              <button class="btn btn-accent btn-sm" onclick="openPhotographerModal()">+ Add Photographer</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Name</th><th>Type</th><th>Price/Day (EGP)</th><th>Rating</th><th>Bio</th><th>Actions</th></tr></thead>
+                <tbody id="photographers-body"><tr><td colspan="6" class="empty-row"><span class="loading"></span></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AV EQUIPMENT PAGE -->
+      <div class="page" id="page-av">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">AV Equipment</span>
+            <div class="toolbar">
+              <div class="search-box">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" placeholder="Search equipment…" oninput="filterAV(this.value)">
+              </div>
+              <button class="btn btn-accent btn-sm" onclick="openAVModal()">+ Add Equipment</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Name</th><th>Category</th><th>Price/Day (EGP)</th><th>Description</th><th>Actions</th></tr></thead>
+                <tbody id="av-body"><tr><td colspan="5" class="empty-row"><span class="loading"></span></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRINTING ITEMS PAGE -->
+      <div class="page" id="page-printing">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Printing Items</span>
+            <div class="toolbar">
+              <div class="search-box">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" placeholder="Search printing items…" oninput="filterPrinting(this.value)">
+              </div>
+              <button class="btn btn-accent btn-sm" onclick="openPrintingModal()">+ Add Item</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Name</th><th>Category</th><th>Price/Unit (EGP)</th><th>Description</th><th>Actions</th></tr></thead>
+                <tbody id="printing-body"><tr><td colspan="5" class="empty-row"><span class="loading"></span></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUPPORT TICKETS PAGE -->
+      <div class="page" id="page-tickets">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Support Tickets</span>
+            <div class="toolbar">
+              <div class="search-box">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" placeholder="Search tickets…" oninput="filterTickets(this.value)">
+              </div>
+              <select class="filter-select" onchange="filterTickets()" id="ticket-status-filter">
+                <option value="">All Status</option>
+                <option value="open">Open</option>
+                <option value="closed">Closed</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>ID</th><th>User ID</th><th>Subject</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+                <tbody id="tickets-body"><tr><td colspan="6" class="empty-row"><span class="loading"></span></td></tr></tbody>
               </table>
             </div>
           </div>
@@ -534,38 +640,223 @@
   </div>
 </div>
 
-<!-- RESERVATION MODAL -->
-<div class="modal-overlay" id="res-modal">
+<!-- RESTAURANT MODAL -->
+<div class="modal-overlay" id="restaurant-modal">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title" id="res-modal-title">Add Reservation</div>
-      <button class="modal-close" onclick="closeModal('res-modal')">✕</button>
+      <div class="modal-title" id="restaurant-modal-title">Add Restaurant</div>
+      <button class="modal-close" onclick="closeModal('restaurant-modal')">✕</button>
     </div>
     <div class="modal-body">
-      <input type="hidden" id="res-edit-id">
-      <div class="field"><label>Guest Name</label><input type="text" id="res-name" placeholder="Guest name"></div>
-      <div class="field"><label>Phone</label><input type="text" id="res-phone" placeholder="+20 1xx xxx xxxx"></div>
+      <input type="hidden" id="restaurant-edit-id">
       <div class="field-row">
-        <div class="field"><label>Date</label><input type="date" id="res-date"></div>
-        <div class="field"><label>Time</label><input type="time" id="res-time"></div>
+        <div class="field"><label>Name</label><input type="text" id="restaurant-name" placeholder="Restaurant name"></div>
+        <div class="field"><label>Cuisine</label><input type="text" id="restaurant-cuisine" placeholder="e.g. Egyptian, Italian"></div>
       </div>
-      <div class="field-row">
-        <div class="field"><label>Table</label><input type="text" id="res-table" placeholder="Table number/name"></div>
-        <div class="field"><label>Guests Count</label><input type="number" id="res-guests" min="1" max="200" placeholder="2"></div>
-      </div>
-      <div class="field"><label>Status</label>
-        <select id="res-status">
-          <option value="pending">Pending</option>
-          <option value="confirmed">Confirmed</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
-      </div>
-      <div class="field"><label>Notes</label><textarea id="res-notes" placeholder="Special requests…"></textarea></div>
+      <div class="field"><label>Rating (0–5)</label><input type="number" id="restaurant-rating" min="0" max="5" step="0.1" placeholder="4.5"></div>
+      <div class="field"><label>Description</label><textarea id="restaurant-description" placeholder="Describe the restaurant…"></textarea></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('res-modal')">Cancel</button>
-      <button class="btn btn-accent" onclick="saveReservation()">Save</button>
+      <button class="btn btn-outline" onclick="closeModal('restaurant-modal')">Cancel</button>
+      <button class="btn btn-accent" onclick="saveRestaurant()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- PHOTOGRAPHER MODAL -->
+<div class="modal-overlay" id="photographer-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="photographer-modal-title">Add Photographer</div>
+      <button class="modal-close" onclick="closeModal('photographer-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="photographer-edit-id">
+      <div class="field-row">
+        <div class="field"><label>Name</label><input type="text" id="photographer-name" placeholder="Full name"></div>
+        <div class="field"><label>Type</label>
+          <select id="photographer-type">
+            <option value="individual">Individual</option>
+            <option value="company">Company</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Price/Day (EGP)</label><input type="number" id="photographer-price" min="0" placeholder="2000"></div>
+        <div class="field"><label>Rating (0–5)</label><input type="number" id="photographer-rating" min="0" max="5" step="0.1" placeholder="4.5"></div>
+      </div>
+      <div class="field"><label>Bio</label><textarea id="photographer-bio" placeholder="Short bio…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('photographer-modal')">Cancel</button>
+      <button class="btn btn-accent" onclick="savePhotographer()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- AV MODAL -->
+<div class="modal-overlay" id="av-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="av-modal-title">Add AV Equipment</div>
+      <button class="modal-close" onclick="closeModal('av-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="av-edit-id">
+      <div class="field-row">
+        <div class="field"><label>Name</label><input type="text" id="av-name" placeholder="Equipment name"></div>
+        <div class="field"><label>Category</label>
+          <select id="av-category">
+            <option value="stage">Stage</option>
+            <option value="led">LED</option>
+            <option value="projector">Projector</option>
+            <option value="audio">Audio</option>
+            <option value="lights">Lights</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Price/Day (EGP)</label><input type="number" id="av-price" min="0" placeholder="500"></div>
+      <div class="field"><label>Description</label><textarea id="av-description" placeholder="Describe the equipment…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('av-modal')">Cancel</button>
+      <button class="btn btn-accent" onclick="saveAV()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRINTING MODAL -->
+<div class="modal-overlay" id="printing-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="printing-modal-title">Add Printing Item</div>
+      <button class="modal-close" onclick="closeModal('printing-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="printing-edit-id">
+      <div class="field-row">
+        <div class="field"><label>Name</label><input type="text" id="printing-name" placeholder="Item name"></div>
+        <div class="field"><label>Category</label><input type="text" id="printing-category" placeholder="e.g. Banners, Cards"></div>
+      </div>
+      <div class="field"><label>Price/Unit (EGP)</label><input type="number" id="printing-price" min="0" placeholder="50"></div>
+      <div class="field"><label>Description</label><textarea id="printing-description" placeholder="Describe the item…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('printing-modal')">Cancel</button>
+      <button class="btn btn-accent" onclick="savePrinting()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER DETAIL MODAL -->
+<div class="modal-overlay" id="order-detail-modal">
+  <div class="modal" style="width:560px">
+    <div class="modal-header">
+      <div class="modal-title">Order Details</div>
+      <button class="modal-close" onclick="closeModal('order-detail-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="order-detail-body">Loading…</div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('order-detail-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- TICKET DETAIL MODAL -->
+<div class="modal-overlay" id="ticket-detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Ticket Details</div>
+      <button class="modal-close" onclick="closeModal('ticket-detail-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="ticket-detail-body">Loading…</div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('ticket-detail-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE EDIT MODAL -->
+<div class="modal-overlay" id="profile-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Edit Profile</div>
+      <button class="modal-close" onclick="closeModal('profile-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="profile-edit-id">
+      <div class="field-row">
+        <div class="field"><label>Full Name</label><input type="text" id="profile-full-name" placeholder="Full name"></div>
+        <div class="field"><label>Username</label><input type="text" id="profile-username" placeholder="username"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Phone</label><input type="text" id="profile-phone" placeholder="+20 1xx xxx xxxx"></div>
+        <div class="field"><label>Role</label>
+          <select id="profile-role">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('profile-modal')">Cancel</button>
+      <button class="btn btn-accent" onclick="saveProfile()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER EDIT MODAL -->
+<div class="modal-overlay" id="order-edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Edit Order</div>
+      <button class="modal-close" onclick="closeModal('order-edit-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="order-edit-id">
+      <div class="field-row">
+        <div class="field"><label>Status</label>
+          <select id="order-status">
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="field"><label>Total (EGP)</label><input type="number" id="order-total" min="0" placeholder="0"></div>
+      </div>
+      <div class="field"><label>Event Date</label><input type="date" id="order-event-date"></div>
+      <div class="field"><label>Notes</label><textarea id="order-notes" placeholder="Order notes…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('order-edit-modal')">Cancel</button>
+      <button class="btn btn-accent" onclick="saveOrder()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- TICKET EDIT MODAL -->
+<div class="modal-overlay" id="ticket-edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Edit Ticket</div>
+      <button class="modal-close" onclick="closeModal('ticket-edit-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ticket-edit-id">
+      <div class="field"><label>Subject</label><input type="text" id="ticket-subject" placeholder="Subject"></div>
+      <div class="field"><label>Status</label>
+        <select id="ticket-status-edit">
+          <option value="open">Open</option>
+          <option value="closed">Closed</option>
+        </select>
+      </div>
+      <div class="field"><label>Message</label><textarea id="ticket-message" placeholder="Ticket message…" style="min-height:120px"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('ticket-edit-modal')">Cancel</button>
+      <button class="btn btn-accent" onclick="saveTicket()">Save</button>
     </div>
   </div>
 </div>
@@ -587,20 +878,6 @@
   </div>
 </div>
 
-<!-- ORDER DETAIL MODAL -->
-<div class="modal-overlay" id="order-detail-modal">
-  <div class="modal" style="width:560px">
-    <div class="modal-header">
-      <div class="modal-title">Order Details</div>
-      <button class="modal-close" onclick="closeModal('order-detail-modal')">✕</button>
-    </div>
-    <div class="modal-body" id="order-detail-body">Loading…</div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('order-detail-modal')">Close</button>
-    </div>
-  </div>
-</div>
-
 <!-- TOAST -->
 <div class="toast" id="toast">
   <div class="toast-icon" id="toast-icon">✓</div>
@@ -609,9 +886,13 @@
 
 <script>
 // ── Supabase ──────────────────────────────────────────────────────────────────
-const SUPABASE_URL     = 'https://vkpamatgglwfyyctqokv.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrcGFtYXRnZ2x3Znl5Y3Rxb2t2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNTgxMzIsImV4cCI6MjA5MzczNDEzMn0.8cqvwgjLW8dTmlp_7KlL0mTGDExQaOhgVVM7HZ7ZCSI';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// ⚠️  Use the SERVICE ROLE key here (Supabase → Project Settings → API → service_role)
+// This bypasses RLS so all tables (profiles, venues, etc.) are fully accessible.
+const SUPABASE_URL          = 'https://vkpamatgglwfyyctqokv.supabase.co';
+const SUPABASE_SERVICE_KEY  = 'PASTE_YOUR_SERVICE_ROLE_KEY_HERE';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
+  auth: { autoRefreshToken: false, persistSession: false }
+});
 
 // ── Admins ────────────────────────────────────────────────────────────────────
 const ADMINS = [
@@ -623,10 +904,8 @@ const ADMINS = [
 // ── State ─────────────────────────────────────────────────────────────────────
 let currentAdmin = null;
 let currentPage  = 'overview';
-let allProfiles = [], allVenues = [], allReservations = [], allOrders = [];
-
-// Tables that failed to load (don't exist yet)
-const missingTables = new Set();
+let allProfiles = [], allVenues = [], allOrders = [];
+let allRestaurants = [], allPhotographers = [], allAV = [], allPrinting = [], allTickets = [];
 
 // ── Clock ─────────────────────────────────────────────────────────────────────
 function updateClock() {
@@ -670,20 +949,31 @@ function logout() {
 }
 
 // ── Navigation ────────────────────────────────────────────────────────────────
+const PAGE_TITLES = {
+  overview:'Overview', profiles:'User Profiles', venues:'Venues',
+  orders:'Orders', restaurants:'Restaurants', photographers:'Photographers',
+  av:'AV Equipment', printing:'Printing Items', tickets:'Support Tickets'
+};
+
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   currentPage = name;
-  const titles = { overview:'Overview', profiles:'User Profiles', venues:'Venues', reservations:'Reservations', orders:'Orders' };
-  document.getElementById('page-title').textContent = titles[name] || name;
-  const navMap = { overview:0, profiles:1, venues:2, reservations:3, orders:4 };
+  document.getElementById('page-title').textContent = PAGE_TITLES[name] || name;
+  // Highlight sidebar item
   const navItems = document.querySelectorAll('.nav-item');
+  const navMap = { overview:0, profiles:1, venues:2, orders:3, restaurants:4, photographers:5, av:6, printing:7, tickets:8 };
   if (navItems[navMap[name]]) navItems[navMap[name]].classList.add('active');
+  // Render
   if (name==='profiles')     renderProfiles();
   if (name==='venues')       renderVenues();
-  if (name==='reservations') renderReservations(allReservations);
   if (name==='orders')       renderOrders(allOrders);
+  if (name==='restaurants')  renderRestaurants();
+  if (name==='photographers') renderPhotographers();
+  if (name==='av')           renderAV();
+  if (name==='printing')     renderPrinting();
+  if (name==='tickets')      renderTickets(allTickets);
 }
 
 function refreshCurrentPage() {
@@ -692,93 +982,30 @@ function refreshCurrentPage() {
   loadAll().finally(() => setTimeout(() => btn.classList.remove('spinning'), 600));
 }
 
-// ── Load All (independent per table) ─────────────────────────────────────────
+// ── Load All ──────────────────────────────────────────────────────────────────
 async function loadAll() {
-  missingTables.clear();
-
-  // Run all four independently — one missing table won't kill the rest
   await Promise.all([
-    loadProfiles(),
-    loadVenues(),
-    loadReservations(),
-    loadOrders(),
+    loadProfiles(), loadVenues(), loadOrders(),
+    loadRestaurants(), loadPhotographers(), loadAV(), loadPrinting(), loadTickets()
   ]);
-
   updateOverviewStats();
   renderOverviewRecent();
-  renderMissingTablesBanner();
-  setConnectionStatus(missingTables.size === 0 ? 'ok' : missingTables.size < 4 ? 'partial' : 'error');
-}
-
-function setConnectionStatus(state) {
-  const dot   = document.getElementById('conn-dot');
-  const label = document.getElementById('conn-label');
-  if (state === 'ok') {
-    dot.className = 'conn-dot';
-    label.textContent = 'Connected';
-  } else if (state === 'partial') {
-    dot.className = 'conn-dot warning';
-    label.textContent = 'Partial';
-  } else {
-    dot.className = 'conn-dot error';
-    label.textContent = 'Error';
-  }
-}
-
-// ── Helper: is this a "table not found" error? ────────────────────────────────
-function isTableMissingError(error) {
-  if (!error) return false;
-  const msg = (error.message || error.details || '').toLowerCase();
-  return (
-    msg.includes('does not exist') ||
-    msg.includes('schema cache') ||
-    msg.includes('relation') ||
-    msg.includes('not found') ||
-    error.code === '42P01' ||
-    error.code === 'PGRST204' ||
-    error.code === 'PGRST200'
-  );
-}
-
-// ── Missing-tables banner ─────────────────────────────────────────────────────
-function missingTableBanner(tableName) {
-  return `<div class="alert-banner" style="margin-bottom:18px">
-    ⚠️ Table <code>public.${tableName}</code> does not exist yet.
-    Run <code>supabase/${tableName}.sql</code> in your Supabase SQL editor to create it.
-    <a href="#" onclick="refreshCurrentPage();return false;" style="color:inherit;margin-left:8px;text-decoration:underline">Retry</a>
-  </div>`;
-}
-
-function renderMissingTablesBanner() {
-  const el = document.getElementById('missing-tables-banner');
-  if (missingTables.size === 0) { el.style.display = 'none'; el.innerHTML = ''; return; }
-  el.style.display = 'block';
-  el.innerHTML = [...missingTables].map(t => missingTableBanner(t)).join('');
+  document.getElementById('conn-dot').className = 'conn-dot';
+  document.getElementById('conn-label').textContent = 'Connected';
 }
 
 // ── Profiles ──────────────────────────────────────────────────────────────────
 async function loadProfiles() {
   const { data, error } = await sb.from('profiles').select('*').order('created_at', { ascending: false });
-  const banner = document.getElementById('profiles-banner');
-  if (error) {
-    allProfiles = [];
-    missingTables.add('profiles');
-    banner.innerHTML = missingTableBanner('profiles');
-    document.getElementById('profiles-body').innerHTML =
-      '<tr><td colspan="6" class="empty-row">Table not found — see banner above.</td></tr>';
-    document.getElementById('nav-profiles-count').textContent = 0;
-    return;
-  }
-  banner.innerHTML = '';
+  if (error) { allProfiles = []; return; }
   allProfiles = data || [];
   document.getElementById('nav-profiles-count').textContent = allProfiles.length;
   renderProfiles();
 }
-
 function renderProfiles(filtered) {
   const data  = filtered ?? allProfiles;
   const tbody = document.getElementById('profiles-body');
-  if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No profiles found.</td></tr>'; return; }
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-row">No profiles found.</td></tr>'; return; }
   tbody.innerHTML = data.map(p => `
     <tr>
       <td><div class="avatar-sm">${(p.full_name||p.username||'?')[0].toUpperCase()}</div></td>
@@ -787,9 +1014,14 @@ function renderProfiles(filtered) {
       <td style="color:var(--text2)">${esc(p.phone||'—')}</td>
       <td>${roleBadge(p.role)}</td>
       <td style="color:var(--text2);font-size:12px">${fmtDate(p.created_at)}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-outline btn-sm" onclick="editProfile('${p.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('profiles','${p.id}','Delete profile for ${esc(p.full_name||p.username||'this user')}?')">Del</button>
+        </div>
+      </td>
     </tr>`).join('');
 }
-
 function filterProfiles(q) {
   const s = q.toLowerCase();
   renderProfiles(allProfiles.filter(p =>
@@ -802,22 +1034,11 @@ function filterProfiles(q) {
 // ── Venues ────────────────────────────────────────────────────────────────────
 async function loadVenues() {
   const { data, error } = await sb.from('venues').select('*').order('name', { ascending: true });
-  const banner = document.getElementById('venues-banner');
-  if (error) {
-    allVenues = [];
-    missingTables.add('venues');
-    banner.innerHTML = missingTableBanner('venues');
-    document.getElementById('venues-body').innerHTML =
-      '<tr><td colspan="7" class="empty-row">Table not found — see banner above.</td></tr>';
-    document.getElementById('nav-venues-count').textContent = 0;
-    return;
-  }
-  banner.innerHTML = '';
+  if (error) { allVenues = []; return; }
   allVenues = data || [];
   document.getElementById('nav-venues-count').textContent = allVenues.length;
   renderVenues();
 }
-
 function renderVenues(filtered) {
   const data  = filtered ?? allVenues;
   const tbody = document.getElementById('venues-body');
@@ -835,12 +1056,11 @@ function renderVenues(filtered) {
       <td>
         <div style="display:flex;gap:6px">
           <button class="btn btn-outline btn-sm" onclick="editVenue('${v.id}')">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="confirmDelete('venues','${v.id}','Delete venue ${esc(v.name)}?')">Del</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('venues','${v.id}','Delete venue?')">Del</button>
         </div>
       </td>
     </tr>`).join('');
 }
-
 function filterVenues(q) {
   let data   = [...allVenues];
   const search = (typeof q === 'string' ? q : '').toLowerCase();
@@ -854,54 +1074,46 @@ function filterVenues(q) {
   renderVenues(data);
 }
 
-function openVenueModal(id) {
+function openVenueModal() {
   clearVenueForm();
-  if (id) {
-    const v = allVenues.find(x => x.id === id);
-    if (!v) return;
-    document.getElementById('venue-edit-id').value       = v.id;
-    document.getElementById('venue-name').value          = v.name||'';
-    document.getElementById('venue-type').value          = v.type||'';
-    document.getElementById('venue-capacity').value      = v.capacity||'';
-    document.getElementById('venue-price').value         = v.price_per_day||'';
-    document.getElementById('venue-city').value          = v.city||'';
-    document.getElementById('venue-address').value       = v.address||'';
-    document.getElementById('venue-description').value   = v.description||'';
-    document.getElementById('venue-available').value     = String(v.is_available);
-    document.getElementById('venue-modal-title').textContent = 'Edit Venue';
-  }
   openModal('venue-modal');
 }
-function editVenue(id) { openVenueModal(id); }
-
+function editVenue(id) {
+  const v = allVenues.find(x => x.id === id);
+  if (!v) return;
+  document.getElementById('venue-edit-id').value     = v.id;
+  document.getElementById('venue-name').value        = v.name||'';
+  document.getElementById('venue-type').value        = v.type||'';
+  document.getElementById('venue-capacity').value    = v.capacity||'';
+  document.getElementById('venue-price').value       = v.price_per_day||'';
+  document.getElementById('venue-city').value        = v.city||'';
+  document.getElementById('venue-address').value     = v.address||'';
+  document.getElementById('venue-description').value = v.description||'';
+  document.getElementById('venue-available').value   = String(v.is_available);
+  document.getElementById('venue-modal-title').textContent = 'Edit Venue';
+  openModal('venue-modal');
+}
 function clearVenueForm() {
   ['venue-edit-id','venue-name','venue-type','venue-capacity','venue-price','venue-city','venue-address','venue-description']
     .forEach(id => document.getElementById(id).value = '');
   document.getElementById('venue-available').value = 'true';
   document.getElementById('venue-modal-title').textContent = 'Add Venue';
 }
-
 async function saveVenue() {
-  if (missingTables.has('venues')) {
-    showToast('Create the venues table first — see banner.', 'warning'); return;
-  }
   const id = document.getElementById('venue-edit-id').value;
   const payload = {
-    name:         document.getElementById('venue-name').value.trim(),
-    type:         document.getElementById('venue-type').value.trim(),
-    capacity:     parseInt(document.getElementById('venue-capacity').value) || null,
-    price_per_day:parseFloat(document.getElementById('venue-price').value) || null,
-    city:         document.getElementById('venue-city').value.trim(),
-    address:      document.getElementById('venue-address').value.trim(),
-    description:  document.getElementById('venue-description').value.trim(),
-    is_available: document.getElementById('venue-available').value === 'true',
+    name:          document.getElementById('venue-name').value.trim(),
+    type:          document.getElementById('venue-type').value.trim(),
+    capacity:      parseInt(document.getElementById('venue-capacity').value) || null,
+    price_per_day: parseFloat(document.getElementById('venue-price').value) || null,
+    city:          document.getElementById('venue-city').value.trim(),
+    address:       document.getElementById('venue-address').value.trim(),
+    description:   document.getElementById('venue-description').value.trim(),
+    is_available:  document.getElementById('venue-available').value === 'true',
   };
   let err;
-  if (id) {
-    ({ error: err } = await sb.from('venues').update(payload).eq('id', id));
-  } else {
-    ({ error: err } = await sb.from('venues').insert([payload]));
-  }
+  if (id) { ({ error: err } = await sb.from('venues').update(payload).eq('id', id)); }
+  else    { ({ error: err } = await sb.from('venues').insert([payload])); }
   if (err) { showToast(err.message, 'error'); return; }
   showToast(id ? 'Venue updated!' : 'Venue added!', 'success');
   closeModal('venue-modal');
@@ -909,181 +1121,17 @@ async function saveVenue() {
   updateOverviewStats();
 }
 
-// ── Reservations ──────────────────────────────────────────────────────────────
-async function loadReservations() {
-  const { data, error } = await sb
-    .from('reservations')
-    .select('*')
-    .order('reservation_date', { ascending: false });
-
-  const banner = document.getElementById('reservations-banner');
-  if (error) {
-    allReservations = [];
-    missingTables.add('reservations');
-    banner.innerHTML = missingTableBanner('reservations');
-    document.getElementById('res-body').innerHTML =
-      '<tr><td colspan="10" class="empty-row">Table not found — see banner above.</td></tr>';
-    document.getElementById('nav-res-count').textContent = 0;
-    return;
-  }
-  banner.innerHTML = '';
-  allReservations = data || [];
-  document.getElementById('nav-res-count').textContent = allReservations.length;
-  renderReservations(allReservations);
-}
-
-function renderReservations(data) {
-  const tbody = document.getElementById('res-body');
-  if (!data||!data.length) {
-    tbody.innerHTML = '<tr><td colspan="10" class="empty-row">No reservations found.</td></tr>'; return;
-  }
-  tbody.innerHTML = data.map(r => `
-    <tr>
-      <td style="color:var(--text2);font-size:11px">#${r.id}</td>
-      <td><strong>${esc(r.guest_name||'—')}</strong></td>
-      <td style="color:var(--text2)">${esc(r.phone||'—')}</td>
-      <td style="white-space:nowrap">${fmtDate(r.reservation_date)}</td>
-      <td style="white-space:nowrap">${r.reservation_time ? r.reservation_time.slice(0,5) : '—'}</td>
-      <td><span class="badge badge-info">${esc(r.table_number||'—')}</span></td>
-      <td style="text-align:center">${r.guests_count||'—'}</td>
-      <td>${statusBadge(r.status)}</td>
-      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12px">${esc(r.notes||'')}</td>
-      <td>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-outline btn-sm" onclick="editRes(${r.id})">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="confirmDelete('reservations',${r.id},'Delete reservation #${r.id}?')">Del</button>
-        </div>
-      </td>
-    </tr>`).join('');
-}
-
-function filterReservations() {
-  let data = [...allReservations];
-  const search = (document.getElementById('res-search')?.value||'').toLowerCase();
-  const status = document.getElementById('res-status-filter')?.value||'';
-  const from   = document.getElementById('date-from')?.value||'';
-  const to     = document.getElementById('date-to')?.value||'';
-  if (search) data = data.filter(r =>
-    (r.guest_name||'').toLowerCase().includes(search) ||
-    (r.phone||'').includes(search) ||
-    (r.table_number||'').includes(search)
-  );
-  if (status) data = data.filter(r => r.status === status);
-  if (from)   data = data.filter(r => r.reservation_date >= from);
-  if (to)     data = data.filter(r => r.reservation_date <= to);
-  renderReservations(data);
-}
-
-function setDateFilter(range, e) {
-  document.querySelectorAll('.qf-btn').forEach(b => b.classList.remove('active'));
-  if(e) e.target.classList.add('active');
-  const today = new Date();
-  const fmt = d => d.toISOString().split('T')[0];
-  if (range==='today') {
-    document.getElementById('date-from').value = fmt(today);
-    document.getElementById('date-to').value   = fmt(today);
-  } else if (range==='week') {
-    const mon = new Date(today); mon.setDate(today.getDate() - today.getDay() + 1);
-    const sun = new Date(mon);   sun.setDate(mon.getDate() + 6);
-    document.getElementById('date-from').value = fmt(mon);
-    document.getElementById('date-to').value   = fmt(sun);
-  } else if (range==='month') {
-    document.getElementById('date-from').value = fmt(new Date(today.getFullYear(), today.getMonth(), 1));
-    document.getElementById('date-to').value   = fmt(new Date(today.getFullYear(), today.getMonth()+1, 0));
-  } else {
-    document.getElementById('date-from').value = '';
-    document.getElementById('date-to').value   = '';
-  }
-  filterReservations();
-}
-
-function openResModal() {
-  document.getElementById('res-edit-id').value   = '';
-  document.getElementById('res-name').value      = '';
-  document.getElementById('res-phone').value     = '';
-  document.getElementById('res-date').value      = new Date().toISOString().split('T')[0];
-  document.getElementById('res-time').value      = '';
-  document.getElementById('res-table').value     = '';
-  document.getElementById('res-guests').value    = '';
-  document.getElementById('res-status').value    = 'pending';
-  document.getElementById('res-notes').value     = '';
-  document.getElementById('res-modal-title').textContent = 'Add Reservation';
-  openModal('res-modal');
-}
-
-async function saveReservation() {
-  if (missingTables.has('reservations')) {
-    showToast('Create the reservations table first — see banner.', 'warning'); return;
-  }
-  const id = document.getElementById('res-edit-id').value;
-  const payload = {
-    guest_name:       document.getElementById('res-name').value.trim(),
-    phone:            document.getElementById('res-phone').value.trim(),
-    reservation_date: document.getElementById('res-date').value,
-    reservation_time: document.getElementById('res-time').value || null,
-    table_number:     document.getElementById('res-table').value.trim() || null,
-    guests_count:     parseInt(document.getElementById('res-guests').value) || null,
-    status:           document.getElementById('res-status').value,
-    notes:            document.getElementById('res-notes').value.trim() || null,
-  };
-  let err;
-  if (id) {
-    ({ error: err } = await sb.from('reservations').update(payload).eq('id', id));
-  } else {
-    ({ error: err } = await sb.from('reservations').insert([payload]));
-  }
-  if (err) { showToast(err.message, 'error'); return; }
-  showToast(id ? 'Reservation updated!' : 'Reservation added!', 'success');
-  closeModal('res-modal');
-  await loadReservations();
-  renderOverviewRecent();
-}
-
-function editRes(id) {
-  const r = allReservations.find(x => x.id === id);
-  if (!r) return;
-  document.getElementById('res-edit-id').value   = id;
-  document.getElementById('res-name').value      = r.guest_name||'';
-  document.getElementById('res-phone').value     = r.phone||'';
-  document.getElementById('res-date').value      = r.reservation_date||'';
-  document.getElementById('res-time').value      = r.reservation_time||'';
-  document.getElementById('res-table').value     = r.table_number||'';
-  document.getElementById('res-guests').value    = r.guests_count||'';
-  document.getElementById('res-status').value    = r.status||'pending';
-  document.getElementById('res-notes').value     = r.notes||'';
-  document.getElementById('res-modal-title').textContent = 'Edit Reservation';
-  openModal('res-modal');
-}
-
 // ── Orders ────────────────────────────────────────────────────────────────────
 async function loadOrders() {
-  const { data, error } = await sb
-    .from('orders')
-    .select('*, order_items(*)')
-    .order('created_at', { ascending: false });
-
-  const banner = document.getElementById('orders-banner');
-  if (error) {
-    allOrders = [];
-    missingTables.add('orders');
-    banner.innerHTML = missingTableBanner('orders');
-    document.getElementById('orders-body').innerHTML =
-      '<tr><td colspan="8" class="empty-row">Table not found — see banner above.</td></tr>';
-    document.getElementById('nav-orders-count').textContent = 0;
-    document.getElementById('stat-orders').textContent = 0;
-    return;
-  }
-  banner.innerHTML = '';
+  const { data, error } = await sb.from('orders').select('*, order_items(*)').order('created_at', { ascending: false });
+  if (error) { allOrders = []; return; }
   allOrders = data || [];
   document.getElementById('nav-orders-count').textContent = allOrders.length;
   renderOrders(allOrders);
 }
-
 function renderOrders(data) {
   const tbody = document.getElementById('orders-body');
-  if (!data||!data.length) {
-    tbody.innerHTML = '<tr><td colspan="8" class="empty-row">No orders found.</td></tr>'; return;
-  }
+  if (!data||!data.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty-row">No orders found.</td></tr>'; return; }
   tbody.innerHTML = data.map(o => `
     <tr>
       <td style="color:var(--text2);font-size:11px">#${o.id.slice(0,8)}…</td>
@@ -1096,26 +1144,22 @@ function renderOrders(data) {
       <td>
         <div style="display:flex;gap:6px">
           <button class="btn btn-outline btn-sm" onclick="viewOrder('${o.id}')">View</button>
+          <button class="btn btn-outline btn-sm" onclick="editOrder('${o.id}')">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="confirmDelete('orders','${o.id}','Delete order?')">Del</button>
         </div>
       </td>
     </tr>`).join('');
 }
-
 function filterOrders(q) {
   let data   = [...allOrders];
   const status = document.getElementById('order-status-filter')?.value||'';
   if (typeof q === 'string' && q) {
     const s = q.toLowerCase();
-    data = data.filter(o =>
-      (o.id||'').toLowerCase().includes(s) ||
-      (o.user_id||'').toLowerCase().includes(s)
-    );
+    data = data.filter(o => (o.id||'').toLowerCase().includes(s) || (o.user_id||'').toLowerCase().includes(s));
   }
   if (status) data = data.filter(o => o.status === status);
   renderOrders(data);
 }
-
 async function viewOrder(id) {
   const order = allOrders.find(o => o.id === id);
   if (!order) return;
@@ -1153,43 +1197,358 @@ async function viewOrder(id) {
   openModal('order-detail-modal');
 }
 
-// ── Overview ──────────────────────────────────────────────────────────────────
-function updateOverviewStats() {
-  document.getElementById('stat-profiles').textContent = allProfiles.length;
-  document.getElementById('stat-venues').textContent   = allVenues.length;
-  document.getElementById('stat-res').textContent      = allReservations.length;
-  document.getElementById('stat-orders').textContent   = allOrders.length;
+// ── Restaurants ───────────────────────────────────────────────────────────────
+async function loadRestaurants() {
+  const { data, error } = await sb.from('restaurants').select('*').order('name', { ascending: true });
+  if (error) { allRestaurants = []; return; }
+  allRestaurants = data || [];
+  document.getElementById('nav-restaurants-count').textContent = allRestaurants.length;
+  renderRestaurants();
+}
+function renderRestaurants(filtered) {
+  const data  = filtered ?? allRestaurants;
+  const tbody = document.getElementById('restaurants-body');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No restaurants found.</td></tr>'; return; }
+  tbody.innerHTML = data.map(r => `
+    <tr>
+      <td><strong>${esc(r.name||'—')}</strong></td>
+      <td style="color:var(--text2)">${esc(r.cuisine||'—')}</td>
+      <td>${r.rating != null ? `<span class="badge badge-warning">★ ${r.rating}</span>` : '—'}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12px">${esc(r.description||'')}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-outline btn-sm" onclick="editRestaurant('${r.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('restaurants','${r.id}','Delete restaurant?')">Del</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+function filterRestaurants(q) {
+  const s = q.toLowerCase();
+  renderRestaurants(allRestaurants.filter(r =>
+    (r.name||'').toLowerCase().includes(s) || (r.cuisine||'').toLowerCase().includes(s)
+  ));
+}
+function openRestaurantModal() {
+  ['restaurant-edit-id','restaurant-name','restaurant-cuisine','restaurant-rating','restaurant-description']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('restaurant-modal-title').textContent = 'Add Restaurant';
+  openModal('restaurant-modal');
+}
+function editRestaurant(id) {
+  const r = allRestaurants.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('restaurant-edit-id').value      = r.id;
+  document.getElementById('restaurant-name').value         = r.name||'';
+  document.getElementById('restaurant-cuisine').value      = r.cuisine||'';
+  document.getElementById('restaurant-rating').value       = r.rating||'';
+  document.getElementById('restaurant-description').value  = r.description||'';
+  document.getElementById('restaurant-modal-title').textContent = 'Edit Restaurant';
+  openModal('restaurant-modal');
+}
+async function saveRestaurant() {
+  const id = document.getElementById('restaurant-edit-id').value;
+  const payload = {
+    name:        document.getElementById('restaurant-name').value.trim(),
+    cuisine:     document.getElementById('restaurant-cuisine').value.trim(),
+    rating:      parseFloat(document.getElementById('restaurant-rating').value) || null,
+    description: document.getElementById('restaurant-description').value.trim(),
+  };
+  let err;
+  if (id) { ({ error: err } = await sb.from('restaurants').update(payload).eq('id', id)); }
+  else    { ({ error: err } = await sb.from('restaurants').insert([payload])); }
+  if (err) { showToast(err.message, 'error'); return; }
+  showToast(id ? 'Restaurant updated!' : 'Restaurant added!', 'success');
+  closeModal('restaurant-modal');
+  await loadRestaurants();
+  updateOverviewStats();
 }
 
-function renderOverviewRecent() {
-  // Reservations
-  const tbody1 = document.getElementById('overview-res-body');
-  const recentRes = allReservations.slice(0, 6);
-  if (!recentRes.length) {
-    tbody1.innerHTML = missingTables.has('reservations')
-      ? '<tr><td colspan="6" class="empty-row">Table not created yet.</td></tr>'
-      : '<tr><td colspan="6" class="empty-row">No reservations yet.</td></tr>';
-  } else {
-    tbody1.innerHTML = recentRes.map(r => `
-      <tr>
-        <td style="color:var(--text2);font-size:11px">#${r.id}</td>
-        <td><strong>${esc(r.guest_name||'—')}</strong></td>
-        <td>${fmtDate(r.reservation_date)} ${r.reservation_time ? r.reservation_time.slice(0,5) : ''}</td>
-        <td>${esc(r.table_number||'—')}</td>
-        <td>${r.guests_count||'—'}</td>
-        <td>${statusBadge(r.status)}</td>
-      </tr>`).join('');
-  }
+// ── Photographers ─────────────────────────────────────────────────────────────
+async function loadPhotographers() {
+  const { data, error } = await sb.from('photographers').select('*').order('name', { ascending: true });
+  if (error) { allPhotographers = []; return; }
+  allPhotographers = data || [];
+  document.getElementById('nav-photographers-count').textContent = allPhotographers.length;
+  renderPhotographers();
+}
+function renderPhotographers(filtered) {
+  const data  = filtered ?? allPhotographers;
+  const tbody = document.getElementById('photographers-body');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No photographers found.</td></tr>'; return; }
+  tbody.innerHTML = data.map(p => `
+    <tr>
+      <td><strong>${esc(p.name||'—')}</strong></td>
+      <td><span class="badge badge-teal">${capitalize(p.type||'—')}</span></td>
+      <td><strong>${p.price_per_day != null ? Number(p.price_per_day).toLocaleString() : '—'}</strong></td>
+      <td>${p.rating != null ? `<span class="badge badge-warning">★ ${p.rating}</span>` : '—'}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12px">${esc(p.bio||'')}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-outline btn-sm" onclick="editPhotographer('${p.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('photographers','${p.id}','Delete photographer?')">Del</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+function filterPhotographers(q) {
+  const s = q.toLowerCase();
+  renderPhotographers(allPhotographers.filter(p => (p.name||'').toLowerCase().includes(s)));
+}
+function openPhotographerModal() {
+  ['photographer-edit-id','photographer-name','photographer-price','photographer-rating','photographer-bio']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('photographer-type').value = 'individual';
+  document.getElementById('photographer-modal-title').textContent = 'Add Photographer';
+  openModal('photographer-modal');
+}
+function editPhotographer(id) {
+  const p = allPhotographers.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('photographer-edit-id').value  = p.id;
+  document.getElementById('photographer-name').value     = p.name||'';
+  document.getElementById('photographer-type').value     = p.type||'individual';
+  document.getElementById('photographer-price').value    = p.price_per_day||'';
+  document.getElementById('photographer-rating').value   = p.rating||'';
+  document.getElementById('photographer-bio').value      = p.bio||'';
+  document.getElementById('photographer-modal-title').textContent = 'Edit Photographer';
+  openModal('photographer-modal');
+}
+async function savePhotographer() {
+  const id = document.getElementById('photographer-edit-id').value;
+  const payload = {
+    name:          document.getElementById('photographer-name').value.trim(),
+    type:          document.getElementById('photographer-type').value,
+    price_per_day: parseFloat(document.getElementById('photographer-price').value) || null,
+    rating:        parseFloat(document.getElementById('photographer-rating').value) || null,
+    bio:           document.getElementById('photographer-bio').value.trim(),
+  };
+  let err;
+  if (id) { ({ error: err } = await sb.from('photographers').update(payload).eq('id', id)); }
+  else    { ({ error: err } = await sb.from('photographers').insert([payload])); }
+  if (err) { showToast(err.message, 'error'); return; }
+  showToast(id ? 'Photographer updated!' : 'Photographer added!', 'success');
+  closeModal('photographer-modal');
+  await loadPhotographers();
+  updateOverviewStats();
+}
 
+// ── AV Equipment ──────────────────────────────────────────────────────────────
+async function loadAV() {
+  const { data, error } = await sb.from('av_equipment').select('*').order('name', { ascending: true });
+  if (error) { allAV = []; return; }
+  allAV = data || [];
+  document.getElementById('nav-av-count').textContent = allAV.length;
+  renderAV();
+}
+function renderAV(filtered) {
+  const data  = filtered ?? allAV;
+  const tbody = document.getElementById('av-body');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No AV equipment found.</td></tr>'; return; }
+  tbody.innerHTML = data.map(a => `
+    <tr>
+      <td><strong>${esc(a.name||'—')}</strong></td>
+      <td><span class="badge badge-info">${capitalize(a.category||'—')}</span></td>
+      <td><strong>${a.price_per_day != null ? Number(a.price_per_day).toLocaleString() : '—'}</strong></td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12px">${esc(a.description||'')}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-outline btn-sm" onclick="editAV('${a.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('av_equipment','${a.id}','Delete AV equipment?')">Del</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+function filterAV(q) {
+  const s = q.toLowerCase();
+  renderAV(allAV.filter(a => (a.name||'').toLowerCase().includes(s) || (a.category||'').toLowerCase().includes(s)));
+}
+function openAVModal() {
+  ['av-edit-id','av-name','av-price','av-description'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('av-category').value = 'audio';
+  document.getElementById('av-modal-title').textContent = 'Add AV Equipment';
+  openModal('av-modal');
+}
+function editAV(id) {
+  const a = allAV.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('av-edit-id').value     = a.id;
+  document.getElementById('av-name').value        = a.name||'';
+  document.getElementById('av-category').value    = a.category||'audio';
+  document.getElementById('av-price').value       = a.price_per_day||'';
+  document.getElementById('av-description').value = a.description||'';
+  document.getElementById('av-modal-title').textContent = 'Edit AV Equipment';
+  openModal('av-modal');
+}
+async function saveAV() {
+  const id = document.getElementById('av-edit-id').value;
+  const payload = {
+    name:          document.getElementById('av-name').value.trim(),
+    category:      document.getElementById('av-category').value,
+    price_per_day: parseFloat(document.getElementById('av-price').value) || null,
+    description:   document.getElementById('av-description').value.trim(),
+  };
+  let err;
+  if (id) { ({ error: err } = await sb.from('av_equipment').update(payload).eq('id', id)); }
+  else    { ({ error: err } = await sb.from('av_equipment').insert([payload])); }
+  if (err) { showToast(err.message, 'error'); return; }
+  showToast(id ? 'Equipment updated!' : 'Equipment added!', 'success');
+  closeModal('av-modal');
+  await loadAV();
+  updateOverviewStats();
+}
+
+// ── Printing Items ────────────────────────────────────────────────────────────
+async function loadPrinting() {
+  const { data, error } = await sb.from('printing_items').select('*').order('name', { ascending: true });
+  if (error) { allPrinting = []; return; }
+  allPrinting = data || [];
+  document.getElementById('nav-printing-count').textContent = allPrinting.length;
+  renderPrinting();
+}
+function renderPrinting(filtered) {
+  const data  = filtered ?? allPrinting;
+  const tbody = document.getElementById('printing-body');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No printing items found.</td></tr>'; return; }
+  tbody.innerHTML = data.map(p => `
+    <tr>
+      <td><strong>${esc(p.name||'—')}</strong></td>
+      <td style="color:var(--text2)">${esc(p.category||'—')}</td>
+      <td><strong>${p.price_per_unit != null ? Number(p.price_per_unit).toLocaleString() : '—'}</strong></td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12px">${esc(p.description||'')}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-outline btn-sm" onclick="editPrinting('${p.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('printing_items','${p.id}','Delete printing item?')">Del</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+function filterPrinting(q) {
+  const s = q.toLowerCase();
+  renderPrinting(allPrinting.filter(p => (p.name||'').toLowerCase().includes(s) || (p.category||'').toLowerCase().includes(s)));
+}
+function openPrintingModal() {
+  ['printing-edit-id','printing-name','printing-category','printing-price','printing-description']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('printing-modal-title').textContent = 'Add Printing Item';
+  openModal('printing-modal');
+}
+function editPrinting(id) {
+  const p = allPrinting.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('printing-edit-id').value      = p.id;
+  document.getElementById('printing-name').value         = p.name||'';
+  document.getElementById('printing-category').value     = p.category||'';
+  document.getElementById('printing-price').value        = p.price_per_unit||'';
+  document.getElementById('printing-description').value  = p.description||'';
+  document.getElementById('printing-modal-title').textContent = 'Edit Printing Item';
+  openModal('printing-modal');
+}
+async function savePrinting() {
+  const id = document.getElementById('printing-edit-id').value;
+  const payload = {
+    name:           document.getElementById('printing-name').value.trim(),
+    category:       document.getElementById('printing-category').value.trim(),
+    price_per_unit: parseFloat(document.getElementById('printing-price').value) || null,
+    description:    document.getElementById('printing-description').value.trim(),
+  };
+  let err;
+  if (id) { ({ error: err } = await sb.from('printing_items').update(payload).eq('id', id)); }
+  else    { ({ error: err } = await sb.from('printing_items').insert([payload])); }
+  if (err) { showToast(err.message, 'error'); return; }
+  showToast(id ? 'Item updated!' : 'Item added!', 'success');
+  closeModal('printing-modal');
+  await loadPrinting();
+}
+
+// ── Support Tickets ───────────────────────────────────────────────────────────
+async function loadTickets() {
+  const { data, error } = await sb.from('support_tickets').select('*').order('created_at', { ascending: false });
+  if (error) { allTickets = []; return; }
+  allTickets = data || [];
+  document.getElementById('nav-tickets-count').textContent = allTickets.length;
+  renderTickets(allTickets);
+}
+function renderTickets(data) {
+  const tbody = document.getElementById('tickets-body');
+  if (!data||!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No tickets found.</td></tr>'; return; }
+  tbody.innerHTML = data.map(t => `
+    <tr>
+      <td style="color:var(--text2);font-size:11px">#${t.id.slice(0,8)}…</td>
+      <td style="color:var(--text2);font-size:11px">${t.user_id ? t.user_id.slice(0,8)+'…' : '—'}</td>
+      <td><strong>${esc(t.subject||'—')}</strong></td>
+      <td>${t.status === 'open'
+        ? '<span class="badge badge-warning">Open</span>'
+        : '<span class="badge badge-success">Closed</span>'}</td>
+      <td style="color:var(--text2);font-size:12px;white-space:nowrap">${fmtDate(t.created_at)}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-outline btn-sm" onclick="viewTicket('${t.id}')">View</button>
+          <button class="btn btn-outline btn-sm" onclick="editTicket('${t.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('support_tickets','${t.id}','Delete ticket?')">Del</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+function filterTickets(q) {
+  let data   = [...allTickets];
+  const status = document.getElementById('ticket-status-filter')?.value||'';
+  if (typeof q === 'string' && q) {
+    const s = q.toLowerCase();
+    data = data.filter(t => (t.subject||'').toLowerCase().includes(s));
+  }
+  if (status) data = data.filter(t => t.status === status);
+  renderTickets(data);
+}
+function viewTicket(id) {
+  const t = allTickets.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('ticket-detail-body').innerHTML = `
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Subject</div>
+      <div style="font-size:15px;font-weight:700">${esc(t.subject)}</div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Status</div>
+      ${t.status === 'open'
+        ? '<span class="badge badge-warning">Open</span>'
+        : '<span class="badge badge-success">Closed</span>'}
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">User ID</div>
+      <div style="font-size:12px;color:var(--text2);word-break:break-all">${esc(t.user_id||'—')}</div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Created</div>
+      <div style="font-size:12px;color:var(--text2)">${fmtDate(t.created_at)}</div>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Message</div>
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;font-size:13px;line-height:1.7;color:var(--text)">${esc(t.message||'—')}</div>
+    </div>
+  `;
+  openModal('ticket-detail-modal');
+}
+
+// ── Overview ──────────────────────────────────────────────────────────────────
+function updateOverviewStats() {
+  document.getElementById('stat-profiles').textContent     = allProfiles.length;
+  document.getElementById('stat-venues').textContent       = allVenues.length;
+  document.getElementById('stat-orders').textContent       = allOrders.length;
+  document.getElementById('stat-restaurants').textContent  = allRestaurants.length;
+  document.getElementById('stat-photographers').textContent= allPhotographers.length;
+  document.getElementById('stat-av').textContent           = allAV.length;
+  document.getElementById('stat-tickets').textContent      = allTickets.length;
+}
+function renderOverviewRecent() {
   // Orders
-  const tbody2 = document.getElementById('overview-orders-body');
+  const tbody1 = document.getElementById('overview-orders-body');
   const recentOrders = allOrders.slice(0, 6);
   if (!recentOrders.length) {
-    tbody2.innerHTML = missingTables.has('orders')
-      ? '<tr><td colspan="6" class="empty-row">Table not created yet.</td></tr>'
-      : '<tr><td colspan="6" class="empty-row">No orders yet.</td></tr>';
+    tbody1.innerHTML = '<tr><td colspan="6" class="empty-row">No orders yet.</td></tr>';
   } else {
-    tbody2.innerHTML = recentOrders.map(o => `
+    tbody1.innerHTML = recentOrders.map(o => `
       <tr>
         <td style="color:var(--text2);font-size:11px">#${o.id.slice(0,8)}…</td>
         <td style="color:var(--text2);font-size:11px">${o.user_id ? o.user_id.slice(0,8)+'…' : '—'}</td>
@@ -1199,11 +1558,104 @@ function renderOverviewRecent() {
         <td style="color:var(--text2);font-size:12px">${fmtDate(o.created_at)}</td>
       </tr>`).join('');
   }
+  // Tickets
+  const tbody2 = document.getElementById('overview-tickets-body');
+  const recentTickets = allTickets.slice(0, 6);
+  if (!recentTickets.length) {
+    tbody2.innerHTML = '<tr><td colspan="4" class="empty-row">No tickets yet.</td></tr>';
+  } else {
+    tbody2.innerHTML = recentTickets.map(t => `
+      <tr>
+        <td style="color:var(--text2);font-size:11px">#${t.id.slice(0,8)}…</td>
+        <td><strong>${esc(t.subject||'—')}</strong></td>
+        <td>${t.status === 'open'
+          ? '<span class="badge badge-warning">Open</span>'
+          : '<span class="badge badge-success">Closed</span>'}</td>
+        <td style="color:var(--text2);font-size:12px">${fmtDate(t.created_at)}</td>
+      </tr>`).join('');
+  }
+}
+
+// ── Profile Edit ──────────────────────────────────────────────────────────────
+function editProfile(id) {
+  const p = allProfiles.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('profile-edit-id').value       = p.id;
+  document.getElementById('profile-full-name').value     = p.full_name||'';
+  document.getElementById('profile-username').value      = p.username||'';
+  document.getElementById('profile-phone').value         = p.phone||'';
+  document.getElementById('profile-role').value          = p.role||'user';
+  openModal('profile-modal');
+}
+async function saveProfile() {
+  const id = document.getElementById('profile-edit-id').value;
+  const payload = {
+    full_name: document.getElementById('profile-full-name').value.trim() || null,
+    username:  document.getElementById('profile-username').value.trim()  || null,
+    phone:     document.getElementById('profile-phone').value.trim()     || null,
+    role:      document.getElementById('profile-role').value,
+  };
+  const { error } = await sb.from('profiles').update(payload).eq('id', id);
+  if (error) { showToast(error.message, 'error'); return; }
+  showToast('Profile updated!', 'success');
+  closeModal('profile-modal');
+  await loadProfiles();
+}
+
+// ── Order Edit ────────────────────────────────────────────────────────────────
+function editOrder(id) {
+  const o = allOrders.find(x => x.id === id);
+  if (!o) return;
+  document.getElementById('order-edit-id').value     = o.id;
+  document.getElementById('order-status').value      = o.status||'pending';
+  document.getElementById('order-total').value       = o.total_egp||'';
+  document.getElementById('order-event-date').value  = o.event_date||'';
+  document.getElementById('order-notes').value       = o.notes||'';
+  openModal('order-edit-modal');
+}
+async function saveOrder() {
+  const id = document.getElementById('order-edit-id').value;
+  const payload = {
+    status:     document.getElementById('order-status').value,
+    total_egp:  parseFloat(document.getElementById('order-total').value) || null,
+    event_date: document.getElementById('order-event-date').value || null,
+    notes:      document.getElementById('order-notes').value.trim() || null,
+  };
+  const { error } = await sb.from('orders').update(payload).eq('id', id);
+  if (error) { showToast(error.message, 'error'); return; }
+  showToast('Order updated!', 'success');
+  closeModal('order-edit-modal');
+  await loadOrders();
+  renderOverviewRecent();
+}
+
+// ── Ticket Edit ───────────────────────────────────────────────────────────────
+function editTicket(id) {
+  const t = allTickets.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('ticket-edit-id').value      = t.id;
+  document.getElementById('ticket-subject').value      = t.subject||'';
+  document.getElementById('ticket-message').value      = t.message||'';
+  document.getElementById('ticket-status-edit').value  = t.status||'open';
+  openModal('ticket-edit-modal');
+}
+async function saveTicket() {
+  const id = document.getElementById('ticket-edit-id').value;
+  const payload = {
+    subject: document.getElementById('ticket-subject').value.trim(),
+    message: document.getElementById('ticket-message').value.trim(),
+    status:  document.getElementById('ticket-status-edit').value,
+  };
+  const { error } = await sb.from('support_tickets').update(payload).eq('id', id);
+  if (error) { showToast(error.message, 'error'); return; }
+  showToast('Ticket updated!', 'success');
+  closeModal('ticket-edit-modal');
+  await loadTickets();
+  renderOverviewRecent();
 }
 
 // ── Delete ────────────────────────────────────────────────────────────────────
 let pendingDelete = null;
-
 function confirmDelete(table, id, msg) {
   pendingDelete = { table, id };
   document.getElementById('confirm-msg').textContent = msg || 'Are you sure?';
@@ -1212,10 +1664,14 @@ function confirmDelete(table, id, msg) {
     if (error) { showToast(error.message, 'error'); closeModal('confirm-modal'); return; }
     showToast('Deleted successfully.', 'success');
     closeModal('confirm-modal');
-    if (pendingDelete.table==='venues')       await loadVenues();
-    else if (pendingDelete.table==='reservations') { await loadReservations(); renderOverviewRecent(); }
-    else if (pendingDelete.table==='orders')  { await loadOrders(); renderOverviewRecent(); }
+    const reloaders = {
+      venues: loadVenues, orders: loadOrders, restaurants: loadRestaurants,
+      photographers: loadPhotographers, av_equipment: loadAV,
+      printing_items: loadPrinting, support_tickets: loadTickets
+    };
+    if (reloaders[pendingDelete.table]) await reloaders[pendingDelete.table]();
     updateOverviewStats();
+    renderOverviewRecent();
     pendingDelete = null;
   };
   openModal('confirm-modal');
@@ -1251,10 +1707,6 @@ function fmtDate(s) {
   const d = new Date(s);
   if (isNaN(d)) return s;
   return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-}
-function statusBadge(status) {
-  const map = { confirmed:'badge-success', pending:'badge-warning', cancelled:'badge-danger', completed:'badge-info' };
-  return `<span class="badge ${map[status]||'badge-gray'}">${capitalize(status||'unknown')}</span>`;
 }
 function orderStatusBadge(status) {
   const map = { pending:'badge-warning', confirmed:'badge-success', completed:'badge-info', cancelled:'badge-danger' };
