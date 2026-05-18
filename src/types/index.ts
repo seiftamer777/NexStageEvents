@@ -5,10 +5,12 @@ export type Venue = {
   capacity: number;
   price_per_day: number;
   city: string;
+  area: string;           // ← add
   address: string;
   description: string;
   amenities: string[];
   images: string[];
+  available_dates: string[]; // ← add
   is_available: boolean;
 };
 

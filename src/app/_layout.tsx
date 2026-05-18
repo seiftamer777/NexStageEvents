@@ -2,6 +2,7 @@ import { Slot, router, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { AuthProvider, useAuth } from '../context/AuthContext';
+import { CartProvider } from '../context/CartContext';  // ← add this
 import { colors } from '../constants/theme';
 
 function RootLayoutNav() {
@@ -10,14 +11,9 @@ function RootLayoutNav() {
 
   useEffect(() => {
     if (loading) return;
-
     const onAuthScreen = segments[0] === 'login' || segments[0] === 'register';
-
-    if (!user && !onAuthScreen) {
-      router.replace('/login');
-    } else if (user && onAuthScreen) {
-      router.replace('/(tabs)');
-    }
+    if (!user && !onAuthScreen) router.replace('/login');
+    else if (user && onAuthScreen) router.replace('/(tabs)');
   }, [user, loading, segments]);
 
   if (loading) {
@@ -34,7 +30,9 @@ function RootLayoutNav() {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <RootLayoutNav />
+      <CartProvider>          {/* ← wrap here */}
+        <RootLayoutNav />
+      </CartProvider>
     </AuthProvider>
   );
 }
