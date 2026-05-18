@@ -85,7 +85,6 @@
   .stat-icon.green { background: rgba(34,197,94,0.15); }
   .stat-icon.blue { background: rgba(59,130,246,0.15); }
   .stat-icon.amber { background: rgba(245,158,11,0.15); }
-  .stat-icon.red { background: rgba(239,68,68,0.15); }
   .stat-label { font-size: 12px; color: var(--text2); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
   .stat-value { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
   .stat-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
@@ -103,6 +102,11 @@
   tbody tr:hover { background: rgba(255,255,255,0.025); }
   tbody td { padding: 13px 18px; font-size: 13px; vertical-align: middle; }
   .empty-row { text-align: center; color: var(--text2); padding: 40px !important; }
+
+  /* ALERT BANNER */
+  .alert-banner { display: flex; align-items: flex-start; gap: 12px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 20px; font-size: 13px; color: #fbbf24; line-height: 1.6; }
+  .alert-banner.error { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #f87171; }
+  .alert-banner code { font-family: monospace; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
 
   /* BADGES */
   .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
@@ -122,8 +126,6 @@
   .btn-outline:hover { background: var(--bg3); color: var(--text); }
   .btn-danger { background: rgba(239,68,68,0.12); color: #f87171; border-color: rgba(239,68,68,0.25); }
   .btn-danger:hover { background: rgba(239,68,68,0.2); }
-  .btn-success { background: rgba(34,197,94,0.12); color: #4ade80; border-color: rgba(34,197,94,0.25); }
-  .btn-success:hover { background: rgba(34,197,94,0.2); }
 
   /* TOOLBAR */
   .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -150,17 +152,17 @@
   .field select option { background: var(--bg3); }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
-  /* NOTIFICATIONS */
+  /* TOAST */
   .toast { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; align-items: center; gap: 12px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 12px; padding: 14px 18px; font-size: 13px; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.4); transform: translateX(200%); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); max-width: 340px; }
   .toast.show { transform: translateX(0); }
   .toast-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .toast.success .toast-icon { background: rgba(34,197,94,0.15); color: #4ade80; }
   .toast.error .toast-icon { background: rgba(239,68,68,0.15); color: #f87171; }
+  .toast.warning .toast-icon { background: rgba(245,158,11,0.15); color: #fbbf24; }
 
   /* LOADING */
   .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.15); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-center { display: flex; align-items: center; justify-content: center; padding: 40px; gap: 12px; color: var(--text2); }
 
   /* DATE FILTER */
   .date-filter-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
@@ -183,11 +185,10 @@
   .conn-status { display: flex; align-items: center; gap: 6px; font-size: 12px; }
   .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
   .conn-dot.error { background: var(--danger); }
+  .conn-dot.warning { background: var(--warning); }
 
   @media (max-width: 900px) {
     .stats-grid { grid-template-columns: repeat(2,1fr); }
-    .sidebar { width: 0; overflow: hidden; }
-    .main { margin-left: 0; }
   }
   @media (max-width: 600px) {
     .stats-grid { grid-template-columns: 1fr; }
@@ -274,7 +275,7 @@
       <div class="topbar-right">
         <div class="conn-status">
           <div class="conn-dot" id="conn-dot"></div>
-          <span id="conn-label" style="color:var(--text2);font-size:12px">Connected</span>
+          <span id="conn-label" style="color:var(--text2);font-size:12px">Connecting…</span>
         </div>
         <button class="refresh-btn" onclick="refreshCurrentPage()" id="refresh-btn">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
@@ -289,6 +290,9 @@
 
       <!-- OVERVIEW PAGE -->
       <div class="page active" id="page-overview">
+        <!-- Missing-tables warning injected here if needed -->
+        <div id="missing-tables-banner" style="display:none"></div>
+
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-icon purple">
@@ -324,7 +328,6 @@
           </div>
         </div>
 
-        <!-- Recent Reservations -->
         <div class="card" style="margin-bottom:24px">
           <div class="card-header">
             <span class="card-title">Recent Reservations</span>
@@ -340,7 +343,6 @@
           </div>
         </div>
 
-        <!-- Recent Orders -->
         <div class="card">
           <div class="card-header">
             <span class="card-title">Recent Orders</span>
@@ -359,6 +361,7 @@
 
       <!-- PROFILES PAGE -->
       <div class="page" id="page-profiles">
+        <div id="profiles-banner"></div>
         <div class="card">
           <div class="card-header">
             <span class="card-title">User Profiles</span>
@@ -382,6 +385,7 @@
 
       <!-- VENUES PAGE -->
       <div class="page" id="page-venues">
+        <div id="venues-banner"></div>
         <div class="card">
           <div class="card-header">
             <span class="card-title">Venues</span>
@@ -411,6 +415,7 @@
 
       <!-- RESERVATIONS PAGE -->
       <div class="page" id="page-reservations">
+        <div id="reservations-banner"></div>
         <div class="card">
           <div class="card-header">
             <span class="card-title">Reservations</span>
@@ -443,7 +448,7 @@
                 <button class="qf-btn" onclick="setDateFilter('today',event)">Today</button>
                 <button class="qf-btn" onclick="setDateFilter('week',event)">This Week</button>
                 <button class="qf-btn" onclick="setDateFilter('month',event)">This Month</button>
-                <button class="qf-btn" onclick="setDateFilter('all',event)">All</button>
+                <button class="qf-btn active" onclick="setDateFilter('all',event)">All</button>
               </div>
             </div>
           </div>
@@ -460,6 +465,7 @@
 
       <!-- ORDERS PAGE -->
       <div class="page" id="page-orders">
+        <div id="orders-banner"></div>
         <div class="card">
           <div class="card-header">
             <span class="card-title">Orders</span>
@@ -602,24 +608,27 @@
 </div>
 
 <script>
-// ── Supabase ─────────────────────────────────────────────────────────────────
-const SUPABASE_URL = 'https://vkpamatgglwfyyctqokv.supabase.co';
+// ── Supabase ──────────────────────────────────────────────────────────────────
+const SUPABASE_URL     = 'https://vkpamatgglwfyyctqokv.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrcGFtYXRnZ2x3Znl5Y3Rxb2t2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNTgxMzIsImV4cCI6MjA5MzczNDEzMn0.8cqvwgjLW8dTmlp_7KlL0mTGDExQaOhgVVM7HZ7ZCSI';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ── Admins ───────────────────────────────────────────────────────────────────
+// ── Admins ────────────────────────────────────────────────────────────────────
 const ADMINS = [
   { username: 'mohamed', password: '12345678' },
   { username: 'seif',    password: '12345678' },
   { username: 'youssef', password: '12345678' },
 ];
 
-// ── State ────────────────────────────────────────────────────────────────────
+// ── State ─────────────────────────────────────────────────────────────────────
 let currentAdmin = null;
-let currentPage = 'overview';
+let currentPage  = 'overview';
 let allProfiles = [], allVenues = [], allReservations = [], allOrders = [];
 
-// ── Clock ────────────────────────────────────────────────────────────────────
+// Tables that failed to load (don't exist yet)
+const missingTables = new Set();
+
+// ── Clock ─────────────────────────────────────────────────────────────────────
 function updateClock() {
   const now = new Date();
   document.getElementById('current-time').textContent =
@@ -628,7 +637,7 @@ function updateClock() {
 }
 setInterval(updateClock, 1000); updateClock();
 
-// ── Login ────────────────────────────────────────────────────────────────────
+// ── Login ─────────────────────────────────────────────────────────────────────
 document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 document.getElementById('login-user').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 
@@ -660,7 +669,7 @@ function logout() {
   document.getElementById('login-error').style.display = 'none';
 }
 
-// ── Navigation ───────────────────────────────────────────────────────────────
+// ── Navigation ────────────────────────────────────────────────────────────────
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -671,47 +680,103 @@ function showPage(name) {
   const navMap = { overview:0, profiles:1, venues:2, reservations:3, orders:4 };
   const navItems = document.querySelectorAll('.nav-item');
   if (navItems[navMap[name]]) navItems[navMap[name]].classList.add('active');
-  if (name==='profiles') renderProfiles();
-  if (name==='venues') renderVenues();
+  if (name==='profiles')     renderProfiles();
+  if (name==='venues')       renderVenues();
   if (name==='reservations') renderReservations(allReservations);
-  if (name==='orders') renderOrders(allOrders);
+  if (name==='orders')       renderOrders(allOrders);
 }
 
 function refreshCurrentPage() {
   const btn = document.getElementById('refresh-btn');
   btn.classList.add('spinning');
-  loadAll().finally(() => setTimeout(()=>btn.classList.remove('spinning'), 600));
+  loadAll().finally(() => setTimeout(() => btn.classList.remove('spinning'), 600));
 }
 
-// ── Load All ─────────────────────────────────────────────────────────────────
+// ── Load All (independent per table) ─────────────────────────────────────────
 async function loadAll() {
-  setConnectionStatus(true);
-  try {
-    await Promise.all([loadProfiles(), loadVenues(), loadReservations(), loadOrders()]);
-    updateOverviewStats();
-    renderOverviewRecent();
-  } catch(e) {
-    setConnectionStatus(false);
-    showToast('Failed to load data: ' + e.message, 'error');
+  missingTables.clear();
+
+  // Run all four independently — one missing table won't kill the rest
+  await Promise.all([
+    loadProfiles(),
+    loadVenues(),
+    loadReservations(),
+    loadOrders(),
+  ]);
+
+  updateOverviewStats();
+  renderOverviewRecent();
+  renderMissingTablesBanner();
+  setConnectionStatus(missingTables.size === 0 ? 'ok' : missingTables.size < 4 ? 'partial' : 'error');
+}
+
+function setConnectionStatus(state) {
+  const dot   = document.getElementById('conn-dot');
+  const label = document.getElementById('conn-label');
+  if (state === 'ok') {
+    dot.className = 'conn-dot';
+    label.textContent = 'Connected';
+  } else if (state === 'partial') {
+    dot.className = 'conn-dot warning';
+    label.textContent = 'Partial';
+  } else {
+    dot.className = 'conn-dot error';
+    label.textContent = 'Error';
   }
 }
 
-function setConnectionStatus(ok) {
-  document.getElementById('conn-dot').className = 'conn-dot' + (ok ? '' : ' error');
-  document.getElementById('conn-label').textContent = ok ? 'Connected' : 'Error';
+// ── Helper: is this a "table not found" error? ────────────────────────────────
+function isTableMissingError(error) {
+  if (!error) return false;
+  const msg = (error.message || error.details || '').toLowerCase();
+  return (
+    msg.includes('does not exist') ||
+    msg.includes('schema cache') ||
+    msg.includes('relation') ||
+    msg.includes('not found') ||
+    error.code === '42P01' ||
+    error.code === 'PGRST204' ||
+    error.code === 'PGRST200'
+  );
 }
 
-// ── Profiles ─────────────────────────────────────────────────────────────────
+// ── Missing-tables banner ─────────────────────────────────────────────────────
+function missingTableBanner(tableName) {
+  return `<div class="alert-banner" style="margin-bottom:18px">
+    ⚠️ Table <code>public.${tableName}</code> does not exist yet.
+    Run <code>supabase/${tableName}.sql</code> in your Supabase SQL editor to create it.
+    <a href="#" onclick="refreshCurrentPage();return false;" style="color:inherit;margin-left:8px;text-decoration:underline">Retry</a>
+  </div>`;
+}
+
+function renderMissingTablesBanner() {
+  const el = document.getElementById('missing-tables-banner');
+  if (missingTables.size === 0) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = 'block';
+  el.innerHTML = [...missingTables].map(t => missingTableBanner(t)).join('');
+}
+
+// ── Profiles ──────────────────────────────────────────────────────────────────
 async function loadProfiles() {
   const { data, error } = await sb.from('profiles').select('*').order('created_at', { ascending: false });
-  if (error) throw error;
+  const banner = document.getElementById('profiles-banner');
+  if (error) {
+    allProfiles = [];
+    missingTables.add('profiles');
+    banner.innerHTML = missingTableBanner('profiles');
+    document.getElementById('profiles-body').innerHTML =
+      '<tr><td colspan="6" class="empty-row">Table not found — see banner above.</td></tr>';
+    document.getElementById('nav-profiles-count').textContent = 0;
+    return;
+  }
+  banner.innerHTML = '';
   allProfiles = data || [];
   document.getElementById('nav-profiles-count').textContent = allProfiles.length;
   renderProfiles();
 }
 
 function renderProfiles(filtered) {
-  const data = filtered ?? allProfiles;
+  const data  = filtered ?? allProfiles;
   const tbody = document.getElementById('profiles-body');
   if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No profiles found.</td></tr>'; return; }
   tbody.innerHTML = data.map(p => `
@@ -737,14 +802,24 @@ function filterProfiles(q) {
 // ── Venues ────────────────────────────────────────────────────────────────────
 async function loadVenues() {
   const { data, error } = await sb.from('venues').select('*').order('name', { ascending: true });
-  if (error) throw error;
+  const banner = document.getElementById('venues-banner');
+  if (error) {
+    allVenues = [];
+    missingTables.add('venues');
+    banner.innerHTML = missingTableBanner('venues');
+    document.getElementById('venues-body').innerHTML =
+      '<tr><td colspan="7" class="empty-row">Table not found — see banner above.</td></tr>';
+    document.getElementById('nav-venues-count').textContent = 0;
+    return;
+  }
+  banner.innerHTML = '';
   allVenues = data || [];
   document.getElementById('nav-venues-count').textContent = allVenues.length;
   renderVenues();
 }
 
 function renderVenues(filtered) {
-  const data = filtered ?? allVenues;
+  const data  = filtered ?? allVenues;
   const tbody = document.getElementById('venues-body');
   if (!data.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-row">No venues found.</td></tr>'; return; }
   tbody.innerHTML = data.map(v => `
@@ -767,7 +842,7 @@ function renderVenues(filtered) {
 }
 
 function filterVenues(q) {
-  let data = [...allVenues];
+  let data   = [...allVenues];
   const search = (typeof q === 'string' ? q : '').toLowerCase();
   const avail  = document.getElementById('venue-avail-filter').value;
   if (search) data = data.filter(v =>
@@ -784,15 +859,15 @@ function openVenueModal(id) {
   if (id) {
     const v = allVenues.find(x => x.id === id);
     if (!v) return;
-    document.getElementById('venue-edit-id').value = v.id;
-    document.getElementById('venue-name').value = v.name||'';
-    document.getElementById('venue-type').value = v.type||'';
-    document.getElementById('venue-capacity').value = v.capacity||'';
-    document.getElementById('venue-price').value = v.price_per_day||'';
-    document.getElementById('venue-city').value = v.city||'';
-    document.getElementById('venue-address').value = v.address||'';
-    document.getElementById('venue-description').value = v.description||'';
-    document.getElementById('venue-available').value = String(v.is_available);
+    document.getElementById('venue-edit-id').value       = v.id;
+    document.getElementById('venue-name').value          = v.name||'';
+    document.getElementById('venue-type').value          = v.type||'';
+    document.getElementById('venue-capacity').value      = v.capacity||'';
+    document.getElementById('venue-price').value         = v.price_per_day||'';
+    document.getElementById('venue-city').value          = v.city||'';
+    document.getElementById('venue-address').value       = v.address||'';
+    document.getElementById('venue-description').value   = v.description||'';
+    document.getElementById('venue-available').value     = String(v.is_available);
     document.getElementById('venue-modal-title').textContent = 'Edit Venue';
   }
   openModal('venue-modal');
@@ -800,21 +875,25 @@ function openVenueModal(id) {
 function editVenue(id) { openVenueModal(id); }
 
 function clearVenueForm() {
-  ['venue-edit-id','venue-name','venue-type','venue-capacity','venue-price','venue-city','venue-address','venue-description'].forEach(id => document.getElementById(id).value = '');
+  ['venue-edit-id','venue-name','venue-type','venue-capacity','venue-price','venue-city','venue-address','venue-description']
+    .forEach(id => document.getElementById(id).value = '');
   document.getElementById('venue-available').value = 'true';
   document.getElementById('venue-modal-title').textContent = 'Add Venue';
 }
 
 async function saveVenue() {
+  if (missingTables.has('venues')) {
+    showToast('Create the venues table first — see banner.', 'warning'); return;
+  }
   const id = document.getElementById('venue-edit-id').value;
   const payload = {
-    name: document.getElementById('venue-name').value.trim(),
-    type: document.getElementById('venue-type').value.trim(),
-    capacity: parseInt(document.getElementById('venue-capacity').value) || null,
-    price_per_day: parseFloat(document.getElementById('venue-price').value) || null,
-    city: document.getElementById('venue-city').value.trim(),
-    address: document.getElementById('venue-address').value.trim(),
-    description: document.getElementById('venue-description').value.trim(),
+    name:         document.getElementById('venue-name').value.trim(),
+    type:         document.getElementById('venue-type').value.trim(),
+    capacity:     parseInt(document.getElementById('venue-capacity').value) || null,
+    price_per_day:parseFloat(document.getElementById('venue-price').value) || null,
+    city:         document.getElementById('venue-city').value.trim(),
+    address:      document.getElementById('venue-address').value.trim(),
+    description:  document.getElementById('venue-description').value.trim(),
     is_available: document.getElementById('venue-available').value === 'true',
   };
   let err;
@@ -832,8 +911,22 @@ async function saveVenue() {
 
 // ── Reservations ──────────────────────────────────────────────────────────────
 async function loadReservations() {
-  const { data, error } = await sb.from('reservations').select('*').order('reservation_date', { ascending: false });
-  if (error) throw error;
+  const { data, error } = await sb
+    .from('reservations')
+    .select('*')
+    .order('reservation_date', { ascending: false });
+
+  const banner = document.getElementById('reservations-banner');
+  if (error) {
+    allReservations = [];
+    missingTables.add('reservations');
+    banner.innerHTML = missingTableBanner('reservations');
+    document.getElementById('res-body').innerHTML =
+      '<tr><td colspan="10" class="empty-row">Table not found — see banner above.</td></tr>';
+    document.getElementById('nav-res-count').textContent = 0;
+    return;
+  }
+  banner.innerHTML = '';
   allReservations = data || [];
   document.getElementById('nav-res-count').textContent = allReservations.length;
   renderReservations(allReservations);
@@ -841,7 +934,9 @@ async function loadReservations() {
 
 function renderReservations(data) {
   const tbody = document.getElementById('res-body');
-  if (!data||!data.length) { tbody.innerHTML = '<tr><td colspan="10" class="empty-row">No reservations found.</td></tr>'; return; }
+  if (!data||!data.length) {
+    tbody.innerHTML = '<tr><td colspan="10" class="empty-row">No reservations found.</td></tr>'; return;
+  }
   tbody.innerHTML = data.map(r => `
     <tr>
       <td style="color:var(--text2);font-size:11px">#${r.id}</td>
@@ -886,47 +981,50 @@ function setDateFilter(range, e) {
   const fmt = d => d.toISOString().split('T')[0];
   if (range==='today') {
     document.getElementById('date-from').value = fmt(today);
-    document.getElementById('date-to').value = fmt(today);
+    document.getElementById('date-to').value   = fmt(today);
   } else if (range==='week') {
     const mon = new Date(today); mon.setDate(today.getDate() - today.getDay() + 1);
-    const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+    const sun = new Date(mon);   sun.setDate(mon.getDate() + 6);
     document.getElementById('date-from').value = fmt(mon);
-    document.getElementById('date-to').value = fmt(sun);
+    document.getElementById('date-to').value   = fmt(sun);
   } else if (range==='month') {
     document.getElementById('date-from').value = fmt(new Date(today.getFullYear(), today.getMonth(), 1));
-    document.getElementById('date-to').value = fmt(new Date(today.getFullYear(), today.getMonth()+1, 0));
+    document.getElementById('date-to').value   = fmt(new Date(today.getFullYear(), today.getMonth()+1, 0));
   } else {
     document.getElementById('date-from').value = '';
-    document.getElementById('date-to').value = '';
+    document.getElementById('date-to').value   = '';
   }
   filterReservations();
 }
 
 function openResModal() {
-  document.getElementById('res-edit-id').value = '';
-  document.getElementById('res-name').value = '';
-  document.getElementById('res-phone').value = '';
-  document.getElementById('res-date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('res-time').value = '';
-  document.getElementById('res-table').value = '';
-  document.getElementById('res-guests').value = '';
-  document.getElementById('res-status').value = 'pending';
-  document.getElementById('res-notes').value = '';
+  document.getElementById('res-edit-id').value   = '';
+  document.getElementById('res-name').value      = '';
+  document.getElementById('res-phone').value     = '';
+  document.getElementById('res-date').value      = new Date().toISOString().split('T')[0];
+  document.getElementById('res-time').value      = '';
+  document.getElementById('res-table').value     = '';
+  document.getElementById('res-guests').value    = '';
+  document.getElementById('res-status').value    = 'pending';
+  document.getElementById('res-notes').value     = '';
   document.getElementById('res-modal-title').textContent = 'Add Reservation';
   openModal('res-modal');
 }
 
 async function saveReservation() {
+  if (missingTables.has('reservations')) {
+    showToast('Create the reservations table first — see banner.', 'warning'); return;
+  }
   const id = document.getElementById('res-edit-id').value;
   const payload = {
-    guest_name: document.getElementById('res-name').value.trim(),
-    phone: document.getElementById('res-phone').value.trim(),
+    guest_name:       document.getElementById('res-name').value.trim(),
+    phone:            document.getElementById('res-phone').value.trim(),
     reservation_date: document.getElementById('res-date').value,
     reservation_time: document.getElementById('res-time').value || null,
-    table_number: document.getElementById('res-table').value.trim() || null,
-    guests_count: parseInt(document.getElementById('res-guests').value) || null,
-    status: document.getElementById('res-status').value,
-    notes: document.getElementById('res-notes').value.trim() || null,
+    table_number:     document.getElementById('res-table').value.trim() || null,
+    guests_count:     parseInt(document.getElementById('res-guests').value) || null,
+    status:           document.getElementById('res-status').value,
+    notes:            document.getElementById('res-notes').value.trim() || null,
   };
   let err;
   if (id) {
@@ -944,29 +1042,38 @@ async function saveReservation() {
 function editRes(id) {
   const r = allReservations.find(x => x.id === id);
   if (!r) return;
-  document.getElementById('res-edit-id').value = id;
-  document.getElementById('res-name').value = r.guest_name||'';
-  document.getElementById('res-phone').value = r.phone||'';
-  document.getElementById('res-date').value = r.reservation_date||'';
-  document.getElementById('res-time').value = r.reservation_time||'';
-  document.getElementById('res-table').value = r.table_number||'';
-  document.getElementById('res-guests').value = r.guests_count||'';
-  document.getElementById('res-status').value = r.status||'pending';
-  document.getElementById('res-notes').value = r.notes||'';
+  document.getElementById('res-edit-id').value   = id;
+  document.getElementById('res-name').value      = r.guest_name||'';
+  document.getElementById('res-phone').value     = r.phone||'';
+  document.getElementById('res-date').value      = r.reservation_date||'';
+  document.getElementById('res-time').value      = r.reservation_time||'';
+  document.getElementById('res-table').value     = r.table_number||'';
+  document.getElementById('res-guests').value    = r.guests_count||'';
+  document.getElementById('res-status').value    = r.status||'pending';
+  document.getElementById('res-notes').value     = r.notes||'';
   document.getElementById('res-modal-title').textContent = 'Edit Reservation';
   openModal('res-modal');
 }
 
 // ── Orders ────────────────────────────────────────────────────────────────────
 async function loadOrders() {
-  const { data, error } = await sb.from('orders').select('*, order_items(*)').order('created_at', { ascending: false });
+  const { data, error } = await sb
+    .from('orders')
+    .select('*, order_items(*)')
+    .order('created_at', { ascending: false });
+
+  const banner = document.getElementById('orders-banner');
   if (error) {
-    // table may not exist yet — fail silently
     allOrders = [];
+    missingTables.add('orders');
+    banner.innerHTML = missingTableBanner('orders');
+    document.getElementById('orders-body').innerHTML =
+      '<tr><td colspan="8" class="empty-row">Table not found — see banner above.</td></tr>';
     document.getElementById('nav-orders-count').textContent = 0;
     document.getElementById('stat-orders').textContent = 0;
     return;
   }
+  banner.innerHTML = '';
   allOrders = data || [];
   document.getElementById('nav-orders-count').textContent = allOrders.length;
   renderOrders(allOrders);
@@ -974,7 +1081,9 @@ async function loadOrders() {
 
 function renderOrders(data) {
   const tbody = document.getElementById('orders-body');
-  if (!data||!data.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty-row">No orders found.</td></tr>'; return; }
+  if (!data||!data.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="empty-row">No orders found.</td></tr>'; return;
+  }
   tbody.innerHTML = data.map(o => `
     <tr>
       <td style="color:var(--text2);font-size:11px">#${o.id.slice(0,8)}…</td>
@@ -987,20 +1096,22 @@ function renderOrders(data) {
       <td>
         <div style="display:flex;gap:6px">
           <button class="btn btn-outline btn-sm" onclick="viewOrder('${o.id}')">View</button>
-          <button class="btn btn-danger btn-sm" onclick="confirmDelete('orders','${o.id}','Delete order #${o.id.slice(0,8)}…?')">Del</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('orders','${o.id}','Delete order?')">Del</button>
         </div>
       </td>
     </tr>`).join('');
 }
 
 function filterOrders(q) {
-  let data = [...allOrders];
-  const search = (typeof q==='string' ? q : (document.getElementById('order-status-filter')?.value||'')).toLowerCase();
+  let data   = [...allOrders];
   const status = document.getElementById('order-status-filter')?.value||'';
-  if (typeof q === 'string' && q) data = data.filter(o =>
-    (o.id||'').toLowerCase().includes(q.toLowerCase()) ||
-    (o.user_id||'').toLowerCase().includes(q.toLowerCase())
-  );
+  if (typeof q === 'string' && q) {
+    const s = q.toLowerCase();
+    data = data.filter(o =>
+      (o.id||'').toLowerCase().includes(s) ||
+      (o.user_id||'').toLowerCase().includes(s)
+    );
+  }
   if (status) data = data.filter(o => o.status === status);
   renderOrders(data);
 }
@@ -1009,11 +1120,10 @@ async function viewOrder(id) {
   const order = allOrders.find(o => o.id === id);
   if (!order) return;
   const items = order.order_items || [];
-  const body = document.getElementById('order-detail-body');
-  body.innerHTML = `
+  document.getElementById('order-detail-body').innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
-      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Order ID</div><div style="font-size:13px">${esc(order.id)}</div></div>
-      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Status</div><div>${orderStatusBadge(order.status)}</div></div>
+      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Order ID</div><div style="font-size:12px;word-break:break-all">${esc(order.id)}</div></div>
+      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Status</div>${orderStatusBadge(order.status)}</div>
       <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Total</div><div style="font-size:18px;font-weight:700">${order.total_egp != null ? Number(order.total_egp).toLocaleString() : '—'} EGP</div></div>
       <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Event Date</div><div>${fmtDate(order.event_date)||'—'}</div></div>
       <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Created</div><div style="font-size:12px;color:var(--text2)">${fmtDate(order.created_at)}</div></div>
@@ -1046,9 +1156,9 @@ async function viewOrder(id) {
 // ── Overview ──────────────────────────────────────────────────────────────────
 function updateOverviewStats() {
   document.getElementById('stat-profiles').textContent = allProfiles.length;
-  document.getElementById('stat-venues').textContent = allVenues.length;
-  document.getElementById('stat-res').textContent = allReservations.length;
-  document.getElementById('stat-orders').textContent = allOrders.length;
+  document.getElementById('stat-venues').textContent   = allVenues.length;
+  document.getElementById('stat-res').textContent      = allReservations.length;
+  document.getElementById('stat-orders').textContent   = allOrders.length;
 }
 
 function renderOverviewRecent() {
@@ -1056,7 +1166,9 @@ function renderOverviewRecent() {
   const tbody1 = document.getElementById('overview-res-body');
   const recentRes = allReservations.slice(0, 6);
   if (!recentRes.length) {
-    tbody1.innerHTML = '<tr><td colspan="6" class="empty-row">No reservations yet.</td></tr>';
+    tbody1.innerHTML = missingTables.has('reservations')
+      ? '<tr><td colspan="6" class="empty-row">Table not created yet.</td></tr>'
+      : '<tr><td colspan="6" class="empty-row">No reservations yet.</td></tr>';
   } else {
     tbody1.innerHTML = recentRes.map(r => `
       <tr>
@@ -1073,7 +1185,9 @@ function renderOverviewRecent() {
   const tbody2 = document.getElementById('overview-orders-body');
   const recentOrders = allOrders.slice(0, 6);
   if (!recentOrders.length) {
-    tbody2.innerHTML = '<tr><td colspan="6" class="empty-row">No orders yet.</td></tr>';
+    tbody2.innerHTML = missingTables.has('orders')
+      ? '<tr><td colspan="6" class="empty-row">Table not created yet.</td></tr>'
+      : '<tr><td colspan="6" class="empty-row">No orders yet.</td></tr>';
   } else {
     tbody2.innerHTML = recentOrders.map(o => `
       <tr>
@@ -1098,9 +1212,9 @@ function confirmDelete(table, id, msg) {
     if (error) { showToast(error.message, 'error'); closeModal('confirm-modal'); return; }
     showToast('Deleted successfully.', 'success');
     closeModal('confirm-modal');
-    if (pendingDelete.table==='venues') await loadVenues();
+    if (pendingDelete.table==='venues')       await loadVenues();
     else if (pendingDelete.table==='reservations') { await loadReservations(); renderOverviewRecent(); }
-    else if (pendingDelete.table==='orders') { await loadOrders(); renderOverviewRecent(); }
+    else if (pendingDelete.table==='orders')  { await loadOrders(); renderOverviewRecent(); }
     updateOverviewStats();
     pendingDelete = null;
   };
@@ -1108,7 +1222,7 @@ function confirmDelete(table, id, msg) {
 }
 
 // ── Modals ────────────────────────────────────────────────────────────────────
-function openModal(id) { document.getElementById(id).classList.add('open'); }
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(o =>
   o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); })
@@ -1116,18 +1230,20 @@ document.querySelectorAll('.modal-overlay').forEach(o =>
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function showToast(msg, type='success') {
-  const t = document.getElementById('toast');
+  const t    = document.getElementById('toast');
   const icon = document.getElementById('toast-icon');
   document.getElementById('toast-msg').textContent = msg;
   t.className = `toast ${type}`;
-  icon.textContent = type==='success' ? '✓' : '✕';
+  icon.textContent = type==='success' ? '✓' : type==='warning' ? '⚠' : '✕';
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3500);
+  setTimeout(() => t.classList.remove('show'), 4000);
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 function fmtDate(s) {
