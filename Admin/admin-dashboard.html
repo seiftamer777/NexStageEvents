@@ -5,185 +5,204 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f1117;
-    --bg2: #1a1d27;
-    --bg3: #232636;
-    --border: rgba(255,255,255,0.08);
-    --border2: rgba(255,255,255,0.14);
-    --text: #e8eaf0;
-    --text2: #8b90a7;
-    --accent: #6c63ff;
-    --accent2: #8b85ff;
-    --success: #22c55e;
-    --warning: #f59e0b;
-    --danger: #ef4444;
-    --info: #3b82f6;
+    --bg: #F8F7F4;
+    --bg2: #FFFFFF;
+    --bg3: #F2F1EE;
+    --border: #E8E4DE;
+    --border2: #D8D2CA;
+    --text: #1A1714;
+    --text2: #7A7570;
+    --text3: #B0AAA4;
+    --accent: #E8714A;
+    --accent2: #BE4E26;
+    --accent-bg: #FEF0EB;
+    --success: #3D9A6C;
+    --success-bg: #EAF7F0;
+    --warning: #D4870A;
+    --warning-bg: #FEF6E7;
+    --danger: #D03B3B;
+    --danger-bg: #FCEAEA;
+    --info: #2F7CC9;
+    --info-bg: #EBF4FD;
+    --purple: #7B5EA7;
+    --purple-bg: #F2EDF9;
+    --teal: #2B8A7E;
+    --teal-bg: #E8F5F3;
     --radius: 10px;
     --radius-lg: 14px;
+    --radius-xl: 18px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+  body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
 
   /* LOGIN */
   #login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg); }
-  .login-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 48px 40px; width: 380px; }
-  .login-logo { text-align: center; margin-bottom: 32px; }
-  .login-logo-icon { width: 56px; height: 56px; background: linear-gradient(135deg,#6c63ff,#a78bfa); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 16px; }
-  .login-logo h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
-  .login-logo p { color: var(--text2); font-size: 13px; margin-top: 4px; }
-  .form-group { margin-bottom: 18px; }
-  .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
-  .form-group input { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); padding: 10px 14px; color: var(--text); font-size: 14px; outline: none; transition: border-color 0.2s; }
-  .form-group input:focus { border-color: var(--accent); }
-  .btn-primary { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 8px; }
-  .btn-primary:hover { opacity: 0.9; }
-  .btn-primary:active { transform: scale(0.98); }
-  .login-error { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #f87171; border-radius: var(--radius); padding: 10px 14px; font-size: 13px; margin-top: 12px; display: none; }
+  .login-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 48px 44px; width: 420px; box-shadow: 0 4px 24px rgba(26,23,20,0.08), 0 1px 4px rgba(26,23,20,0.04); }
+  .login-logo { text-align: center; margin-bottom: 36px; }
+  .login-logo-icon { width: 60px; height: 60px; background: linear-gradient(135deg, var(--accent), #F5A882); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 18px; box-shadow: 0 4px 16px rgba(232,113,74,0.3); }
+  .login-logo h1 { font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+  .login-logo p { color: var(--text2); font-size: 14px; margin-top: 6px; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 8px; }
+  .form-group input { width: 100%; background: var(--bg3); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 11px 14px; color: var(--text); font-size: 14px; font-family: inherit; outline: none; transition: all 0.2s; }
+  .form-group input:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(232,113,74,0.12); }
+  .btn-primary { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); padding: 13px; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.2s; margin-top: 8px; letter-spacing: -0.2px; }
+  .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(232,113,74,0.35); }
+  .btn-primary:active { transform: translateY(0); }
+  .login-error { background: var(--danger-bg); border: 1px solid rgba(208,59,59,0.25); color: var(--danger); border-radius: var(--radius); padding: 11px 14px; font-size: 13px; margin-top: 14px; display: none; font-weight: 500; }
 
   /* DASHBOARD */
   #dashboard { display: none; flex-direction: row; min-height: 100vh; }
-  .sidebar { width: 220px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
-  .sidebar-header { padding: 20px 18px; border-bottom: 1px solid var(--border); }
-  .sidebar-logo { display: flex; align-items: center; gap: 10px; }
-  .sidebar-logo-icon { width: 34px; height: 34px; background: linear-gradient(135deg,#6c63ff,#a78bfa); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-  .sidebar-logo span { font-size: 15px; font-weight: 700; }
-  .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
-  .nav-label { font-size: 10px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; padding: 8px 8px 4px; margin-top: 8px; }
-  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; color: var(--text2); cursor: pointer; transition: all 0.15s; font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .sidebar { width: 232px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+  .sidebar-header { padding: 22px 20px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo { display: flex; align-items: center; gap: 12px; }
+  .sidebar-logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), #F5A882); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .sidebar-logo span { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+  .sidebar-nav { flex: 1; padding: 14px 12px; overflow-y: auto; }
+  .nav-label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1.2px; padding: 10px 8px 5px; margin-top: 6px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 9px; color: var(--text2); cursor: pointer; transition: all 0.15s; font-size: 13.5px; font-weight: 500; margin-bottom: 2px; }
   .nav-item:hover { background: var(--bg3); color: var(--text); }
-  .nav-item.active { background: rgba(108,99,255,0.15); color: var(--accent2); }
+  .nav-item.active { background: var(--accent-bg); color: var(--accent); font-weight: 600; }
   .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; }
-  .nav-badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
-  .sidebar-footer { padding: 14px 10px; border-top: 1px solid var(--border); }
-  .admin-info { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; }
-  .admin-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#6c63ff,#a78bfa); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
-  .admin-name { font-size: 13px; font-weight: 600; }
-  .admin-role { font-size: 11px; color: var(--text2); }
-  .logout-btn { width: 100%; background: transparent; border: 1px solid var(--border2); border-radius: 8px; padding: 8px; color: var(--text2); cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.15s; margin-top: 8px; }
-  .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
+  .nav-badge { margin-left: auto; background: var(--bg3); color: var(--text2); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+  .nav-item.active .nav-badge { background: rgba(232,113,74,0.15); color: var(--accent); }
+  .sidebar-footer { padding: 16px 12px; border-top: 1px solid var(--border); }
+  .admin-info { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 9px; background: var(--bg3); }
+  .admin-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #F5A882); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .admin-name { font-size: 13px; font-weight: 700; color: var(--text); }
+  .admin-role { font-size: 11px; color: var(--text2); font-weight: 500; }
+  .logout-btn { width: 100%; background: transparent; border: 1.5px solid var(--border2); border-radius: 9px; padding: 9px; color: var(--text2); cursor: pointer; font-size: 12.5px; font-weight: 600; font-family: inherit; transition: all 0.15s; margin-top: 10px; }
+  .logout-btn:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); }
 
-  .main { margin-left: 220px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
-  .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
-  .topbar-title { font-size: 17px; font-weight: 700; }
+  .main { margin-left: 232px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+  .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 14px 30px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+  .topbar-title { font-size: 18px; font-weight: 700; letter-spacing: -0.4px; color: var(--text); }
   .topbar-right { display: flex; align-items: center; gap: 12px; }
-  .topbar-badge { background: rgba(108,99,255,0.15); color: var(--accent2); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(108,99,255,0.25); }
-  .refresh-btn { background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 6px 12px; color: var(--text2); cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.15s; display: flex; align-items: center; gap: 6px; }
-  .refresh-btn:hover { background: rgba(108,99,255,0.1); color: var(--accent2); border-color: rgba(108,99,255,0.3); }
+  .topbar-badge { background: var(--accent-bg); color: var(--accent); font-size: 12px; font-weight: 700; padding: 5px 13px; border-radius: 20px; border: 1px solid rgba(232,113,74,0.2); }
+  .refresh-btn { background: var(--bg3); border: 1px solid var(--border); border-radius: 9px; padding: 7px 14px; color: var(--text2); cursor: pointer; font-size: 12px; font-weight: 600; font-family: inherit; transition: all 0.15s; display: flex; align-items: center; gap: 6px; }
+  .refresh-btn:hover { background: var(--accent-bg); color: var(--accent); border-color: rgba(232,113,74,0.3); }
   .refresh-btn.spinning svg { animation: spin 0.7s linear infinite; }
 
-  .content { padding: 28px; flex: 1; }
+  .content { padding: 30px; flex: 1; }
   .page { display: none; }
   .page.active { display: block; }
 
   /* STATS */
   .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
-  .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 22px; }
-  .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
-  .stat-icon.purple { background: rgba(108,99,255,0.15); }
-  .stat-icon.green  { background: rgba(34,197,94,0.15); }
-  .stat-icon.blue   { background: rgba(59,130,246,0.15); }
-  .stat-icon.amber  { background: rgba(245,158,11,0.15); }
-  .stat-icon.rose   { background: rgba(244,63,94,0.15); }
-  .stat-icon.teal   { background: rgba(20,184,166,0.15); }
-  .stat-label { font-size: 12px; color: var(--text2); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .stat-value { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
-  .stat-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+  .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 22px 24px; transition: box-shadow 0.2s; }
+  .stat-card:hover { box-shadow: 0 4px 16px rgba(26,23,20,0.07); }
+  .stat-icon { width: 42px; height: 42px; border-radius: 11px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .stat-icon.orange { background: var(--accent-bg); }
+  .stat-icon.green  { background: var(--success-bg); }
+  .stat-icon.blue   { background: var(--info-bg); }
+  .stat-icon.amber  { background: var(--warning-bg); }
+  .stat-icon.rose   { background: var(--danger-bg); }
+  .stat-icon.teal   { background: var(--teal-bg); }
+  .stat-icon.purple { background: var(--purple-bg); }
+  .stat-label { font-size: 11.5px; color: var(--text2); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.6px; }
+  .stat-value { font-size: 28px; font-weight: 700; letter-spacing: -1px; color: var(--text); }
+  .stat-sub { font-size: 12px; color: var(--text3); margin-top: 4px; font-weight: 500; }
 
   /* TABLES */
   .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); }
-  .card-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-  .card-title { font-size: 15px; font-weight: 700; }
+  .card-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .card-title { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
   .card-body { padding: 0; }
   .table-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; }
-  thead th { padding: 12px 18px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid var(--border); background: var(--bg3); white-space: nowrap; }
-  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+  thead th { padding: 12px 18px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.9px; border-bottom: 1px solid var(--border); background: var(--bg3); white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
   tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: rgba(255,255,255,0.025); }
-  tbody td { padding: 13px 18px; font-size: 13px; vertical-align: middle; }
-  .empty-row { text-align: center; color: var(--text2); padding: 40px !important; }
+  tbody tr:hover { background: var(--bg3); }
+  tbody td { padding: 13px 18px; font-size: 13.5px; vertical-align: middle; }
+  .empty-row { text-align: center; color: var(--text2); padding: 48px !important; }
 
   /* BADGES */
-  .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
-  .badge-success { background: rgba(34,197,94,0.13); color: #4ade80; }
-  .badge-danger  { background: rgba(239,68,68,0.13); color: #f87171; }
-  .badge-warning { background: rgba(245,158,11,0.13); color: #fbbf24; }
-  .badge-info    { background: rgba(59,130,246,0.13); color: #60a5fa; }
-  .badge-gray    { background: rgba(139,144,167,0.15); color: var(--text2); }
-  .badge-purple  { background: rgba(108,99,255,0.15); color: var(--accent2); }
-  .badge-teal    { background: rgba(20,184,166,0.15); color: #2dd4bf; }
+  .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .badge-success { background: var(--success-bg); color: var(--success); }
+  .badge-danger  { background: var(--danger-bg); color: var(--danger); }
+  .badge-warning { background: var(--warning-bg); color: var(--warning); }
+  .badge-info    { background: var(--info-bg); color: var(--info); }
+  .badge-gray    { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+  .badge-purple  { background: var(--purple-bg); color: var(--purple); }
+  .badge-teal    { background: var(--teal-bg); color: var(--teal); }
+  .badge-orange  { background: var(--accent-bg); color: var(--accent); }
 
   /* BUTTONS */
-  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; white-space: nowrap; }
-  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: 1.5px solid transparent; white-space: nowrap; font-family: inherit; }
+  .btn-sm { padding: 5px 11px; font-size: 12px; }
   .btn-accent  { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .btn-accent:hover { opacity: 0.85; }
+  .btn-accent:hover { background: var(--accent2); border-color: var(--accent2); }
   .btn-outline { background: transparent; border-color: var(--border2); color: var(--text2); }
-  .btn-outline:hover { background: var(--bg3); color: var(--text); }
-  .btn-danger  { background: rgba(239,68,68,0.12); color: #f87171; border-color: rgba(239,68,68,0.25); }
-  .btn-danger:hover { background: rgba(239,68,68,0.2); }
+  .btn-outline:hover { background: var(--bg3); color: var(--text); border-color: var(--border2); }
+  .btn-danger  { background: var(--danger-bg); color: var(--danger); border-color: rgba(208,59,59,0.2); }
+  .btn-danger:hover { background: rgba(208,59,59,0.15); }
 
   /* TOOLBAR */
   .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .search-box { display: flex; align-items: center; gap: 8px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 7px 12px; min-width: 200px; }
-  .search-box input { background: none; border: none; outline: none; color: var(--text); font-size: 13px; width: 100%; }
-  .search-box svg { color: var(--text2); flex-shrink: 0; }
-  .filter-select { background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 7px 12px; color: var(--text); font-size: 13px; outline: none; cursor: pointer; }
+  .search-box { display: flex; align-items: center; gap: 8px; background: var(--bg3); border: 1.5px solid var(--border); border-radius: 9px; padding: 7px 12px; min-width: 210px; transition: all 0.2s; }
+  .search-box:focus-within { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(232,113,74,0.1); }
+  .search-box input { background: none; border: none; outline: none; color: var(--text); font-size: 13px; width: 100%; font-family: inherit; }
+  .search-box svg { color: var(--text3); flex-shrink: 0; }
+  .filter-select { background: var(--bg3); border: 1.5px solid var(--border); border-radius: 9px; padding: 7px 12px; color: var(--text2); font-size: 13px; outline: none; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+  .filter-select:focus { border-color: var(--accent); }
 
   /* MODAL */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: center; justify-content: center; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(26,23,20,0.4); backdrop-filter: blur(6px); z-index: 1000; display: none; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
-  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 18px; width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
-  .modal-header { padding: 22px 26px 0; display: flex; align-items: center; justify-content: space-between; }
-  .modal-title { font-size: 17px; font-weight: 700; }
-  .modal-close { background: var(--bg3); border: none; color: var(--text2); width: 30px; height: 30px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.15s; }
-  .modal-close:hover { background: rgba(239,68,68,0.15); color: #f87171; }
-  .modal-body { padding: 22px 26px; }
-  .modal-footer { padding: 0 26px 22px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+  .modal { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-xl); width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(26,23,20,0.15); }
+  .modal-header { padding: 24px 28px 0; display: flex; align-items: center; justify-content: space-between; }
+  .modal-title { font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+  .modal-close { background: var(--bg3); border: 1px solid var(--border); color: var(--text2); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.15s; }
+  .modal-close:hover { background: var(--danger-bg); color: var(--danger); border-color: rgba(208,59,59,0.2); }
+  .modal-body { padding: 22px 28px; }
+  .modal-footer { padding: 0 28px 24px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
   .field { margin-bottom: 16px; }
-  .field label { display: block; font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 7px; }
-  .field input, .field select, .field textarea { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 13px; color: var(--text); font-size: 13px; outline: none; transition: border-color 0.2s; font-family: inherit; }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+  .field label { display: block; font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 7px; }
+  .field input, .field select, .field textarea { width: 100%; background: var(--bg3); border: 1.5px solid var(--border); border-radius: 9px; padding: 10px 13px; color: var(--text); font-size: 13.5px; outline: none; transition: all 0.2s; font-family: inherit; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(232,113,74,0.1); }
   .field textarea { resize: vertical; min-height: 80px; }
-  .field select option { background: var(--bg3); }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
   /* TOAST */
-  .toast { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; align-items: center; gap: 12px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 12px; padding: 14px 18px; font-size: 13px; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.4); transform: translateX(200%); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); max-width: 340px; }
+  .toast { position: fixed; top: 22px; right: 22px; z-index: 9999; display: flex; align-items: center; gap: 12px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 18px; font-size: 13.5px; font-weight: 600; box-shadow: 0 8px 32px rgba(26,23,20,0.12); transform: translateX(200%); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); max-width: 340px; }
   .toast.show { transform: translateX(0); }
-  .toast-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .toast.success .toast-icon { background: rgba(34,197,94,0.15); color: #4ade80; }
-  .toast.error   .toast-icon { background: rgba(239,68,68,0.15); color: #f87171; }
-  .toast.warning .toast-icon { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .toast-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 15px; }
+  .toast.success .toast-icon { background: var(--success-bg); color: var(--success); }
+  .toast.error   .toast-icon { background: var(--danger-bg); color: var(--danger); }
+  .toast.warning .toast-icon { background: var(--warning-bg); color: var(--warning); }
 
   /* LOADING */
-  .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.15); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+  .loading { display: inline-block; width: 18px; height: 18px; border: 2.5px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* AVATAR */
-  .avatar-sm { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#6c63ff,#a78bfa); display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0; vertical-align: middle; margin-right: 8px; }
-
-  /* CONFIRM MODAL */
-  .confirm-modal .modal { width: 360px; }
-  .confirm-msg { font-size: 14px; color: var(--text2); line-height: 1.6; }
+  .avatar-sm { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #F5A882); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; vertical-align: middle; margin-right: 8px; }
 
   /* CONNECTION STATUS */
-  .conn-status { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+  .conn-status { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text2); font-weight: 600; }
   .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
   .conn-dot.error { background: var(--danger); }
+  .conn-dot.connecting { background: var(--warning); animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-  /* STATS GRID 3-col for overview row 2 */
+  /* STATS GRID 3-col */
   .stats-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
 
-  @media (max-width: 900px) {
-    .stats-grid   { grid-template-columns: repeat(2,1fr); }
-    .stats-grid-3 { grid-template-columns: repeat(2,1fr); }
-  }
+  /* SECTION SPACING */
+  .mb-6 { margin-bottom: 24px; }
+
+  /* CONFIRM MODAL */
+  .confirm-msg { font-size: 14px; color: var(--text2); line-height: 1.65; font-weight: 500; }
+  .confirm-icon { width: 48px; height: 48px; border-radius: 14px; background: var(--danger-bg); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; font-size: 22px; }
+
+  @media (max-width: 1100px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 900px) { .stats-grid-3 { grid-template-columns: repeat(2,1fr); } }
   @media (max-width: 600px) {
-    .stats-grid   { grid-template-columns: 1fr; }
-    .stats-grid-3 { grid-template-columns: 1fr; }
+    .stats-grid, .stats-grid-3 { grid-template-columns: 1fr; }
     .content { padding: 16px; }
     .field-row { grid-template-columns: 1fr; }
   }
@@ -231,42 +250,42 @@
       <div class="nav-item" onclick="showPage('profiles')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
         Profiles
-        <span class="nav-badge" id="nav-profiles-count">0</span>
+        <span class="nav-badge" id="nav-profiles-count">—</span>
       </div>
       <div class="nav-item" onclick="showPage('venues')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M8 9V6a4 4 0 018 0v3"/><path d="M12 14v3"/></svg>
         Venues
-        <span class="nav-badge" id="nav-venues-count">0</span>
+        <span class="nav-badge" id="nav-venues-count">—</span>
       </div>
       <div class="nav-item" onclick="showPage('orders')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
         Orders
-        <span class="nav-badge" id="nav-orders-count">0</span>
+        <span class="nav-badge" id="nav-orders-count">—</span>
       </div>
       <div class="nav-item" onclick="showPage('restaurants')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>
         Restaurants
-        <span class="nav-badge" id="nav-restaurants-count">0</span>
+        <span class="nav-badge" id="nav-restaurants-count">—</span>
       </div>
       <div class="nav-item" onclick="showPage('photographers')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 00-2 2v9a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>
         Photographers
-        <span class="nav-badge" id="nav-photographers-count">0</span>
+        <span class="nav-badge" id="nav-photographers-count">—</span>
       </div>
       <div class="nav-item" onclick="showPage('av')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>
         AV Equipment
-        <span class="nav-badge" id="nav-av-count">0</span>
+        <span class="nav-badge" id="nav-av-count">—</span>
       </div>
       <div class="nav-item" onclick="showPage('printing')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Printing Items
-        <span class="nav-badge" id="nav-printing-count">0</span>
+        <span class="nav-badge" id="nav-printing-count">—</span>
       </div>
       <div class="nav-item" onclick="showPage('tickets')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         Support Tickets
-        <span class="nav-badge" id="nav-tickets-count">0</span>
+        <span class="nav-badge" id="nav-tickets-count">—</span>
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -286,15 +305,15 @@
       <div class="topbar-title" id="page-title">Overview</div>
       <div class="topbar-right">
         <div class="conn-status">
-          <div class="conn-dot" id="conn-dot"></div>
-          <span id="conn-label" style="color:var(--text2);font-size:12px">Connecting…</span>
+          <div class="conn-dot connecting" id="conn-dot"></div>
+          <span id="conn-label">Connecting…</span>
         </div>
         <button class="refresh-btn" onclick="refreshCurrentPage()" id="refresh-btn">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           Refresh
         </button>
         <span class="topbar-badge" id="admin-badge">Admin</span>
-        <span style="font-size:12px;color:var(--text2)" id="current-time"></span>
+        <span style="font-size:12px;color:var(--text2);font-weight:500" id="current-time"></span>
       </div>
     </div>
 
@@ -304,8 +323,8 @@
       <div class="page active" id="page-overview">
         <div class="stats-grid">
           <div class="stat-card">
-            <div class="stat-icon purple">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            <div class="stat-icon orange">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
             </div>
             <div class="stat-label">Total Profiles</div>
             <div class="stat-value" id="stat-profiles">—</div>
@@ -313,7 +332,7 @@
           </div>
           <div class="stat-card">
             <div class="stat-icon blue">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M8 9V6a4 4 0 018 0v3"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--info)" stroke-width="2"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M8 9V6a4 4 0 018 0v3"/></svg>
             </div>
             <div class="stat-label">Venues</div>
             <div class="stat-value" id="stat-venues">—</div>
@@ -321,7 +340,7 @@
           </div>
           <div class="stat-card">
             <div class="stat-icon amber">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
             </div>
             <div class="stat-label">Orders</div>
             <div class="stat-value" id="stat-orders">—</div>
@@ -329,7 +348,7 @@
           </div>
           <div class="stat-card">
             <div class="stat-icon green">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>
             </div>
             <div class="stat-label">Restaurants</div>
             <div class="stat-value" id="stat-restaurants">—</div>
@@ -339,7 +358,7 @@
         <div class="stats-grid-3">
           <div class="stat-card">
             <div class="stat-icon teal">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 00-2 2v9a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 00-2 2v9a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>
             </div>
             <div class="stat-label">Photographers</div>
             <div class="stat-value" id="stat-photographers">—</div>
@@ -347,7 +366,7 @@
           </div>
           <div class="stat-card">
             <div class="stat-icon rose">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fb7185" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
             </div>
             <div class="stat-label">AV Equipment</div>
             <div class="stat-value" id="stat-av">—</div>
@@ -355,7 +374,7 @@
           </div>
           <div class="stat-card">
             <div class="stat-icon amber">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
             </div>
             <div class="stat-label">Support Tickets</div>
             <div class="stat-value" id="stat-tickets">—</div>
@@ -363,7 +382,7 @@
           </div>
         </div>
 
-        <div class="card" style="margin-bottom:24px">
+        <div class="card mb-6">
           <div class="card-header">
             <span class="card-title">Recent Orders</span>
             <button class="btn btn-outline btn-sm" onclick="showPage('orders')">View All →</button>
@@ -604,6 +623,8 @@
   </div>
 </div>
 
+<!-- MODALS (same structure, white theme inherits via CSS vars) -->
+
 <!-- VENUE MODAL -->
 <div class="modal-overlay" id="venue-modal">
   <div class="modal">
@@ -635,7 +656,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('venue-modal')">Cancel</button>
-      <button class="btn btn-accent" onclick="saveVenue()">Save</button>
+      <button class="btn btn-accent" onclick="saveVenue()">Save Venue</button>
     </div>
   </div>
 </div>
@@ -862,14 +883,15 @@
 </div>
 
 <!-- CONFIRM MODAL -->
-<div class="modal-overlay confirm-modal" id="confirm-modal">
-  <div class="modal">
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal" style="width:380px">
     <div class="modal-header">
       <div class="modal-title">Confirm Delete</div>
       <button class="modal-close" onclick="closeModal('confirm-modal')">✕</button>
     </div>
     <div class="modal-body">
-      <p class="confirm-msg" id="confirm-msg">Are you sure you want to delete this record?</p>
+      <div class="confirm-icon">🗑️</div>
+      <p class="confirm-msg" id="confirm-msg">Are you sure you want to delete this record? This action cannot be undone.</p>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('confirm-modal')">Cancel</button>
@@ -884,13 +906,27 @@
   <span id="toast-msg"></span>
 </div>
 
+<!-- SERVICE KEY NOTICE (shown if data fails to load) -->
+<div id="service-key-notice" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;border:1.5px solid #E8D9B5;border-radius:12px;padding:14px 20px;font-size:13px;color:#7A5C00;max-width:520px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.1);line-height:1.5;">
+  <strong>⚠️ Service Role Key Required:</strong> Some tables use RLS. Replace <code style="background:#F5F0E0;padding:2px 6px;border-radius:4px">PASTE_YOUR_SERVICE_ROLE_KEY_HERE</code> in the script with your Supabase service role key (Project Settings → API → service_role secret).
+</div>
+
 <script>
 // ── Supabase ──────────────────────────────────────────────────────────────────
-// ⚠️  Use the SERVICE ROLE key here (Supabase → Project Settings → API → service_role)
-// This bypasses RLS so all tables (profiles, venues, etc.) are fully accessible.
-const SUPABASE_URL          = 'https://vkpamatgglwfyyctqokv.supabase.co';
-const SUPABASE_SERVICE_KEY  = 'PASTE_YOUR_SERVICE_ROLE_KEY_HERE';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
+// IMPORTANT: Replace with your SERVICE ROLE key from Supabase → Project Settings → API
+// The anon key cannot bypass RLS for admin operations.
+const SUPABASE_URL = 'https://vkpamatgglwfyyctqokv.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrcGFtYXRnZ2x3Znl5Y3Rxb2t2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNTgxMzIsImV4cCI6MjA5MzczNDEzMn0.8cqvwgjLW8dTmlp_7KlL0mTGDExQaOhgVVM7HZ7ZCSI';
+
+// ← PASTE YOUR SERVICE ROLE KEY HERE (keeps data access working regardless of RLS)
+const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrcGFtYXRnZ2x3Znl5Y3Rxb2t2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODE1ODEzMiwiZXhwIjoyMDkzNzM0MTMyfQ.QDkSeLzFwfJMbEsI2EwCSSwRALCMxkqUguxz3MvaWgA';
+
+// Use service key if provided, fall back to anon key
+const activeKey = (SUPABASE_SERVICE_KEY && SUPABASE_SERVICE_KEY !== 'PASTE_YOUR_SERVICE_ROLE_KEY_HERE')
+  ? SUPABASE_SERVICE_KEY
+  : SUPABASE_ANON_KEY;
+
+const sb = supabase.createClient(SUPABASE_URL, activeKey, {
   auth: { autoRefreshToken: false, persistSession: false }
 });
 
@@ -906,6 +942,7 @@ let currentAdmin = null;
 let currentPage  = 'overview';
 let allProfiles = [], allVenues = [], allOrders = [];
 let allRestaurants = [], allPhotographers = [], allAV = [], allPrinting = [], allTickets = [];
+let loadErrors = [];
 
 // ── Clock ─────────────────────────────────────────────────────────────────────
 function updateClock() {
@@ -961,11 +998,9 @@ function showPage(name) {
   document.getElementById('page-' + name).classList.add('active');
   currentPage = name;
   document.getElementById('page-title').textContent = PAGE_TITLES[name] || name;
-  // Highlight sidebar item
   const navItems = document.querySelectorAll('.nav-item');
   const navMap = { overview:0, profiles:1, venues:2, orders:3, restaurants:4, photographers:5, av:6, printing:7, tickets:8 };
   if (navItems[navMap[name]]) navItems[navMap[name]].classList.add('active');
-  // Render
   if (name==='profiles')     renderProfiles();
   if (name==='venues')       renderVenues();
   if (name==='orders')       renderOrders(allOrders);
@@ -984,33 +1019,61 @@ function refreshCurrentPage() {
 
 // ── Load All ──────────────────────────────────────────────────────────────────
 async function loadAll() {
+  loadErrors = [];
+  document.getElementById('conn-dot').className = 'conn-dot connecting';
+  document.getElementById('conn-label').textContent = 'Loading…';
+
   await Promise.all([
     loadProfiles(), loadVenues(), loadOrders(),
     loadRestaurants(), loadPhotographers(), loadAV(), loadPrinting(), loadTickets()
   ]);
+
   updateOverviewStats();
   renderOverviewRecent();
-  document.getElementById('conn-dot').className = 'conn-dot';
-  document.getElementById('conn-label').textContent = 'Connected';
+
+  if (loadErrors.length > 0) {
+    document.getElementById('conn-dot').className = 'conn-dot error';
+    document.getElementById('conn-label').textContent = `${loadErrors.length} error(s)`;
+    // Show service key notice if using anon key
+    if (activeKey === SUPABASE_ANON_KEY) {
+      document.getElementById('service-key-notice').style.display = 'block';
+    }
+  } else {
+    document.getElementById('conn-dot').className = 'conn-dot';
+    document.getElementById('conn-label').textContent = 'Connected';
+    document.getElementById('service-key-notice').style.display = 'none';
+  }
+}
+
+// ── Generic fetch helper ──────────────────────────────────────────────────────
+async function fetchTable(table, options = {}) {
+  const { order, ascending = true, extra = '' } = options;
+  let q = sb.from(table).select(extra || '*');
+  if (order) q = q.order(order, { ascending });
+  const { data, error } = await q;
+  if (error) {
+    console.error(`[${table}]`, error.message);
+    loadErrors.push({ table, message: error.message });
+    return [];
+  }
+  return data || [];
 }
 
 // ── Profiles ──────────────────────────────────────────────────────────────────
 async function loadProfiles() {
-  const { data, error } = await sb.from('profiles').select('*').order('created_at', { ascending: false });
-  if (error) { allProfiles = []; return; }
-  allProfiles = data || [];
+  allProfiles = await fetchTable('profiles', { order: 'created_at', ascending: false });
   document.getElementById('nav-profiles-count').textContent = allProfiles.length;
-  renderProfiles();
+  if (currentPage === 'profiles') renderProfiles();
 }
 function renderProfiles(filtered) {
   const data  = filtered ?? allProfiles;
   const tbody = document.getElementById('profiles-body');
-  if (!data.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-row">No profiles found.</td></tr>'; return; }
+  if (!data.length) { tbody.innerHTML = `<tr><td colspan="7" class="empty-row">${allProfiles.length === 0 ? 'No profiles found — check your service role key.' : 'No results.'}</td></tr>`; return; }
   tbody.innerHTML = data.map(p => `
     <tr>
       <td><div class="avatar-sm">${(p.full_name||p.username||'?')[0].toUpperCase()}</div></td>
       <td><strong>${esc(p.full_name||'—')}</strong></td>
-      <td style="color:var(--text2)">${esc(p.username||'—')}</td>
+      <td style="color:var(--text2);font-family:'DM Mono',monospace;font-size:12px">${esc(p.username||'—')}</td>
       <td style="color:var(--text2)">${esc(p.phone||'—')}</td>
       <td>${roleBadge(p.role)}</td>
       <td style="color:var(--text2);font-size:12px">${fmtDate(p.created_at)}</td>
@@ -1033,11 +1096,9 @@ function filterProfiles(q) {
 
 // ── Venues ────────────────────────────────────────────────────────────────────
 async function loadVenues() {
-  const { data, error } = await sb.from('venues').select('*').order('name', { ascending: true });
-  if (error) { allVenues = []; return; }
-  allVenues = data || [];
+  allVenues = await fetchTable('venues', { order: 'name' });
   document.getElementById('nav-venues-count').textContent = allVenues.length;
-  renderVenues();
+  if (currentPage === 'venues') renderVenues();
 }
 function renderVenues(filtered) {
   const data  = filtered ?? allVenues;
@@ -1048,8 +1109,8 @@ function renderVenues(filtered) {
       <td><strong>${esc(v.name||'—')}</strong></td>
       <td style="color:var(--text2)">${esc(v.type||'—')}</td>
       <td style="color:var(--text2)">${esc(v.city||'—')}</td>
-      <td style="text-align:center">${v.capacity ?? '—'}</td>
-      <td><strong>${v.price_per_day != null ? Number(v.price_per_day).toLocaleString() : '—'}</strong></td>
+      <td style="text-align:center;font-weight:600">${v.capacity ?? '—'}</td>
+      <td><strong style="color:var(--accent)">${v.price_per_day != null ? Number(v.price_per_day).toLocaleString() : '—'}</strong></td>
       <td>${v.is_available
         ? '<span class="badge badge-success">✓ Yes</span>'
         : '<span class="badge badge-danger">✗ No</span>'}</td>
@@ -1073,7 +1134,6 @@ function filterVenues(q) {
   if (avail !== '') data = data.filter(v => String(v.is_available) === avail);
   renderVenues(data);
 }
-
 function openVenueModal() {
   clearVenueForm();
   openModal('venue-modal');
@@ -1102,14 +1162,14 @@ function clearVenueForm() {
 async function saveVenue() {
   const id = document.getElementById('venue-edit-id').value;
   const payload = {
-    name:          document.getElementById('venue-name').value.trim(),
-    type:          document.getElementById('venue-type').value.trim(),
-    capacity:      parseInt(document.getElementById('venue-capacity').value) || null,
+    name: document.getElementById('venue-name').value.trim(),
+    type: document.getElementById('venue-type').value.trim(),
+    capacity: parseInt(document.getElementById('venue-capacity').value) || null,
     price_per_day: parseFloat(document.getElementById('venue-price').value) || null,
-    city:          document.getElementById('venue-city').value.trim(),
-    address:       document.getElementById('venue-address').value.trim(),
-    description:   document.getElementById('venue-description').value.trim(),
-    is_available:  document.getElementById('venue-available').value === 'true',
+    city: document.getElementById('venue-city').value.trim(),
+    address: document.getElementById('venue-address').value.trim(),
+    description: document.getElementById('venue-description').value.trim(),
+    is_available: document.getElementById('venue-available').value === 'true',
   };
   let err;
   if (id) { ({ error: err } = await sb.from('venues').update(payload).eq('id', id)); }
@@ -1117,29 +1177,26 @@ async function saveVenue() {
   if (err) { showToast(err.message, 'error'); return; }
   showToast(id ? 'Venue updated!' : 'Venue added!', 'success');
   closeModal('venue-modal');
-  await loadVenues();
-  updateOverviewStats();
+  await loadVenues(); updateOverviewStats();
 }
 
 // ── Orders ────────────────────────────────────────────────────────────────────
 async function loadOrders() {
-  const { data, error } = await sb.from('orders').select('*, order_items(*)').order('created_at', { ascending: false });
-  if (error) { allOrders = []; return; }
-  allOrders = data || [];
+  allOrders = await fetchTable('orders', { order: 'created_at', ascending: false, extra: '*, order_items(*)' });
   document.getElementById('nav-orders-count').textContent = allOrders.length;
-  renderOrders(allOrders);
+  if (currentPage === 'orders') renderOrders(allOrders);
 }
 function renderOrders(data) {
   const tbody = document.getElementById('orders-body');
   if (!data||!data.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty-row">No orders found.</td></tr>'; return; }
   tbody.innerHTML = data.map(o => `
     <tr>
-      <td style="color:var(--text2);font-size:11px">#${o.id.slice(0,8)}…</td>
-      <td style="color:var(--text2);font-size:11px">${o.user_id ? o.user_id.slice(0,8)+'…' : '—'}</td>
+      <td style="color:var(--text2);font-size:11.5px;font-family:'DM Mono',monospace">#${o.id.slice(0,8)}…</td>
+      <td style="color:var(--text2);font-size:11.5px;font-family:'DM Mono',monospace">${o.user_id ? o.user_id.slice(0,8)+'…' : '—'}</td>
       <td>${orderStatusBadge(o.status)}</td>
-      <td><strong>${o.total_egp != null ? Number(o.total_egp).toLocaleString() : '—'}</strong></td>
+      <td><strong style="color:var(--accent)">${o.total_egp != null ? Number(o.total_egp).toLocaleString() : '—'}</strong></td>
       <td>${fmtDate(o.event_date)||'—'}</td>
-      <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12px">${esc(o.notes||'')}</td>
+      <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12px">${esc(o.notes||'—')}</td>
       <td style="color:var(--text2);font-size:12px;white-space:nowrap">${fmtDate(o.created_at)}</td>
       <td>
         <div style="display:flex;gap:6px">
@@ -1151,7 +1208,7 @@ function renderOrders(data) {
     </tr>`).join('');
 }
 function filterOrders(q) {
-  let data   = [...allOrders];
+  let data = [...allOrders];
   const status = document.getElementById('order-status-filter')?.value||'';
   if (typeof q === 'string' && q) {
     const s = q.toLowerCase();
@@ -1165,45 +1222,43 @@ async function viewOrder(id) {
   if (!order) return;
   const items = order.order_items || [];
   document.getElementById('order-detail-body').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
-      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Order ID</div><div style="font-size:12px;word-break:break-all">${esc(order.id)}</div></div>
-      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Status</div>${orderStatusBadge(order.status)}</div>
-      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Total</div><div style="font-size:18px;font-weight:700">${order.total_egp != null ? Number(order.total_egp).toLocaleString() : '—'} EGP</div></div>
-      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Event Date</div><div>${fmtDate(order.event_date)||'—'}</div></div>
-      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Created</div><div style="font-size:12px;color:var(--text2)">${fmtDate(order.created_at)}</div></div>
-      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Notes</div><div style="font-size:12px;color:var(--text2)">${esc(order.notes||'—')}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px">
+      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;font-weight:700">Order ID</div><div style="font-size:11.5px;word-break:break-all;font-family:'DM Mono',monospace;color:var(--text2)">${esc(order.id)}</div></div>
+      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;font-weight:700">Status</div>${orderStatusBadge(order.status)}</div>
+      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;font-weight:700">Total</div><div style="font-size:22px;font-weight:700;color:var(--accent)">${order.total_egp != null ? Number(order.total_egp).toLocaleString() : '—'} EGP</div></div>
+      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;font-weight:700">Event Date</div><div style="font-weight:600">${fmtDate(order.event_date)||'—'}</div></div>
+      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;font-weight:700">Created</div><div style="font-size:12px;color:var(--text2)">${fmtDate(order.created_at)}</div></div>
+      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;font-weight:700">Notes</div><div style="font-size:13px;color:var(--text2)">${esc(order.notes||'—')}</div></div>
     </div>
     ${items.length ? `
-    <div style="font-size:13px;font-weight:700;margin-bottom:12px">Order Items (${items.length})</div>
-    <div style="background:var(--bg3);border-radius:8px;overflow:hidden">
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text)">Order Items (${items.length})</div>
+    <div style="background:var(--bg3);border-radius:10px;overflow:hidden;border:1px solid var(--border)">
       <table style="width:100%;border-collapse:collapse">
         <thead><tr>
-          <th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">Service</th>
-          <th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">Type</th>
-          <th style="padding:10px 14px;text-align:right;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">Qty</th>
-          <th style="padding:10px 14px;text-align:right;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">Subtotal</th>
+          <th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--border);font-weight:700">Service</th>
+          <th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--border);font-weight:700">Type</th>
+          <th style="padding:10px 14px;text-align:right;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--border);font-weight:700">Qty</th>
+          <th style="padding:10px 14px;text-align:right;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--border);font-weight:700">Subtotal</th>
         </tr></thead>
         <tbody>${items.map(i => `
           <tr style="border-bottom:1px solid var(--border)">
-            <td style="padding:10px 14px;font-size:13px">${esc(i.service_name||'—')}</td>
+            <td style="padding:10px 14px;font-size:13px;font-weight:600">${esc(i.service_name||'—')}</td>
             <td style="padding:10px 14px;font-size:12px;color:var(--text2)">${esc(i.service_type||'—')}</td>
             <td style="padding:10px 14px;text-align:right;font-size:13px">${i.quantity||1}</td>
-            <td style="padding:10px 14px;text-align:right;font-size:13px;font-weight:600">${i.subtotal != null ? Number(i.subtotal).toLocaleString() : '—'}</td>
+            <td style="padding:10px 14px;text-align:right;font-size:13px;font-weight:700;color:var(--accent)">${i.subtotal != null ? Number(i.subtotal).toLocaleString() : '—'}</td>
           </tr>`).join('')}
         </tbody>
       </table>
-    </div>` : '<div style="color:var(--text2);font-size:13px">No order items found.</div>'}
+    </div>` : '<div style="color:var(--text2);font-size:13px;padding:16px 0">No order items found.</div>'}
   `;
   openModal('order-detail-modal');
 }
 
 // ── Restaurants ───────────────────────────────────────────────────────────────
 async function loadRestaurants() {
-  const { data, error } = await sb.from('restaurants').select('*').order('name', { ascending: true });
-  if (error) { allRestaurants = []; return; }
-  allRestaurants = data || [];
+  allRestaurants = await fetchTable('restaurants', { order: 'name' });
   document.getElementById('nav-restaurants-count').textContent = allRestaurants.length;
-  renderRestaurants();
+  if (currentPage === 'restaurants') renderRestaurants();
 }
 function renderRestaurants(filtered) {
   const data  = filtered ?? allRestaurants;
@@ -1212,9 +1267,9 @@ function renderRestaurants(filtered) {
   tbody.innerHTML = data.map(r => `
     <tr>
       <td><strong>${esc(r.name||'—')}</strong></td>
-      <td style="color:var(--text2)">${esc(r.cuisine||'—')}</td>
+      <td><span class="badge badge-teal">${esc(r.cuisine||'—')}</span></td>
       <td>${r.rating != null ? `<span class="badge badge-warning">★ ${r.rating}</span>` : '—'}</td>
-      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12px">${esc(r.description||'')}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12.5px">${esc(r.description||'')}</td>
       <td>
         <div style="display:flex;gap:6px">
           <button class="btn btn-outline btn-sm" onclick="editRestaurant('${r.id}')">Edit</button>
@@ -1238,20 +1293,20 @@ function openRestaurantModal() {
 function editRestaurant(id) {
   const r = allRestaurants.find(x => x.id === id);
   if (!r) return;
-  document.getElementById('restaurant-edit-id').value      = r.id;
-  document.getElementById('restaurant-name').value         = r.name||'';
-  document.getElementById('restaurant-cuisine').value      = r.cuisine||'';
-  document.getElementById('restaurant-rating').value       = r.rating||'';
-  document.getElementById('restaurant-description').value  = r.description||'';
+  document.getElementById('restaurant-edit-id').value = r.id;
+  document.getElementById('restaurant-name').value = r.name||'';
+  document.getElementById('restaurant-cuisine').value = r.cuisine||'';
+  document.getElementById('restaurant-rating').value = r.rating||'';
+  document.getElementById('restaurant-description').value = r.description||'';
   document.getElementById('restaurant-modal-title').textContent = 'Edit Restaurant';
   openModal('restaurant-modal');
 }
 async function saveRestaurant() {
   const id = document.getElementById('restaurant-edit-id').value;
   const payload = {
-    name:        document.getElementById('restaurant-name').value.trim(),
-    cuisine:     document.getElementById('restaurant-cuisine').value.trim(),
-    rating:      parseFloat(document.getElementById('restaurant-rating').value) || null,
+    name: document.getElementById('restaurant-name').value.trim(),
+    cuisine: document.getElementById('restaurant-cuisine').value.trim(),
+    rating: parseFloat(document.getElementById('restaurant-rating').value) || null,
     description: document.getElementById('restaurant-description').value.trim(),
   };
   let err;
@@ -1260,17 +1315,14 @@ async function saveRestaurant() {
   if (err) { showToast(err.message, 'error'); return; }
   showToast(id ? 'Restaurant updated!' : 'Restaurant added!', 'success');
   closeModal('restaurant-modal');
-  await loadRestaurants();
-  updateOverviewStats();
+  await loadRestaurants(); updateOverviewStats();
 }
 
 // ── Photographers ─────────────────────────────────────────────────────────────
 async function loadPhotographers() {
-  const { data, error } = await sb.from('photographers').select('*').order('name', { ascending: true });
-  if (error) { allPhotographers = []; return; }
-  allPhotographers = data || [];
+  allPhotographers = await fetchTable('photographers', { order: 'name' });
   document.getElementById('nav-photographers-count').textContent = allPhotographers.length;
-  renderPhotographers();
+  if (currentPage === 'photographers') renderPhotographers();
 }
 function renderPhotographers(filtered) {
   const data  = filtered ?? allPhotographers;
@@ -1279,10 +1331,10 @@ function renderPhotographers(filtered) {
   tbody.innerHTML = data.map(p => `
     <tr>
       <td><strong>${esc(p.name||'—')}</strong></td>
-      <td><span class="badge badge-teal">${capitalize(p.type||'—')}</span></td>
-      <td><strong>${p.price_per_day != null ? Number(p.price_per_day).toLocaleString() : '—'}</strong></td>
+      <td><span class="badge badge-orange">${capitalize(p.type||'—')}</span></td>
+      <td><strong style="color:var(--accent)">${p.price_per_day != null ? Number(p.price_per_day).toLocaleString() : '—'}</strong></td>
       <td>${p.rating != null ? `<span class="badge badge-warning">★ ${p.rating}</span>` : '—'}</td>
-      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12px">${esc(p.bio||'')}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12.5px">${esc(p.bio||'')}</td>
       <td>
         <div style="display:flex;gap:6px">
           <button class="btn btn-outline btn-sm" onclick="editPhotographer('${p.id}')">Edit</button>
@@ -1305,23 +1357,23 @@ function openPhotographerModal() {
 function editPhotographer(id) {
   const p = allPhotographers.find(x => x.id === id);
   if (!p) return;
-  document.getElementById('photographer-edit-id').value  = p.id;
-  document.getElementById('photographer-name').value     = p.name||'';
-  document.getElementById('photographer-type').value     = p.type||'individual';
-  document.getElementById('photographer-price').value    = p.price_per_day||'';
-  document.getElementById('photographer-rating').value   = p.rating||'';
-  document.getElementById('photographer-bio').value      = p.bio||'';
+  document.getElementById('photographer-edit-id').value = p.id;
+  document.getElementById('photographer-name').value    = p.name||'';
+  document.getElementById('photographer-type').value    = p.type||'individual';
+  document.getElementById('photographer-price').value   = p.price_per_day||'';
+  document.getElementById('photographer-rating').value  = p.rating||'';
+  document.getElementById('photographer-bio').value     = p.bio||'';
   document.getElementById('photographer-modal-title').textContent = 'Edit Photographer';
   openModal('photographer-modal');
 }
 async function savePhotographer() {
   const id = document.getElementById('photographer-edit-id').value;
   const payload = {
-    name:          document.getElementById('photographer-name').value.trim(),
-    type:          document.getElementById('photographer-type').value,
+    name: document.getElementById('photographer-name').value.trim(),
+    type: document.getElementById('photographer-type').value,
     price_per_day: parseFloat(document.getElementById('photographer-price').value) || null,
-    rating:        parseFloat(document.getElementById('photographer-rating').value) || null,
-    bio:           document.getElementById('photographer-bio').value.trim(),
+    rating: parseFloat(document.getElementById('photographer-rating').value) || null,
+    bio: document.getElementById('photographer-bio').value.trim(),
   };
   let err;
   if (id) { ({ error: err } = await sb.from('photographers').update(payload).eq('id', id)); }
@@ -1329,17 +1381,14 @@ async function savePhotographer() {
   if (err) { showToast(err.message, 'error'); return; }
   showToast(id ? 'Photographer updated!' : 'Photographer added!', 'success');
   closeModal('photographer-modal');
-  await loadPhotographers();
-  updateOverviewStats();
+  await loadPhotographers(); updateOverviewStats();
 }
 
 // ── AV Equipment ──────────────────────────────────────────────────────────────
 async function loadAV() {
-  const { data, error } = await sb.from('av_equipment').select('*').order('name', { ascending: true });
-  if (error) { allAV = []; return; }
-  allAV = data || [];
+  allAV = await fetchTable('av_equipment', { order: 'name' });
   document.getElementById('nav-av-count').textContent = allAV.length;
-  renderAV();
+  if (currentPage === 'av') renderAV();
 }
 function renderAV(filtered) {
   const data  = filtered ?? allAV;
@@ -1349,8 +1398,8 @@ function renderAV(filtered) {
     <tr>
       <td><strong>${esc(a.name||'—')}</strong></td>
       <td><span class="badge badge-info">${capitalize(a.category||'—')}</span></td>
-      <td><strong>${a.price_per_day != null ? Number(a.price_per_day).toLocaleString() : '—'}</strong></td>
-      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12px">${esc(a.description||'')}</td>
+      <td><strong style="color:var(--accent)">${a.price_per_day != null ? Number(a.price_per_day).toLocaleString() : '—'}</strong></td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12.5px">${esc(a.description||'')}</td>
       <td>
         <div style="display:flex;gap:6px">
           <button class="btn btn-outline btn-sm" onclick="editAV('${a.id}')">Edit</button>
@@ -1383,10 +1432,10 @@ function editAV(id) {
 async function saveAV() {
   const id = document.getElementById('av-edit-id').value;
   const payload = {
-    name:          document.getElementById('av-name').value.trim(),
-    category:      document.getElementById('av-category').value,
+    name: document.getElementById('av-name').value.trim(),
+    category: document.getElementById('av-category').value,
     price_per_day: parseFloat(document.getElementById('av-price').value) || null,
-    description:   document.getElementById('av-description').value.trim(),
+    description: document.getElementById('av-description').value.trim(),
   };
   let err;
   if (id) { ({ error: err } = await sb.from('av_equipment').update(payload).eq('id', id)); }
@@ -1394,17 +1443,14 @@ async function saveAV() {
   if (err) { showToast(err.message, 'error'); return; }
   showToast(id ? 'Equipment updated!' : 'Equipment added!', 'success');
   closeModal('av-modal');
-  await loadAV();
-  updateOverviewStats();
+  await loadAV(); updateOverviewStats();
 }
 
 // ── Printing Items ────────────────────────────────────────────────────────────
 async function loadPrinting() {
-  const { data, error } = await sb.from('printing_items').select('*').order('name', { ascending: true });
-  if (error) { allPrinting = []; return; }
-  allPrinting = data || [];
+  allPrinting = await fetchTable('printing_items', { order: 'name' });
   document.getElementById('nav-printing-count').textContent = allPrinting.length;
-  renderPrinting();
+  if (currentPage === 'printing') renderPrinting();
 }
 function renderPrinting(filtered) {
   const data  = filtered ?? allPrinting;
@@ -1414,8 +1460,8 @@ function renderPrinting(filtered) {
     <tr>
       <td><strong>${esc(p.name||'—')}</strong></td>
       <td style="color:var(--text2)">${esc(p.category||'—')}</td>
-      <td><strong>${p.price_per_unit != null ? Number(p.price_per_unit).toLocaleString() : '—'}</strong></td>
-      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12px">${esc(p.description||'')}</td>
+      <td><strong style="color:var(--accent)">${p.price_per_unit != null ? Number(p.price_per_unit).toLocaleString() : '—'}</strong></td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12.5px">${esc(p.description||'')}</td>
       <td>
         <div style="display:flex;gap:6px">
           <button class="btn btn-outline btn-sm" onclick="editPrinting('${p.id}')">Edit</button>
@@ -1437,21 +1483,21 @@ function openPrintingModal() {
 function editPrinting(id) {
   const p = allPrinting.find(x => x.id === id);
   if (!p) return;
-  document.getElementById('printing-edit-id').value      = p.id;
-  document.getElementById('printing-name').value         = p.name||'';
-  document.getElementById('printing-category').value     = p.category||'';
-  document.getElementById('printing-price').value        = p.price_per_unit||'';
-  document.getElementById('printing-description').value  = p.description||'';
+  document.getElementById('printing-edit-id').value     = p.id;
+  document.getElementById('printing-name').value        = p.name||'';
+  document.getElementById('printing-category').value    = p.category||'';
+  document.getElementById('printing-price').value       = p.price_per_unit||'';
+  document.getElementById('printing-description').value = p.description||'';
   document.getElementById('printing-modal-title').textContent = 'Edit Printing Item';
   openModal('printing-modal');
 }
 async function savePrinting() {
   const id = document.getElementById('printing-edit-id').value;
   const payload = {
-    name:           document.getElementById('printing-name').value.trim(),
-    category:       document.getElementById('printing-category').value.trim(),
+    name: document.getElementById('printing-name').value.trim(),
+    category: document.getElementById('printing-category').value.trim(),
     price_per_unit: parseFloat(document.getElementById('printing-price').value) || null,
-    description:    document.getElementById('printing-description').value.trim(),
+    description: document.getElementById('printing-description').value.trim(),
   };
   let err;
   if (id) { ({ error: err } = await sb.from('printing_items').update(payload).eq('id', id)); }
@@ -1464,19 +1510,17 @@ async function savePrinting() {
 
 // ── Support Tickets ───────────────────────────────────────────────────────────
 async function loadTickets() {
-  const { data, error } = await sb.from('support_tickets').select('*').order('created_at', { ascending: false });
-  if (error) { allTickets = []; return; }
-  allTickets = data || [];
+  allTickets = await fetchTable('support_tickets', { order: 'created_at', ascending: false });
   document.getElementById('nav-tickets-count').textContent = allTickets.length;
-  renderTickets(allTickets);
+  if (currentPage === 'tickets') renderTickets(allTickets);
 }
 function renderTickets(data) {
   const tbody = document.getElementById('tickets-body');
   if (!data||!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No tickets found.</td></tr>'; return; }
   tbody.innerHTML = data.map(t => `
     <tr>
-      <td style="color:var(--text2);font-size:11px">#${t.id.slice(0,8)}…</td>
-      <td style="color:var(--text2);font-size:11px">${t.user_id ? t.user_id.slice(0,8)+'…' : '—'}</td>
+      <td style="color:var(--text2);font-size:11.5px;font-family:'DM Mono',monospace">#${t.id.slice(0,8)}…</td>
+      <td style="color:var(--text2);font-size:11.5px;font-family:'DM Mono',monospace">${t.user_id ? t.user_id.slice(0,8)+'…' : '—'}</td>
       <td><strong>${esc(t.subject||'—')}</strong></td>
       <td>${t.status === 'open'
         ? '<span class="badge badge-warning">Open</span>'
@@ -1492,7 +1536,7 @@ function renderTickets(data) {
     </tr>`).join('');
 }
 function filterTickets(q) {
-  let data   = [...allTickets];
+  let data = [...allTickets];
   const status = document.getElementById('ticket-status-filter')?.value||'';
   if (typeof q === 'string' && q) {
     const s = q.toLowerCase();
@@ -1505,27 +1549,27 @@ function viewTicket(id) {
   const t = allTickets.find(x => x.id === id);
   if (!t) return;
   document.getElementById('ticket-detail-body').innerHTML = `
-    <div style="margin-bottom:16px">
-      <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Subject</div>
-      <div style="font-size:15px;font-weight:700">${esc(t.subject)}</div>
+    <div style="margin-bottom:18px">
+      <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px;font-weight:700">Subject</div>
+      <div style="font-size:16px;font-weight:700;color:var(--text)">${esc(t.subject)}</div>
     </div>
-    <div style="margin-bottom:16px">
-      <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Status</div>
+    <div style="margin-bottom:18px">
+      <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px;font-weight:700">Status</div>
       ${t.status === 'open'
         ? '<span class="badge badge-warning">Open</span>'
         : '<span class="badge badge-success">Closed</span>'}
     </div>
-    <div style="margin-bottom:16px">
-      <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">User ID</div>
-      <div style="font-size:12px;color:var(--text2);word-break:break-all">${esc(t.user_id||'—')}</div>
+    <div style="margin-bottom:18px">
+      <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px;font-weight:700">User ID</div>
+      <div style="font-size:12px;color:var(--text2);word-break:break-all;font-family:'DM Mono',monospace">${esc(t.user_id||'—')}</div>
     </div>
-    <div style="margin-bottom:16px">
-      <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Created</div>
-      <div style="font-size:12px;color:var(--text2)">${fmtDate(t.created_at)}</div>
+    <div style="margin-bottom:18px">
+      <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px;font-weight:700">Created</div>
+      <div style="font-size:13px;color:var(--text2)">${fmtDate(t.created_at)}</div>
     </div>
     <div>
-      <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Message</div>
-      <div style="background:var(--bg3);border-radius:8px;padding:14px;font-size:13px;line-height:1.7;color:var(--text)">${esc(t.message||'—')}</div>
+      <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:9px;font-weight:700">Message</div>
+      <div style="background:var(--bg3);border-radius:10px;padding:16px;font-size:13.5px;line-height:1.7;color:var(--text);border:1px solid var(--border)">${esc(t.message||'—')}</div>
     </div>
   `;
   openModal('ticket-detail-modal');
@@ -1542,7 +1586,6 @@ function updateOverviewStats() {
   document.getElementById('stat-tickets').textContent      = allTickets.length;
 }
 function renderOverviewRecent() {
-  // Orders
   const tbody1 = document.getElementById('overview-orders-body');
   const recentOrders = allOrders.slice(0, 6);
   if (!recentOrders.length) {
@@ -1550,15 +1593,14 @@ function renderOverviewRecent() {
   } else {
     tbody1.innerHTML = recentOrders.map(o => `
       <tr>
-        <td style="color:var(--text2);font-size:11px">#${o.id.slice(0,8)}…</td>
-        <td style="color:var(--text2);font-size:11px">${o.user_id ? o.user_id.slice(0,8)+'…' : '—'}</td>
+        <td style="color:var(--text2);font-size:11.5px;font-family:'DM Mono',monospace">#${o.id.slice(0,8)}…</td>
+        <td style="color:var(--text2);font-size:11.5px;font-family:'DM Mono',monospace">${o.user_id ? o.user_id.slice(0,8)+'…' : '—'}</td>
         <td>${orderStatusBadge(o.status)}</td>
-        <td><strong>${o.total_egp != null ? Number(o.total_egp).toLocaleString() : '—'}</strong></td>
+        <td><strong style="color:var(--accent)">${o.total_egp != null ? Number(o.total_egp).toLocaleString() : '—'}</strong></td>
         <td>${fmtDate(o.event_date)||'—'}</td>
         <td style="color:var(--text2);font-size:12px">${fmtDate(o.created_at)}</td>
       </tr>`).join('');
   }
-  // Tickets
   const tbody2 = document.getElementById('overview-tickets-body');
   const recentTickets = allTickets.slice(0, 6);
   if (!recentTickets.length) {
@@ -1566,7 +1608,7 @@ function renderOverviewRecent() {
   } else {
     tbody2.innerHTML = recentTickets.map(t => `
       <tr>
-        <td style="color:var(--text2);font-size:11px">#${t.id.slice(0,8)}…</td>
+        <td style="color:var(--text2);font-size:11.5px;font-family:'DM Mono',monospace">#${t.id.slice(0,8)}…</td>
         <td><strong>${esc(t.subject||'—')}</strong></td>
         <td>${t.status === 'open'
           ? '<span class="badge badge-warning">Open</span>'
@@ -1580,11 +1622,11 @@ function renderOverviewRecent() {
 function editProfile(id) {
   const p = allProfiles.find(x => x.id === id);
   if (!p) return;
-  document.getElementById('profile-edit-id').value       = p.id;
-  document.getElementById('profile-full-name').value     = p.full_name||'';
-  document.getElementById('profile-username').value      = p.username||'';
-  document.getElementById('profile-phone').value         = p.phone||'';
-  document.getElementById('profile-role').value          = p.role||'user';
+  document.getElementById('profile-edit-id').value   = p.id;
+  document.getElementById('profile-full-name').value = p.full_name||'';
+  document.getElementById('profile-username').value  = p.username||'';
+  document.getElementById('profile-phone').value     = p.phone||'';
+  document.getElementById('profile-role').value      = p.role||'user';
   openModal('profile-modal');
 }
 async function saveProfile() {
@@ -1606,11 +1648,11 @@ async function saveProfile() {
 function editOrder(id) {
   const o = allOrders.find(x => x.id === id);
   if (!o) return;
-  document.getElementById('order-edit-id').value     = o.id;
-  document.getElementById('order-status').value      = o.status||'pending';
-  document.getElementById('order-total').value       = o.total_egp||'';
-  document.getElementById('order-event-date').value  = o.event_date||'';
-  document.getElementById('order-notes').value       = o.notes||'';
+  document.getElementById('order-edit-id').value    = o.id;
+  document.getElementById('order-status').value     = o.status||'pending';
+  document.getElementById('order-total').value      = o.total_egp||'';
+  document.getElementById('order-event-date').value = o.event_date||'';
+  document.getElementById('order-notes').value      = o.notes||'';
   openModal('order-edit-modal');
 }
 async function saveOrder() {
@@ -1625,18 +1667,17 @@ async function saveOrder() {
   if (error) { showToast(error.message, 'error'); return; }
   showToast('Order updated!', 'success');
   closeModal('order-edit-modal');
-  await loadOrders();
-  renderOverviewRecent();
+  await loadOrders(); renderOverviewRecent();
 }
 
 // ── Ticket Edit ───────────────────────────────────────────────────────────────
 function editTicket(id) {
   const t = allTickets.find(x => x.id === id);
   if (!t) return;
-  document.getElementById('ticket-edit-id').value      = t.id;
-  document.getElementById('ticket-subject').value      = t.subject||'';
-  document.getElementById('ticket-message').value      = t.message||'';
-  document.getElementById('ticket-status-edit').value  = t.status||'open';
+  document.getElementById('ticket-edit-id').value     = t.id;
+  document.getElementById('ticket-subject').value     = t.subject||'';
+  document.getElementById('ticket-message').value     = t.message||'';
+  document.getElementById('ticket-status-edit').value = t.status||'open';
   openModal('ticket-edit-modal');
 }
 async function saveTicket() {
@@ -1650,15 +1691,14 @@ async function saveTicket() {
   if (error) { showToast(error.message, 'error'); return; }
   showToast('Ticket updated!', 'success');
   closeModal('ticket-edit-modal');
-  await loadTickets();
-  renderOverviewRecent();
+  await loadTickets(); renderOverviewRecent();
 }
 
 // ── Delete ────────────────────────────────────────────────────────────────────
 let pendingDelete = null;
 function confirmDelete(table, id, msg) {
   pendingDelete = { table, id };
-  document.getElementById('confirm-msg').textContent = msg || 'Are you sure?';
+  document.getElementById('confirm-msg').textContent = msg || 'Are you sure? This action cannot be undone.';
   document.getElementById('confirm-ok-btn').onclick = async () => {
     const { error } = await sb.from(pendingDelete.table).delete().eq('id', pendingDelete.id);
     if (error) { showToast(error.message, 'error'); closeModal('confirm-modal'); return; }
@@ -1667,11 +1707,10 @@ function confirmDelete(table, id, msg) {
     const reloaders = {
       venues: loadVenues, orders: loadOrders, restaurants: loadRestaurants,
       photographers: loadPhotographers, av_equipment: loadAV,
-      printing_items: loadPrinting, support_tickets: loadTickets
+      printing_items: loadPrinting, support_tickets: loadTickets, profiles: loadProfiles,
     };
     if (reloaders[pendingDelete.table]) await reloaders[pendingDelete.table]();
-    updateOverviewStats();
-    renderOverviewRecent();
+    updateOverviewStats(); renderOverviewRecent();
     pendingDelete = null;
   };
   openModal('confirm-modal');
@@ -1713,7 +1752,7 @@ function orderStatusBadge(status) {
   return `<span class="badge ${map[status]||'badge-gray'}">${capitalize(status||'unknown')}</span>`;
 }
 function roleBadge(role) {
-  if (role==='admin') return '<span class="badge badge-purple">Admin</span>';
+  if (role==='admin') return '<span class="badge badge-orange">Admin</span>';
   return '<span class="badge badge-gray">User</span>';
 }
 </script>
