@@ -9,11 +9,17 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   throw new Error('Missing Supabase environment variables');
 }
 
+const serverStorage = {
+  getItem: async (_key: string): Promise<null> => null,
+  setItem: async (_key: string, _value: string): Promise<void> => {},
+  removeItem: async (_key: string): Promise<void> => {},
+};
+
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
-    storage: AsyncStorage,
+    storage: typeof window === 'undefined' ? serverStorage : AsyncStorage,
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: false, // Important: disable for React Native
+    detectSessionInUrl: false,
   },
 });
