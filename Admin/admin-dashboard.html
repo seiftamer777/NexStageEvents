@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #1a1d27;
+    --bg3: #232636;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #e8eaf0;
+    --text2: #8b90a7;
+    --accent: #6c63ff;
+    --accent2: #8b85ff;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+
+  /* LOGIN */
+  #login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg); }
+  .login-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 48px 40px; width: 380px; }
+  .login-logo { text-align: center; margin-bottom: 32px; }
+  .login-logo-icon { width: 56px; height: 56px; background: linear-gradient(135deg,#6c63ff,#a78bfa); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 16px; }
+  .login-logo h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+  .login-logo p { color: var(--text2); font-size: 13px; margin-top: 4px; }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
+  .form-group input { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); padding: 10px 14px; color: var(--text); font-size: 14px; outline: none; transition: border-color 0.2s; }
+  .form-group input:focus { border-color: var(--accent); }
+  .btn-primary { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 8px; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.98); }
+  .login-error { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #f87171; border-radius: var(--radius); padding: 10px 14px; font-size: 13px; margin-top: 12px; display: none; }
+
+  /* DASHBOARD */
+  #dashboard { display: none; flex-direction: row; min-height: 100vh; }
+  .sidebar { width: 220px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+  .sidebar-header { padding: 20px 18px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo { display: flex; align-items: center; gap: 10px; }
+  .sidebar-logo-icon { width: 34px; height: 34px; background: linear-gradient(135deg,#6c63ff,#a78bfa); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .sidebar-logo span { font-size: 15px; font-weight: 700; }
+  .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+  .nav-label { font-size: 10px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; padding: 8px 8px 4px; margin-top: 8px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; color: var(--text2); cursor: pointer; transition: all 0.15s; font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active { background: rgba(108,99,255,0.15); color: var(--accent2); }
+  .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; }
+  .nav-badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+  .sidebar-footer { padding: 14px 10px; border-top: 1px solid var(--border); }
+  .admin-info { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; }
+  .admin-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#6c63ff,#a78bfa); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .admin-name { font-size: 13px; font-weight: 600; }
+  .admin-role { font-size: 11px; color: var(--text2); }
+  .logout-btn { width: 100%; background: transparent; border: 1px solid var(--border2); border-radius: 8px; padding: 8px; color: var(--text2); cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.15s; margin-top: 8px; }
+  .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+  .main { margin-left: 220px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+  .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+  .topbar-title { font-size: 17px; font-weight: 700; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .topbar-badge { background: rgba(108,99,255,0.15); color: var(--accent2); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(108,99,255,0.25); }
+
+  .content { padding: 28px; flex: 1; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* STATS */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 22px; }
+  .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+  .stat-icon.purple { background: rgba(108,99,255,0.15); }
+  .stat-icon.green { background: rgba(34,197,94,0.15); }
+  .stat-icon.blue { background: rgba(59,130,246,0.15); }
+  .stat-icon.amber { background: rgba(245,158,11,0.15); }
+  .stat-label { font-size: 12px; color: var(--text2); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-value { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+  .stat-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+  /* TABLES */
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+  .card-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .card-title { font-size: 15px; font-weight: 700; }
+  .card-body { padding: 0; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 12px 18px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid var(--border); background: var(--bg3); white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.025); }
+  tbody td { padding: 13px 18px; font-size: 13px; vertical-align: middle; }
+  .empty-row { text-align: center; color: var(--text2); padding: 40px !important; }
+
+  /* BADGES */
+  .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .badge-success { background: rgba(34,197,94,0.13); color: #4ade80; }
+  .badge-danger { background: rgba(239,68,68,0.13); color: #f87171; }
+  .badge-warning { background: rgba(245,158,11,0.13); color: #fbbf24; }
+  .badge-info { background: rgba(59,130,246,0.13); color: #60a5fa; }
+  .badge-gray { background: rgba(139,144,167,0.15); color: var(--text2); }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; white-space: nowrap; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  .btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-accent:hover { opacity: 0.85; }
+  .btn-outline { background: transparent; border-color: var(--border2); color: var(--text2); }
+  .btn-outline:hover { background: var(--bg3); color: var(--text); }
+  .btn-danger { background: rgba(239,68,68,0.12); color: #f87171; border-color: rgba(239,68,68,0.25); }
+  .btn-danger:hover { background: rgba(239,68,68,0.2); }
+  .btn-success { background: rgba(34,197,94,0.12); color: #4ade80; border-color: rgba(34,197,94,0.25); }
+  .btn-success:hover { background: rgba(34,197,94,0.2); }
+
+  /* TOOLBAR */
+  .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .search-box { display: flex; align-items: center; gap: 8px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 7px 12px; min-width: 200px; }
+  .search-box input { background: none; border: none; outline: none; color: var(--text); font-size: 13px; width: 100%; }
+  .search-box svg { color: var(--text2); flex-shrink: 0; }
+  .filter-select { background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 7px 12px; color: var(--text); font-size: 13px; outline: none; cursor: pointer; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 18px; width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
+  .modal-header { padding: 22px 26px 0; display: flex; align-items: center; justify-content: space-between; }
+  .modal-title { font-size: 17px; font-weight: 700; }
+  .modal-close { background: var(--bg3); border: none; color: var(--text2); width: 30px; height: 30px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.15s; }
+  .modal-close:hover { background: rgba(239,68,68,0.15); color: #f87171; }
+  .modal-body { padding: 22px 26px; }
+  .modal-footer { padding: 0 26px 22px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 7px; }
+  .field input, .field select, .field textarea { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 13px; color: var(--text); font-size: 13px; outline: none; transition: border-color 0.2s; font-family: inherit; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+  .field textarea { resize: vertical; min-height: 80px; }
+  .field select option { background: var(--bg3); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* NOTIFICATIONS */
+  .toast { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; align-items: center; gap: 12px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 12px; padding: 14px 18px; font-size: 13px; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.4); transform: translateX(200%); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); max-width: 340px; }
+  .toast.show { transform: translateX(0); }
+  .toast-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .toast.success .toast-icon { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .toast.error .toast-icon { background: rgba(239,68,68,0.15); color: #f87171; }
+
+  /* LOADING */
+  .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.15); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-center { display: flex; align-items: center; justify-content: center; padding: 40px; gap: 12px; color: var(--text2); }
+
+  /* DATE FILTER */
+  .date-filter-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+  .date-range { display: flex; align-items: center; gap: 8px; }
+  .date-range label { font-size: 12px; color: var(--text2); font-weight: 600; }
+  .date-range input[type="date"] { background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 7px 12px; color: var(--text); font-size: 13px; outline: none; cursor: pointer; }
+  .date-range input[type="date"]:focus { border-color: var(--accent); }
+  .quick-filters { display: flex; gap: 6px; }
+  .qf-btn { background: var(--bg3); border: 1px solid var(--border2); border-radius: 7px; padding: 6px 12px; color: var(--text2); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .qf-btn:hover, .qf-btn.active { background: rgba(108,99,255,0.15); border-color: rgba(108,99,255,0.35); color: var(--accent2); }
+
+  /* AVATAR */
+  .avatar-sm { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#6c63ff,#a78bfa); display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0; vertical-align: middle; margin-right: 8px; }
+
+  /* OVERVIEW CHARTS PLACEHOLDER */
+  .chart-placeholder { height: 180px; background: var(--bg3); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; color: var(--text2); font-size: 13px; margin-top: 16px; }
+
+  @media (max-width: 900px) {
+    .stats-grid { grid-template-columns: repeat(2,1fr); }
+    .sidebar { width: 0; overflow: hidden; }
+    .main { margin-left: 0; }
+  }
+  @media (max-width: 600px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .content { padding: 16px; }
+    .field-row { grid-template-columns: 1fr; }
+  }
+
+  /* CONFIRM DIALOG */
+  .confirm-modal .modal { width: 360px; }
+  .confirm-msg { font-size: 14px; color: var(--text2); line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">⚡</div>
+      <h1>Admin Panel</h1>
+      <p>Sign in to access the dashboard</p>
+    </div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="login-user" placeholder="Enter username" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="Enter password" autocomplete="current-password">
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">⚡</div>
+        <span>AdminPro</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Main</div>
+      <div class="nav-item active" onclick="showPage('overview')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Overview
+      </div>
+      <div class="nav-label">Data</div>
+      <div class="nav-item" onclick="showPage('users')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Users
+        <span class="nav-badge" id="nav-users-count">0</span>
+      </div>
+      <div class="nav-item" onclick="showPage('reservations')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Reservations
+        <span class="nav-badge" id="nav-res-count">0</span>
+      </div>
+      <div class="nav-item" onclick="showPage('tables')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h18M3 14h18M10 4v16M14 4v16"/><rect x="3" y="4" width="18" height="16" rx="1"/></svg>
+        Tables
+        <span class="nav-badge" id="nav-tables-count">0</span>
+      </div>
+      <div class="nav-label">Settings</div>
+      <div class="nav-item" onclick="showPage('admins')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 014-4h0a4 4 0 014 4v2"/><path d="M18 8l2 2-5 5" stroke-width="2"/></svg>
+        Admins
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="admin-info">
+        <div class="admin-avatar" id="admin-avatar">A</div>
+        <div>
+          <div class="admin-name" id="admin-name-display">Admin</div>
+          <div class="admin-role">Administrator</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="page-title">Overview</div>
+      <div class="topbar-right">
+        <span class="topbar-badge" id="admin-badge">Admin</span>
+        <span style="font-size:12px;color:var(--text2)" id="current-time"></span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- OVERVIEW PAGE -->
+      <div class="page active" id="page-overview">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon purple">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            </div>
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value" id="stat-users">—</div>
+            <div class="stat-sub">Registered accounts</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            </div>
+            <div class="stat-label">Reservations</div>
+            <div class="stat-value" id="stat-res">—</div>
+            <div class="stat-sub">All time bookings</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon blue">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M3 10h18M3 14h18M10 4v16M14 4v16"/><rect x="3" y="4" width="18" height="16" rx="1"/></svg>
+            </div>
+            <div class="stat-label">Tables</div>
+            <div class="stat-value" id="stat-tables">—</div>
+            <div class="stat-sub">Available tables</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon amber">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            </div>
+            <div class="stat-label">Today</div>
+            <div class="stat-value" id="stat-today">—</div>
+            <div class="stat-sub">Today's reservations</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Reservations</span>
+            <button class="btn btn-outline btn-sm" onclick="showPage('reservations')">View All →</button>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>ID</th><th>Guest</th><th>Date & Time</th><th>Table</th><th>Guests</th><th>Status</th></tr></thead>
+                <tbody id="overview-recent-body"><tr><td colspan="6" class="empty-row"><span class="loading"></span></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- USERS PAGE -->
+      <div class="page" id="page-users">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Users</span>
+            <div class="toolbar">
+              <div class="search-box">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" placeholder="Search users…" oninput="filterUsers(this.value)" id="user-search">
+              </div>
+              <button class="btn btn-accent btn-sm" onclick="openModal('user-modal')">+ Add User</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Actions</th></tr></thead>
+                <tbody id="users-body"><tr><td colspan="5" class="empty-row"><span class="loading"></span></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESERVATIONS PAGE -->
+      <div class="page" id="page-reservations">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Reservations</span>
+            <div class="toolbar">
+              <div class="search-box">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" placeholder="Search…" oninput="filterReservations()" id="res-search">
+              </div>
+              <select class="filter-select" onchange="filterReservations()" id="res-status-filter">
+                <option value="">All Status</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="pending">Pending</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="completed">Completed</option>
+              </select>
+              <button class="btn btn-accent btn-sm" onclick="openModal('res-modal')">+ Add</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding: 16px 22px 0;">
+            <div class="date-filter-bar">
+              <div class="date-range">
+                <label>From</label>
+                <input type="date" id="date-from" onchange="filterReservations()">
+              </div>
+              <div class="date-range">
+                <label>To</label>
+                <input type="date" id="date-to" onchange="filterReservations()">
+              </div>
+              <div class="quick-filters">
+                <button class="qf-btn" onclick="setDateFilter('today')">Today</button>
+                <button class="qf-btn" onclick="setDateFilter('week')">This Week</button>
+                <button class="qf-btn" onclick="setDateFilter('month')">This Month</button>
+                <button class="qf-btn" onclick="setDateFilter('all')">All</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>ID</th><th>Guest Name</th><th>Phone</th><th>Date</th><th>Time</th><th>Table</th><th>Guests</th><th>Status</th><th>Notes</th><th>Actions</th></tr></thead>
+                <tbody id="res-body"><tr><td colspan="10" class="empty-row"><span class="loading"></span></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLES PAGE -->
+      <div class="page" id="page-tables">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Restaurant Tables</span>
+            <button class="btn btn-accent btn-sm" onclick="openModal('table-modal')">+ Add Table</button>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Table #</th><th>Capacity</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="tables-body"><tr><td colspan="5" class="empty-row"><span class="loading"></span></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMINS PAGE -->
+      <div class="page" id="page-admins">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Admin Accounts</span>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Avatar</th><th>Username</th><th>Created</th><th>Last Login</th></tr></thead>
+                <tbody id="admins-body">
+                  <tr><td colspan="4" class="empty-row"><span class="loading"></span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- USER MODAL -->
+<div class="modal-overlay" id="user-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="user-modal-title">Add User</div>
+      <button class="modal-close" onclick="closeModal('user-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="user-edit-id">
+      <div class="field-row">
+        <div class="field"><label>First Name</label><input type="text" id="user-fname" placeholder="John"></div>
+        <div class="field"><label>Last Name</label><input type="text" id="user-lname" placeholder="Doe"></div>
+      </div>
+      <div class="field"><label>Email</label><input type="email" id="user-email" placeholder="john@example.com"></div>
+      <div class="field"><label>Phone</label><input type="text" id="user-phone" placeholder="+1 555 000 0000"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('user-modal')">Cancel</button>
+      <button class="btn btn-accent" onclick="saveUser()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESERVATION MODAL -->
+<div class="modal-overlay" id="res-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="res-modal-title">Add Reservation</div>
+      <button class="modal-close" onclick="closeModal('res-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="res-edit-id">
+      <div class="field"><label>Guest Name</label><input type="text" id="res-name" placeholder="Guest name"></div>
+      <div class="field"><label>Phone</label><input type="text" id="res-phone" placeholder="+1 555 000 0000"></div>
+      <div class="field-row">
+        <div class="field"><label>Date</label><input type="date" id="res-date"></div>
+        <div class="field"><label>Time</label><input type="time" id="res-time"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Table</label>
+          <select id="res-table"><option value="">Select table…</option></select>
+        </div>
+        <div class="field"><label>Guests Count</label><input type="number" id="res-guests" min="1" max="20" placeholder="2"></div>
+      </div>
+      <div class="field"><label>Status</label>
+        <select id="res-status">
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div class="field"><label>Notes</label><textarea id="res-notes" placeholder="Special requests, dietary needs…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('res-modal')">Cancel</button>
+      <button class="btn btn-accent" onclick="saveReservation()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABLE MODAL -->
+<div class="modal-overlay" id="table-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="table-modal-title">Add Table</div>
+      <button class="modal-close" onclick="closeModal('table-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="table-edit-id">
+      <div class="field-row">
+        <div class="field"><label>Table Number</label><input type="text" id="table-number" placeholder="T01"></div>
+        <div class="field"><label>Capacity</label><input type="number" id="table-capacity" min="1" max="20" placeholder="4"></div>
+      </div>
+      <div class="field"><label>Location</label><input type="text" id="table-location" placeholder="Indoor / Outdoor / Window…"></div>
+      <div class="field"><label>Status</label>
+        <select id="table-status">
+          <option value="available">Available</option>
+          <option value="reserved">Reserved</option>
+          <option value="occupied">Occupied</option>
+          <option value="maintenance">Maintenance</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('table-modal')">Cancel</button>
+      <button class="btn btn-accent" onclick="saveTable()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay confirm-modal" id="confirm-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Confirm Delete</div>
+      <button class="modal-close" onclick="closeModal('confirm-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="confirm-msg" id="confirm-msg">Are you sure you want to delete this record? This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('confirm-modal')">Cancel</button>
+      <button class="btn btn-danger" id="confirm-ok-btn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-icon" id="toast-icon">✓</div>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://hvyuxobnblkwoeeqgrjh.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2eXV4b2JuYmxrd29lZXFncmpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NDgyMDAsImV4cCI6MjA5MzIyNDIwMH0.NJ173IivglISYSAWIiOO3zy7mxk-gTCgCALv9K_OMjg';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const ADMINS = [
+  { username: 'mohamed', password: '12345678' },
+  { username: 'seif',    password: '12345678' },
+  { username: 'youssef', password: '12345678' },
+];
+
+let currentAdmin = null;
+let allUsers = [], allReservations = [], allTables = [];
+
+// ── TIME CLOCK ──────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById('current-time').textContent =
+    now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) + ' ' +
+    now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── LOGIN ────────────────────────────────────────────────────
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('login-user').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+function doLogin() {
+  const u = document.getElementById('login-user').value.trim().toLowerCase();
+  const p = document.getElementById('login-pass').value;
+  const admin = ADMINS.find(a => a.username === u && a.password === p);
+  if (!admin) {
+    const err = document.getElementById('login-error');
+    err.textContent = 'Invalid username or password.';
+    err.style.display = 'block';
+    return;
+  }
+  currentAdmin = admin;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'flex';
+  document.getElementById('admin-name-display').textContent = capitalize(admin.username);
+  document.getElementById('admin-avatar').textContent = admin.username[0].toUpperCase();
+  document.getElementById('admin-badge').textContent = capitalize(admin.username);
+  loadAll();
+}
+
+function logout() {
+  currentAdmin = null;
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const titles = { overview:'Overview', users:'Users', reservations:'Reservations', tables:'Tables', admins:'Admin Accounts' };
+  document.getElementById('page-title').textContent = titles[name] || name;
+  const navMap = { overview:0, users:1, reservations:2, tables:3, admins:4 };
+  const navItems = document.querySelectorAll('.nav-item');
+  if (navItems[navMap[name]]) navItems[navMap[name]].classList.add('active');
+  if (name === 'reservations') loadReservations();
+  if (name === 'users') renderUsers();
+  if (name === 'tables') renderTables();
+  if (name === 'admins') renderAdmins();
+}
+
+// ── LOAD ALL ─────────────────────────────────────────────────
+async function loadAll() {
+  await Promise.all([ loadUsers(), loadReservations(), loadTables() ]);
+  updateOverview();
+  renderOverviewRecent();
+}
+
+async function loadUsers() {
+  const { data } = await sb.from('users').select('*').order('created_at', { ascending: false });
+  allUsers = data || [];
+  document.getElementById('nav-users-count').textContent = allUsers.length;
+  document.getElementById('stat-users').textContent = allUsers.length;
+  renderUsers();
+}
+
+async function loadReservations() {
+  const { data } = await sb.from('reservations').select('*').order('reservation_date', { ascending: false });
+  allReservations = data || [];
+  const today = new Date().toISOString().split('T')[0];
+  const todayCount = allReservations.filter(r => r.reservation_date === today).length;
+  document.getElementById('nav-res-count').textContent = allReservations.length;
+  document.getElementById('stat-res').textContent = allReservations.length;
+  document.getElementById('stat-today').textContent = todayCount;
+  renderReservations(allReservations);
+}
+
+async function loadTables() {
+  const { data } = await sb.from('tables').select('*').order('table_number', { ascending: true });
+  allTables = data || [];
+  document.getElementById('nav-tables-count').textContent = allTables.length;
+  document.getElementById('stat-tables').textContent = allTables.length;
+  renderTables();
+  populateTableSelect();
+}
+
+// ── OVERVIEW ─────────────────────────────────────────────────
+function updateOverview() {
+  document.getElementById('stat-users').textContent = allUsers.length;
+  document.getElementById('stat-res').textContent = allReservations.length;
+  document.getElementById('stat-tables').textContent = allTables.length;
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('stat-today').textContent = allReservations.filter(r => r.reservation_date === today).length;
+}
+
+function renderOverviewRecent() {
+  const tbody = document.getElementById('overview-recent-body');
+  const recent = allReservations.slice(0, 8);
+  if (!recent.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No reservations yet.</td></tr>'; return; }
+  tbody.innerHTML = recent.map(r => `
+    <tr>
+      <td><span style="color:var(--text2);font-size:11px">#${r.id}</span></td>
+      <td><strong>${esc(r.guest_name || '—')}</strong></td>
+      <td>${fmtDate(r.reservation_date)} ${r.reservation_time ? r.reservation_time.slice(0,5) : ''}</td>
+      <td>${esc(r.table_number || '—')}</td>
+      <td>${r.guests_count || '—'}</td>
+      <td>${statusBadge(r.status)}</td>
+    </tr>`).join('');
+}
+
+// ── USERS ─────────────────────────────────────────────────────
+function renderUsers(filtered) {
+  const data = filtered ?? allUsers;
+  const tbody = document.getElementById('users-body');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No users found.</td></tr>'; return; }
+  tbody.innerHTML = data.map(u => `
+    <tr>
+      <td><span class="avatar-sm">${(u.first_name||'?')[0].toUpperCase()}</span><strong>${esc(u.first_name||'')} ${esc(u.last_name||'')}</strong></td>
+      <td style="color:var(--text2)">${esc(u.email||'—')}</td>
+      <td style="color:var(--text2)">${esc(u.phone||'—')}</td>
+      <td style="color:var(--text2);font-size:12px">${fmtDate(u.created_at)}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-outline btn-sm" onclick="editUser(${u.id})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('users',${u.id},'Delete user ${esc(u.first_name)} ${esc(u.last_name)}?')">Del</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function filterUsers(q) {
+  const s = q.toLowerCase();
+  renderUsers(allUsers.filter(u =>
+    (u.first_name||'').toLowerCase().includes(s) ||
+    (u.last_name||'').toLowerCase().includes(s) ||
+    (u.email||'').toLowerCase().includes(s) ||
+    (u.phone||'').includes(s)
+  ));
+}
+
+async function saveUser() {
+  const id = document.getElementById('user-edit-id').value;
+  const payload = {
+    first_name: document.getElementById('user-fname').value.trim(),
+    last_name: document.getElementById('user-lname').value.trim(),
+    email: document.getElementById('user-email').value.trim(),
+    phone: document.getElementById('user-phone').value.trim(),
+  };
+  let err;
+  if (id) {
+    ({ error: err } = await sb.from('users').update(payload).eq('id', id));
+  } else {
+    ({ error: err } = await sb.from('users').insert([payload]));
+  }
+  if (err) { showToast(err.message, 'error'); return; }
+  showToast(id ? 'User updated!' : 'User added!', 'success');
+  closeModal('user-modal');
+  await loadUsers();
+  updateOverview();
+}
+
+function editUser(id) {
+  const u = allUsers.find(x => x.id === id);
+  if (!u) return;
+  document.getElementById('user-edit-id').value = id;
+  document.getElementById('user-fname').value = u.first_name || '';
+  document.getElementById('user-lname').value = u.last_name || '';
+  document.getElementById('user-email').value = u.email || '';
+  document.getElementById('user-phone').value = u.phone || '';
+  document.getElementById('user-modal-title').textContent = 'Edit User';
+  openModal('user-modal');
+}
+
+// ── RESERVATIONS ──────────────────────────────────────────────
+function renderReservations(data) {
+  const tbody = document.getElementById('res-body');
+  if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="10" class="empty-row">No reservations found.</td></tr>'; return; }
+  tbody.innerHTML = data.map(r => `
+    <tr>
+      <td style="color:var(--text2);font-size:11px">#${r.id}</td>
+      <td><strong>${esc(r.guest_name||'—')}</strong></td>
+      <td style="color:var(--text2)">${esc(r.phone||'—')}</td>
+      <td style="white-space:nowrap">${fmtDate(r.reservation_date)}</td>
+      <td style="white-space:nowrap">${r.reservation_time ? r.reservation_time.slice(0,5) : '—'}</td>
+      <td><span class="badge badge-info">${esc(r.table_number||'—')}</span></td>
+      <td style="text-align:center">${r.guests_count||'—'}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12px">${esc(r.notes||'')}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-outline btn-sm" onclick="editRes(${r.id})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('reservations',${r.id},'Delete reservation #${r.id}?')">Del</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function filterReservations() {
+  let data = [...allReservations];
+  const search = (document.getElementById('res-search')?.value || '').toLowerCase();
+  const status = document.getElementById('res-status-filter')?.value || '';
+  const from = document.getElementById('date-from')?.value || '';
+  const to = document.getElementById('date-to')?.value || '';
+  if (search) data = data.filter(r =>
+    (r.guest_name||'').toLowerCase().includes(search) ||
+    (r.phone||'').includes(search) ||
+    (r.table_number||'').includes(search)
+  );
+  if (status) data = data.filter(r => r.status === status);
+  if (from) data = data.filter(r => r.reservation_date >= from);
+  if (to) data = data.filter(r => r.reservation_date <= to);
+  renderReservations(data);
+}
+
+function setDateFilter(range) {
+  document.querySelectorAll('.qf-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  const today = new Date();
+  const fmt = d => d.toISOString().split('T')[0];
+  if (range === 'today') {
+    document.getElementById('date-from').value = fmt(today);
+    document.getElementById('date-to').value = fmt(today);
+  } else if (range === 'week') {
+    const mon = new Date(today); mon.setDate(today.getDate() - today.getDay() + 1);
+    const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+    document.getElementById('date-from').value = fmt(mon);
+    document.getElementById('date-to').value = fmt(sun);
+  } else if (range === 'month') {
+    document.getElementById('date-from').value = fmt(new Date(today.getFullYear(), today.getMonth(), 1));
+    document.getElementById('date-to').value = fmt(new Date(today.getFullYear(), today.getMonth()+1, 0));
+  } else {
+    document.getElementById('date-from').value = '';
+    document.getElementById('date-to').value = '';
+  }
+  filterReservations();
+}
+
+async function saveReservation() {
+  const id = document.getElementById('res-edit-id').value;
+  const payload = {
+    guest_name: document.getElementById('res-name').value.trim(),
+    phone: document.getElementById('res-phone').value.trim(),
+    reservation_date: document.getElementById('res-date').value,
+    reservation_time: document.getElementById('res-time').value,
+    table_number: document.getElementById('res-table').value,
+    guests_count: parseInt(document.getElementById('res-guests').value) || null,
+    status: document.getElementById('res-status').value,
+    notes: document.getElementById('res-notes').value.trim(),
+  };
+  let err;
+  if (id) {
+    ({ error: err } = await sb.from('reservations').update(payload).eq('id', id));
+  } else {
+    ({ error: err } = await sb.from('reservations').insert([payload]));
+  }
+  if (err) { showToast(err.message, 'error'); return; }
+  showToast(id ? 'Reservation updated!' : 'Reservation added!', 'success');
+  closeModal('res-modal');
+  await loadReservations();
+  updateOverview();
+  renderOverviewRecent();
+}
+
+function editRes(id) {
+  const r = allReservations.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('res-edit-id').value = id;
+  document.getElementById('res-name').value = r.guest_name || '';
+  document.getElementById('res-phone').value = r.phone || '';
+  document.getElementById('res-date').value = r.reservation_date || '';
+  document.getElementById('res-time').value = r.reservation_time || '';
+  document.getElementById('res-table').value = r.table_number || '';
+  document.getElementById('res-guests').value = r.guests_count || '';
+  document.getElementById('res-status').value = r.status || 'pending';
+  document.getElementById('res-notes').value = r.notes || '';
+  document.getElementById('res-modal-title').textContent = 'Edit Reservation';
+  openModal('res-modal');
+}
+
+// ── TABLES ────────────────────────────────────────────────────
+function renderTables() {
+  const tbody = document.getElementById('tables-body');
+  if (!allTables.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No tables found.</td></tr>'; return; }
+  tbody.innerHTML = allTables.map(t => `
+    <tr>
+      <td><strong>${esc(t.table_number||'—')}</strong></td>
+      <td>${t.capacity ? t.capacity + ' pax' : '—'}</td>
+      <td style="color:var(--text2)">${esc(t.location||'—')}</td>
+      <td>${tableStatusBadge(t.status)}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-outline btn-sm" onclick="editTable(${t.id})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('tables',${t.id},'Delete table ${esc(t.table_number)}?')">Del</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function populateTableSelect() {
+  const sel = document.getElementById('res-table');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Select table…</option>' +
+    allTables.map(t => `<option value="${esc(t.table_number)}">${esc(t.table_number)} (cap. ${t.capacity||'?'})</option>`).join('');
+  sel.value = cur;
+}
+
+async function saveTable() {
+  const id = document.getElementById('table-edit-id').value;
+  const payload = {
+    table_number: document.getElementById('table-number').value.trim(),
+    capacity: parseInt(document.getElementById('table-capacity').value) || null,
+    location: document.getElementById('table-location').value.trim(),
+    status: document.getElementById('table-status').value,
+  };
+  let err;
+  if (id) {
+    ({ error: err } = await sb.from('tables').update(payload).eq('id', id));
+  } else {
+    ({ error: err } = await sb.from('tables').insert([payload]));
+  }
+  if (err) { showToast(err.message, 'error'); return; }
+  showToast(id ? 'Table updated!' : 'Table added!', 'success');
+  closeModal('table-modal');
+  await loadTables();
+  updateOverview();
+}
+
+function editTable(id) {
+  const t = allTables.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('table-edit-id').value = id;
+  document.getElementById('table-number').value = t.table_number || '';
+  document.getElementById('table-capacity').value = t.capacity || '';
+  document.getElementById('table-location').value = t.location || '';
+  document.getElementById('table-status').value = t.status || 'available';
+  document.getElementById('table-modal-title').textContent = 'Edit Table';
+  openModal('table-modal');
+}
+
+// ── ADMINS PAGE ───────────────────────────────────────────────
+function renderAdmins() {
+  const tbody = document.getElementById('admins-body');
+  tbody.innerHTML = ADMINS.map(a => `
+    <tr>
+      <td><div class="avatar-sm">${a.username[0].toUpperCase()}</div></td>
+      <td><strong>${capitalize(a.username)}</strong></td>
+      <td style="color:var(--text2)">System</td>
+      <td>${a.username === currentAdmin.username ? '<span class="badge badge-success">Current session</span>' : '<span class="badge badge-gray">—</span>'}</td>
+    </tr>`).join('');
+}
+
+// ── DELETE ────────────────────────────────────────────────────
+let pendingDelete = null;
+
+function confirmDelete(table, id, msg) {
+  pendingDelete = { table, id };
+  document.getElementById('confirm-msg').textContent = msg;
+  document.getElementById('confirm-ok-btn').onclick = async () => {
+    const { error } = await sb.from(pendingDelete.table).delete().eq('id', pendingDelete.id);
+    if (error) { showToast(error.message, 'error'); closeModal('confirm-modal'); return; }
+    showToast('Deleted successfully.', 'success');
+    closeModal('confirm-modal');
+    if (pendingDelete.table === 'users') { await loadUsers(); }
+    else if (pendingDelete.table === 'reservations') { await loadReservations(); renderOverviewRecent(); }
+    else if (pendingDelete.table === 'tables') { await loadTables(); }
+    updateOverview();
+    pendingDelete = null;
+  };
+  openModal('confirm-modal');
+}
+
+// ── MODALS ────────────────────────────────────────────────────
+function openModal(id) {
+  if (id === 'user-modal') {
+    const isEdit = !!document.getElementById('user-edit-id').value;
+    if (!isEdit) {
+      document.getElementById('user-edit-id').value = '';
+      document.getElementById('user-fname').value = '';
+      document.getElementById('user-lname').value = '';
+      document.getElementById('user-email').value = '';
+      document.getElementById('user-phone').value = '';
+      document.getElementById('user-modal-title').textContent = 'Add User';
+    }
+  }
+  if (id === 'res-modal') {
+    const isEdit = !!document.getElementById('res-edit-id').value;
+    if (!isEdit) {
+      document.getElementById('res-edit-id').value = '';
+      document.getElementById('res-name').value = '';
+      document.getElementById('res-phone').value = '';
+      document.getElementById('res-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('res-time').value = '';
+      document.getElementById('res-table').value = '';
+      document.getElementById('res-guests').value = '';
+      document.getElementById('res-status').value = 'pending';
+      document.getElementById('res-notes').value = '';
+      document.getElementById('res-modal-title').textContent = 'Add Reservation';
+    }
+  }
+  if (id === 'table-modal') {
+    const isEdit = !!document.getElementById('table-edit-id').value;
+    if (!isEdit) {
+      document.getElementById('table-edit-id').value = '';
+      document.getElementById('table-number').value = '';
+      document.getElementById('table-capacity').value = '';
+      document.getElementById('table-location').value = '';
+      document.getElementById('table-status').value = 'available';
+      document.getElementById('table-modal-title').textContent = 'Add Table';
+    }
+  }
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  if (id === 'user-modal') document.getElementById('user-edit-id').value = '';
+  if (id === 'res-modal') document.getElementById('res-edit-id').value = '';
+  if (id === 'table-modal') document.getElementById('table-edit-id').value = '';
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  const icon = document.getElementById('toast-icon');
+  document.getElementById('toast-msg').textContent = msg;
+  t.className = `toast ${type}`;
+  icon.textContent = type === 'success' ? '✓' : '✕';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+function fmtDate(s) {
+  if (!s) return '—';
+  const d = new Date(s);
+  if (isNaN(d)) return s;
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+function statusBadge(status) {
+  const map = { confirmed:'badge-success', pending:'badge-warning', cancelled:'badge-danger', completed:'badge-info' };
+  const cls = map[status] || 'badge-gray';
+  return `<span class="badge ${cls}">${capitalize(status||'unknown')}</span>`;
+}
+function tableStatusBadge(status) {
+  const map = { available:'badge-success', reserved:'badge-warning', occupied:'badge-info', maintenance:'badge-danger' };
+  const cls = map[status] || 'badge-gray';
+  return `<span class="badge ${cls}">${capitalize(status||'unknown')}</span>`;
+}
+</script>
+
+<!-- SQL SETUP INSTRUCTIONS (in HTML comment) -->
+<!--
+Run this SQL in your Supabase SQL Editor to create the necessary tables:
+
+create table if not exists users (
+  id bigserial primary key,
+  first_name text,
+  last_name text,
+  email text unique,
+  phone text,
+  created_at timestamptz default now()
+);
+
+create table if not exists tables (
+  id bigserial primary key,
+  table_number text unique not null,
+  capacity int,
+  location text,
+  status text default 'available',
+  created_at timestamptz default now()
+);
+
+create table if not exists reservations (
+  id bigserial primary key,
+  guest_name text not null,
+  phone text,
+  reservation_date date not null,
+  reservation_time time,
+  table_number text references tables(table_number),
+  guests_count int,
+  status text default 'pending',
+  notes text,
+  created_at timestamptz default now()
+);
+
+create table if not exists admins (
+  id bigserial primary key,
+  username text unique not null,
+  created_at timestamptz default now()
+);
+
+insert into admins (username) values ('mohamed'), ('seif'), ('youssef')
+  on conflict (username) do nothing;
+
+-- Enable RLS policies if needed (for production add Row Level Security)
+alter table users enable row level security;
+alter table tables enable row level security;
+alter table reservations enable row level security;
+alter table admins enable row level security;
+
+create policy "Allow all for anon" on users for all using (true) with check (true);
+create policy "Allow all for anon" on tables for all using (true) with check (true);
+create policy "Allow all for anon" on reservations for all using (true) with check (true);
+create policy "Allow all for anon" on admins for all using (true) with check (true);
+-->
+</body>
+</html>
