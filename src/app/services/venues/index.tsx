@@ -17,7 +17,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../../lib/supabase';
-import { colors, spacing, radius, shadows, fontSizes } from '../../../constants/theme';
+import { spacing, radius, shadows, fontSizes } from '../../../constants/theme';
+import { useTheme } from '../../../context/ThemeContext';
+import type { AppColors } from '../../../constants/theme';
 import type { Venue } from '../../../types';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -72,6 +74,8 @@ function buildCalendarDays(): Date[] {
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function VenuesScreen() {
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
   const [venues, setVenues]                   = useState<Venue[]>([]);
   const [loading, setLoading]                 = useState(true);
   const [search, setSearch]                   = useState('');
@@ -306,6 +310,7 @@ export default function VenuesScreen() {
           renderItem={({ item }) => (
             <VenueCard
               venue={item}
+              colors={colors}
               onPress={() => router.push(`/services/venues/${item.id}` as any)}
             />
           )}
@@ -469,7 +474,8 @@ export default function VenuesScreen() {
 
 // ─── Venue Card ───────────────────────────────────────────────────────────────
 
-function VenueCard({ venue, onPress }: { venue: Venue; onPress: () => void }) {
+function VenueCard({ venue, colors, onPress }: { venue: Venue; colors: AppColors; onPress: () => void }) {
+  const styles = makeStyles(colors);
   const amenities = Array.isArray(venue.amenities) ? venue.amenities : [];
 
   return (
@@ -550,7 +556,8 @@ function VenueCard({ venue, onPress }: { venue: Venue; onPress: () => void }) {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-const styles = StyleSheet.create({
+function makeStyles(colors: AppColors) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.cream },
 
   // Header
@@ -898,4 +905,5 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   applyBtnText: { color: colors.white, fontSize: fontSizes.base, fontWeight: '700' },
-});
+  });
+}

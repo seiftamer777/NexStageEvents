@@ -2,7 +2,8 @@ import { Slot, router, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { AuthProvider, useAuth } from '../context/AuthContext';
-import { CartProvider } from '../context/CartContext';  // ← add this
+import { CartProvider } from '../context/CartContext';
+import { ThemeProvider, useTheme } from '../context/ThemeContext';
 import { colors } from '../constants/theme';
 
 function RootLayoutNav() {
@@ -16,10 +17,12 @@ function RootLayoutNav() {
     else if (user && onAuthScreen) router.replace('/(tabs)');
   }, [user, loading, segments]);
 
+  const { colors: themeColors } = useTheme();
+
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.cream }}>
-        <ActivityIndicator size="large" color={colors.coral} />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: themeColors.cream }}>
+        <ActivityIndicator size="large" color={themeColors.coral} />
       </View>
     );
   }
@@ -29,10 +32,12 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <CartProvider>          {/* ← wrap here */}
-        <RootLayoutNav />
-      </CartProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <CartProvider>
+          <RootLayoutNav />
+        </CartProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

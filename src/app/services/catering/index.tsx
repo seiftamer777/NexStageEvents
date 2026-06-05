@@ -6,7 +6,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../../lib/supabase';
-import { colors, spacing, radius, shadows, fontSizes } from '../../../constants/theme';
+import { spacing, radius, shadows, fontSizes } from '../../../constants/theme';
+import { useTheme } from '../../../context/ThemeContext';
+import type { AppColors } from '../../../constants/theme';
 import type { Restaurant } from '../../../types';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -16,6 +18,8 @@ const CATEGORIES = ['All', 'Egyptian', 'Italian', 'BBQ', 'Seafood', 'Vegetarian'
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function CateringScreen() {
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading]         = useState(true);
   const [search, setSearch]           = useState('');
@@ -111,6 +115,7 @@ export default function CateringScreen() {
           renderItem={({ item }) => (
             <RestaurantCard
               restaurant={item}
+              colors={colors}
               onPress={() => router.push(`/services/catering/${item.id}` as any)}
             />
           )}
@@ -124,11 +129,14 @@ export default function CateringScreen() {
 
 function RestaurantCard({
   restaurant,
+  colors,
   onPress,
 }: {
   restaurant: Restaurant;
+  colors: AppColors;
   onPress: () => void;
 }) {
+  const styles = makeStyles(colors);
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
       {/* Image */}
@@ -178,7 +186,8 @@ function RestaurantCard({
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-const styles = StyleSheet.create({
+function makeStyles(colors: AppColors) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.cream },
 
   header: {
@@ -333,4 +342,5 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
   },
   viewBtnText: { fontSize: fontSizes.sm, fontWeight: '700', color: colors.coral },
-});
+  });
+}

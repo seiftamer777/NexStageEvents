@@ -1,4 +1,4 @@
-import { Link, router, type Href } from 'expo-router';
+import { Link, type Href } from 'expo-router';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -6,19 +6,25 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 import { supabase } from '../lib/supabase';
+import { useTheme } from '../context/ThemeContext';
+import { spacing, radius, shadows, fontSizes } from '../constants/theme';
 
 const registerHref = '/register' as Href;
 
 export default function LoginScreen() {
+  const { colors, isDark } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleLogin() {
@@ -26,180 +32,215 @@ export default function LoginScreen() {
       Alert.alert('Missing details', 'Please enter your email and password.');
       return;
     }
-
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    });
+    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setLoading(false);
-
-    if (error) {
-      Alert.alert('Login failed', error.message);
-      return;
-    }
-
-    // AuthContext picks up the new session → _layout.tsx redirects automatically
+    if (error) Alert.alert('Login failed', error.message);
   }
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.select({ ios: 'padding', android: undefined })}
-      style={styles.screen}>
-      <View style={styles.panel}>
+      style={{ flex: 1, backgroundColor: colors.cream }}>
+      <ScrollView
+        contentContainerStyle={[styles.container]}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}>
 
-        <View style={styles.header}>
-          <Text style={styles.eyebrow}>Welcome back</Text>
-          <Text style={styles.title}>Sign in to your account</Text>
-          <Text style={styles.subtitle}>
-            Enter your credentials to continue where you left off.
+        {/* Logo / Brand */}
+        <View style={styles.brand}>
+          <View style={[styles.logoMark, { backgroundColor: colors.coral }]}>
+            <Ionicons name="sparkles" size={28} color={colors.white} />
+          </View>
+          <Text style={[styles.brandName, { color: colors.charcoal }]}>NexStage</Text>
+          <Text style={[styles.brandTagline, { color: colors.mutedFg }]}>
+            Your event, perfectly staged.
           </Text>
         </View>
 
-        <View style={styles.form}>
-          <View style={styles.field}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              autoCapitalize="none"
-              autoComplete="email"
-              keyboardType="email-address"
-              onChangeText={setEmail}
-              placeholder="you@example.com"
-              placeholderTextColor="#7C8794"
-              style={styles.input}
-              value={email}
-            />
+        {/* Card */}
+        <View style={[styles.card, { backgroundColor: colors.white, borderColor: colors.border }, shadows.md]}>
+
+          <View style={styles.cardHeader}>
+            <Text style={[styles.eyebrow, { color: colors.coral }]}>Welcome back</Text>
+            <Text style={[styles.title, { color: colors.charcoal }]}>Sign in</Text>
+            <Text style={[styles.subtitle, { color: colors.mutedFg }]}>
+              Enter your credentials to continue where you left off.
+            </Text>
           </View>
 
-          <View style={styles.field}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              autoCapitalize="none"
-              autoComplete="current-password"
-              onChangeText={setPassword}
-              placeholder="Your password"
-              placeholderTextColor="#7C8794"
-              secureTextEntry
-              style={styles.input}
-              value={password}
-            />
+          <View style={styles.form}>
+            <View style={styles.field}>
+              <Text style={[styles.label, { color: colors.charcoal }]}>Email</Text>
+              <View style={[styles.inputWrap, { backgroundColor: colors.secondary, borderColor: colors.border }]}>
+                <Ionicons name="mail-outline" size={18} color={colors.mutedFg} style={styles.inputIcon} />
+                <TextInput
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  keyboardType="email-address"
+                  onChangeText={setEmail}
+                  placeholder="you@example.com"
+                  placeholderTextColor={colors.mutedFg}
+                  style={[styles.input, { color: colors.charcoal }]}
+                  value={email}
+                />
+              </View>
+            </View>
+
+            <View style={styles.field}>
+              <Text style={[styles.label, { color: colors.charcoal }]}>Password</Text>
+              <View style={[styles.inputWrap, { backgroundColor: colors.secondary, borderColor: colors.border }]}>
+                <Ionicons name="lock-closed-outline" size={18} color={colors.mutedFg} style={styles.inputIcon} />
+                <TextInput
+                  autoCapitalize="none"
+                  autoComplete="current-password"
+                  onChangeText={setPassword}
+                  placeholder="Your password"
+                  placeholderTextColor={colors.mutedFg}
+                  secureTextEntry={!showPassword}
+                  style={[styles.input, { color: colors.charcoal }]}
+                  value={password}
+                />
+                <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
+                  <Ionicons
+                    name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                    size={18}
+                    color={colors.mutedFg}
+                    style={{ marginRight: spacing.md }}
+                  />
+                </Pressable>
+              </View>
+            </View>
+
+            <Pressable
+              disabled={loading}
+              onPress={handleLogin}
+              style={({ pressed }) => [
+                styles.button,
+                { backgroundColor: colors.coral },
+                pressed && styles.buttonPressed,
+                loading && styles.buttonDisabled,
+              ]}>
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.buttonText}>Sign in</Text>
+              )}
+            </Pressable>
           </View>
 
-          <Pressable
-            disabled={loading}
-            onPress={handleLogin}
-            style={({ pressed }) => [
-              styles.button,
-              pressed && styles.buttonPressed,
-              loading && styles.buttonDisabled,
-            ]}>
-            {loading ? (
-              <ActivityIndicator color="#FFFFFF" />
-            ) : (
-              <Text style={styles.buttonText}>Sign in</Text>
-            )}
-          </Pressable>
+          <Text style={[styles.footerText, { color: colors.mutedFg }]}>
+            Don't have an account?{' '}
+            <Link href={registerHref} style={[styles.footerLink, { color: colors.coral }]}>
+              Sign up
+            </Link>
+          </Text>
         </View>
 
-        <Text style={styles.footerText}>
-          Don't have an account?{' '}
-          <Link href={registerHref} style={styles.footerLink}>
-            Sign up
-          </Link>
-        </Text>
-
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
+  container: {
+    flexGrow: 1,
     justifyContent: 'center',
-    backgroundColor: '#F7F3EC',
-    padding: 24,
+    paddingHorizontal: spacing['2xl'],
+    paddingVertical: spacing['4xl'],
+    gap: spacing['3xl'],
   },
-  panel: {
-    width: '100%',
-    maxWidth: 460,
-    alignSelf: 'center',
-    gap: 28,
-    borderRadius: 8,
-    backgroundColor: '#FFFFFF',
-    padding: 24,
-    shadowColor: '#111827',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.1,
-    shadowRadius: 24,
-    elevation: 6,
+  brand: {
+    alignItems: 'center',
+    gap: spacing.sm,
   },
-  header: {
-    gap: 8,
+  logoMark: {
+    width: 64,
+    height: 64,
+    borderRadius: radius.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.xs,
+  },
+  brandName: {
+    fontSize: fontSizes['2xl'],
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  brandTagline: {
+    fontSize: fontSizes.sm,
+    fontWeight: '500',
+  },
+  card: {
+    borderRadius: radius['2xl'],
+    borderWidth: 1,
+    padding: spacing['2xl'],
+    gap: spacing['2xl'],
+  },
+  cardHeader: {
+    gap: spacing.sm,
   },
   eyebrow: {
-    color: '#0F766E',
-    fontSize: 13,
+    fontSize: fontSizes.xs,
     fontWeight: '700',
     textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   title: {
-    color: '#111827',
-    fontSize: 30,
+    fontSize: fontSizes['2xl'],
     fontWeight: '800',
   },
   subtitle: {
-    color: '#5B6472',
-    fontSize: 16,
-    lineHeight: 23,
+    fontSize: fontSizes.base,
+    lineHeight: 22,
   },
   form: {
-    gap: 16,
+    gap: spacing.lg,
   },
   field: {
-    gap: 8,
+    gap: spacing.xs,
   },
   label: {
-    color: '#1F2937',
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: fontSizes.sm,
+    fontWeight: '600',
+  },
+  inputWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: 50,
+    borderWidth: 1,
+    borderRadius: radius.lg,
+    overflow: 'hidden',
+  },
+  inputIcon: {
+    marginLeft: spacing.md,
+    marginRight: spacing.sm,
   },
   input: {
-    minHeight: 52,
-    borderWidth: 1,
-    borderColor: '#D6DAE1',
-    borderRadius: 8,
-    backgroundColor: '#FBFCFE',
-    color: '#111827',
-    fontSize: 16,
-    paddingHorizontal: 14,
+    flex: 1,
+    fontSize: fontSizes.base,
+    paddingVertical: spacing.md,
+    paddingRight: spacing.md,
   },
   button: {
     minHeight: 52,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8,
-    backgroundColor: '#0F766E',
-    marginTop: 4,
+    borderRadius: radius.lg,
+    marginTop: spacing.xs,
   },
-  buttonPressed: {
-    opacity: 0.85,
-  },
-  buttonDisabled: {
-    opacity: 0.65,
-  },
+  buttonPressed: { opacity: 0.85 },
+  buttonDisabled: { opacity: 0.65 },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '800',
+    fontSize: fontSizes.base,
+    fontWeight: '700',
   },
   footerText: {
-    color: '#5B6472',
-    fontSize: 15,
+    fontSize: fontSizes.base,
     textAlign: 'center',
   },
   footerLink: {
-    color: '#B45309',
-    fontWeight: '800',
+    fontWeight: '700',
   },
 });

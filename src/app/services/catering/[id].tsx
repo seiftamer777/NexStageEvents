@@ -8,12 +8,16 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../../lib/supabase';
 import { useCart } from '../../../context/CartContext';
-import { colors, spacing, radius, shadows, fontSizes } from '../../../constants/theme';
+import { spacing, radius, shadows, fontSizes } from '../../../constants/theme';
+import { useTheme } from '../../../context/ThemeContext';
+import type { AppColors } from '../../../constants/theme';
 import type { Restaurant, CateringPackage } from '../../../types';
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function RestaurantScreen() {
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
   const { restaurantId } = useLocalSearchParams<{ restaurantId: string }>();
   const { addItem, isInCart } = useCart();
 
@@ -178,6 +182,7 @@ export default function RestaurantScreen() {
             <PackageCard
               key={pkg.id}
               pkg={pkg}
+              colors={colors}
               inCart={isInCart(pkg.id)}
               onSelect={() => openSheet(pkg)}
             />
@@ -315,13 +320,16 @@ export default function RestaurantScreen() {
 
 function PackageCard({
   pkg,
+  colors,
   inCart,
   onSelect,
 }: {
   pkg: CateringPackage;
+  colors: AppColors;
   inCart: boolean;
   onSelect: () => void;
 }) {
+  const styles = makeStyles(colors);
   return (
     <View style={[styles.pkgCard, inCart && styles.pkgCardInCart]}>
       {inCart ? (
@@ -377,7 +385,8 @@ function PackageCard({
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-const styles = StyleSheet.create({
+function makeStyles(colors: AppColors) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.cream },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.cream },
 
@@ -624,4 +633,5 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
   },
   addedBtnText: { color: colors.white, fontSize: fontSizes.base, fontWeight: '700' },
-});
+  });
+}
