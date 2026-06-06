@@ -9,8 +9,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../../lib/supabase';
 import { useAuth } from '../../../context/AuthContext';
 import { useCart } from '../../../context/CartContext';
-import { spacing, radius, shadows, fontSizes } from '../../../constants/theme';
 import { useTheme } from '../../../context/ThemeContext';
+import { useFavorite } from '../../../hooks/useFavorite';
+import { spacing, radius, shadows, fontSizes } from '../../../constants/theme';
 import type { AppColors } from '../../../constants/theme';
 import type { Venue } from '../../../types';
 
@@ -80,10 +81,14 @@ export default function VenueDetailScreen() {
   const { user } = useAuth();
   const { addItem, isInCart } = useCart();
 
-  const [venue, setVenue]         = useState<Venue | null>(null);
-  const [loading, setLoading]     = useState(true);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [venue, setVenue]             = useState<Venue | null>(null);
+  const [loading, setLoading]         = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+
+  const { isFavorite, toggle: toggleFavorite } = useFavorite(
+    'venue', id,
+    { name: venue?.name ?? '', image: venue?.images?.[0], price: venue?.price_per_day }
+  );
 
   // Sheet
   const [sheetOpen, setSheetOpen]       = useState(false);
@@ -94,49 +99,14 @@ export default function VenueDetailScreen() {
   const alreadyInCart = venue ? isInCart(venue.id) : false;
 
   useEffect(() => {
-    if (id) {
-      fetchVenue();
-      checkFavorite();
-    }
+    if (id) fetchVenue();
   }, [id]);
 
   async function fetchVenue() {
     setLoading(true);
-    const { data } = await supabase
-      .from('venues')
-      .select('*')
-      .eq('id', id)
-      .single();
+    const { data } = await supabase.from('venues').select('*').eq('id', id).single();
     setVenue(data);
     setLoading(false);
-  }
-
-  async function checkFavorite() {
-    if (!user) return;
-    const { data } = await supabase
-      .from('favorites')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('venue_id', id)
-      .single();
-    setIsFavorite(!!data);
-  }
-
-  async function toggleFavorite() {
-    if (!user || !venue) return;
-    if (isFavorite) {
-      await supabase
-        .from('favorites')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('venue_id', venue.id);
-      setIsFavorite(false);
-    } else {
-      await supabase
-        .from('favorites')
-        .insert({ user_id: user.id, venue_id: venue.id });
-      setIsFavorite(true);
-    }
   }
 
   // ── Sheet ────────────────────────────────────────────────────────────────

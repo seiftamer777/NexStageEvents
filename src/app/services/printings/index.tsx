@@ -7,8 +7,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../../lib/supabase';
 import { useCart } from '../../../context/CartContext';
-import { spacing, radius, shadows, fontSizes } from '../../../constants/theme';
 import { useTheme } from '../../../context/ThemeContext';
+import { useFavorite } from '../../../hooks/useFavorite';
+import { spacing, radius, shadows, fontSizes } from '../../../constants/theme';
 import type { AppColors } from '../../../constants/theme';
 import type { PrintingItem } from '../../../types';
 
@@ -285,6 +286,10 @@ function PrintingCard({
 }) {
   const styles = makeStyles(colors);
   const isSelected = quantity > 0;
+  const { isFavorite, toggle: toggleFavorite } = useFavorite(
+    'printing', item.id,
+    { name: item.name, image: item.image, price: item.price_per_unit }
+  );
 
   return (
     <View style={[styles.card, isSelected && styles.cardSelected]}>
@@ -321,6 +326,14 @@ function PrintingCard({
 
         {/* Controls */}
         <View style={styles.cardFooter}>
+          <TouchableOpacity onPress={toggleFavorite} hitSlop={8}>
+            <Ionicons
+              name={isFavorite ? 'heart' : 'heart-outline'}
+              size={18}
+              color={isFavorite ? '#FF4B6E' : colors.mutedFg}
+            />
+          </TouchableOpacity>
+
           {isSelected ? (
             <Text style={styles.subtotalText}>
               {`${(item.price_per_unit * quantity).toLocaleString()} EGP`}

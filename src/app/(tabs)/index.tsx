@@ -69,7 +69,9 @@ export default function HomeScreen() {
             <Text style={s.greeting}>Good morning 👋</Text>
             <Text style={s.userName}>{firstName}</Text>
           </View>
-          
+          <TouchableOpacity style={s.headerBtn} onPress={() => router.push('/notifications' as any)}>
+            <Ionicons name="notifications-outline" size={22} color={colors.charcoal} />
+          </TouchableOpacity>
         </View>
 
         {/* ── Hero Banner ── */}
@@ -212,7 +214,8 @@ function makeStyles(colors: AppColors) {
     },
     greeting: { fontSize: fontSizes.sm, color: colors.mutedFg, fontWeight: '500' },
     userName: { fontSize: fontSizes['2xl'], fontWeight: '700', color: colors.charcoal, marginTop: 2 },
-    notifBtn: {
+    headerActions: { flexDirection: 'row', gap: spacing.sm },
+    headerBtn: {
       width: 44, height: 44, borderRadius: radius.full,
       backgroundColor: colors.white,
       alignItems: 'center', justifyContent: 'center',

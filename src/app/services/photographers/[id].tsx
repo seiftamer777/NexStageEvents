@@ -8,8 +8,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../../lib/supabase';
 import { useCart } from '../../../context/CartContext';
-import { spacing, radius, shadows, fontSizes } from '../../../constants/theme';
 import { useTheme } from '../../../context/ThemeContext';
+import { useFavorite } from '../../../hooks/useFavorite';
+import { spacing, radius, shadows, fontSizes } from '../../../constants/theme';
 import type { AppColors } from '../../../constants/theme';
 import type { Photographer } from '../../../types';
 
@@ -42,6 +43,11 @@ export default function PhotographerDetailScreen() {
   const [photographer, setPhotographer] = useState<Photographer | null>(null);
   const [loading, setLoading]           = useState(true);
   const [activeImage, setActiveImage]   = useState(0);
+
+  const { isFavorite, toggle: toggleFavorite } = useFavorite(
+    'photographer', id,
+    { name: photographer?.name ?? '', image: photographer?.images?.[0], price: photographer?.price_per_day }
+  );
 
   // Sheet
   const [sheetOpen, setSheetOpen]       = useState(false);
@@ -162,6 +168,15 @@ export default function PhotographerDetailScreen() {
           {/* Back button */}
           <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={22} color={colors.white} />
+          </TouchableOpacity>
+
+          {/* Favorite button */}
+          <TouchableOpacity style={styles.favBtn} onPress={toggleFavorite}>
+            <Ionicons
+              name={isFavorite ? 'heart' : 'heart-outline'}
+              size={20}
+              color={isFavorite ? '#FF4B6E' : colors.white}
+            />
           </TouchableOpacity>
 
           {/* Type badge */}
@@ -400,6 +415,14 @@ function makeStyles(colors: AppColors) {
     position: 'absolute',
     top: Platform.OS === 'ios' ? 56 : 36,
     left: spacing['2xl'],
+    width: 40, height: 40, borderRadius: radius.full,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  favBtn: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 56 : 36,
+    right: spacing['2xl'],
     width: 40, height: 40, borderRadius: radius.full,
     backgroundColor: 'rgba(0,0,0,0.3)',
     alignItems: 'center', justifyContent: 'center',

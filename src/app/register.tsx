@@ -22,17 +22,22 @@ const loginHref = '/login' as Href;
 
 export default function RegisterScreen() {
   const { colors } = useTheme();
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [fullName,        setFullName]        = useState('');
+  const [phone,           setPhone]           = useState('');
+  const [email,           setEmail]           = useState('');
+  const [password,        setPassword]        = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [showPassword,    setShowPassword]    = useState(false);
+  const [showConfirm,     setShowConfirm]     = useState(false);
+  const [loading,         setLoading]         = useState(false);
 
   async function handleRegister() {
     if (!fullName.trim() || !email.trim() || !password) {
       Alert.alert('Missing details', 'Please add your name, email, and password.');
+      return;
+    }
+    if (phone.trim() && !/^\+?[\d\s\-().]{7,}$/.test(phone.trim())) {
+      Alert.alert('Invalid phone', 'Please enter a valid phone number.');
       return;
     }
     if (password.length < 6) {
@@ -48,7 +53,12 @@ export default function RegisterScreen() {
     const { error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
-      options: { data: { full_name: fullName.trim() } },
+      options: {
+        data: {
+          full_name: fullName.trim(),
+          phone: phone.trim(),
+        },
+      },
     });
     setLoading(false);
 
@@ -123,6 +133,23 @@ export default function RegisterScreen() {
                   placeholderTextColor={colors.mutedFg}
                   style={[styles.input, { color: colors.charcoal }]}
                   value={email}
+                />
+              </View>
+            </View>
+
+            {/* Phone */}
+            <View style={styles.field}>
+              <Text style={[styles.label, { color: colors.charcoal }]}>Phone number <Text style={{ color: colors.mutedFg, fontWeight: '400' }}>(optional)</Text></Text>
+              <View style={[styles.inputWrap, { backgroundColor: colors.secondary, borderColor: colors.border }]}>
+                <Ionicons name="call-outline" size={18} color={colors.mutedFg} style={styles.inputIcon} />
+                <TextInput
+                  autoComplete="tel"
+                  keyboardType="phone-pad"
+                  onChangeText={setPhone}
+                  placeholder="+20 10 0000 0000"
+                  placeholderTextColor={colors.mutedFg}
+                  style={[styles.input, { color: colors.charcoal }]}
+                  value={phone}
                 />
               </View>
             </View>

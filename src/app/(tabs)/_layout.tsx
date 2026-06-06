@@ -16,7 +16,7 @@ type TabConfig = {
 const tabs: TabConfig[] = [
   { name: 'index',         title: 'Home',   icon: 'home-outline',    activeIcon: 'home' },
   { name: 'cart',          title: 'Cart',   icon: 'bag-outline',     activeIcon: 'bag' },
-  { name: 'notifications', title: 'Orders', icon: 'receipt-outline', activeIcon: 'receipt' },
+  { name: 'orders', title: 'Orders', icon: 'receipt-outline', activeIcon: 'receipt' },
   { name: 'profile',       title: 'Profile',icon: 'person-outline',  activeIcon: 'person' },
 ];
 

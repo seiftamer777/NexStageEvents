@@ -8,8 +8,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../../lib/supabase';
 import { useCart } from '../../../context/CartContext';
-import { spacing, radius, shadows, fontSizes } from '../../../constants/theme';
 import { useTheme } from '../../../context/ThemeContext';
+import { useFavorite } from '../../../hooks/useFavorite';
+import { spacing, radius, shadows, fontSizes } from '../../../constants/theme';
 import type { AppColors } from '../../../constants/theme';
 import type { Restaurant, CateringPackage } from '../../../types';
 
@@ -18,12 +19,17 @@ import type { Restaurant, CateringPackage } from '../../../types';
 export default function RestaurantScreen() {
   const { colors } = useTheme();
   const styles = makeStyles(colors);
-  const { restaurantId } = useLocalSearchParams<{ restaurantId: string }>();
+  const { id: restaurantId } = useLocalSearchParams<{ id: string }>();
   const { addItem, isInCart } = useCart();
 
   const [restaurant, setRestaurant]   = useState<Restaurant | null>(null);
   const [packages, setPackages]       = useState<CateringPackage[]>([]);
   const [loading, setLoading]         = useState(true);
+
+  const { isFavorite, toggle: toggleFavorite } = useFavorite(
+    'restaurant', restaurantId,
+    { name: restaurant?.name ?? '', image: restaurant?.images?.[0] }
+  );
 
   // Sheet state
   const [selectedPkg, setSelectedPkg] = useState<CateringPackage | null>(null);
@@ -139,10 +145,17 @@ export default function RestaurantScreen() {
           <View style={styles.heroOverlay} />
 
           {/* Back button */}
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={() => router.back()}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={22} color={colors.white} />
+          </TouchableOpacity>
+
+          {/* Favorite button */}
+          <TouchableOpacity style={styles.favBtn} onPress={toggleFavorite}>
+            <Ionicons
+              name={isFavorite ? 'heart' : 'heart-outline'}
+              size={20}
+              color={isFavorite ? '#FF4B6E' : colors.white}
+            />
           </TouchableOpacity>
 
           {/* Hero info */}
@@ -402,6 +415,14 @@ function makeStyles(colors: AppColors) {
   heroOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.45)',
+  },
+  favBtn: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 56 : 36,
+    right: spacing['2xl'],
+    width: 40, height: 40, borderRadius: radius.full,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    alignItems: 'center', justifyContent: 'center',
   },
   backBtn: {
     position: 'absolute',

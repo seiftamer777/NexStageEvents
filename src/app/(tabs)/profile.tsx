@@ -90,7 +90,9 @@ export default function ProfileScreen() {
         <View style={s.section}>
           <Text style={s.sectionTitle}>Activity</Text>
           <View style={s.menuCard}>
-            <MenuItem colors={colors} icon="receipt-outline" label="My Orders" sub="View all your event orders" onPress={() => router.push('/(tabs)/notifications' as any)} />
+            <MenuItem colors={colors} icon="receipt-outline" label="My Orders" sub="View all your event orders" onPress={() => router.push('/orders' as any)} />
+            <Divider colors={colors} />
+            <MenuItem colors={colors} icon="heart-outline" label="Saved" sub="Your favorited venues and services" onPress={() => router.push('/favorites' as any)} />
             <Divider colors={colors} />
             <MenuItem colors={colors} icon="bag-outline" label="Cart" sub="Review items before checkout" onPress={() => router.push('/(tabs)/cart' as any)} />
           </View>
@@ -100,7 +102,7 @@ export default function ProfileScreen() {
         <View style={s.section}>
           <Text style={s.sectionTitle}>Account</Text>
           <View style={s.menuCard}>
-            <MenuItem colors={colors} icon="person-outline" label="Edit Profile" sub="Update your name and details" onPress={() => Alert.alert('Coming soon', 'Profile editing is coming soon.')} />
+            <MenuItem colors={colors} icon="person-outline" label="Edit Profile" sub="Update your name and details" onPress={() => router.push('/edit-profile' as any)} />
             <Divider colors={colors} />
             <MenuItem colors={colors} icon="lock-closed-outline" label="Change Password" sub="Update your account password" onPress={() => Alert.alert('Coming soon', 'Password change is coming soon.')} />
           </View>
