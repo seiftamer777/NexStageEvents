@@ -29,6 +29,32 @@ export const colors = {
   secondary:    '#F2EDE4',
 } as const;
 
+export const darkColors = {
+  coral:        '#f75a26',
+  coralLight:   '#EFA080',
+  coralDark:    '#BE4E26',
+
+  cream:        '#151210',
+  creamDark:    '#090909',
+
+  charcoal:     '#F0EAE2',
+  charcoalLight:'#B0A89E',
+
+  gold:         '#F5C418',
+  goldLight:    '#F8DC8A',
+
+  sage:         '#639E6F',
+  sageLight:    '#2D4A32',
+
+  white:        '#211c18',
+  border:       '#3D3530',
+  muted:        '#252018',
+  mutedFg:      '#9A908A',
+  secondary:    '#231F1C',
+} as const;
+
+export type AppColors = { [K in keyof typeof colors]: string };
+
 // ─── Typography ───────────────────────────────────────────────────────────────
 // Note: load these via expo-font or @expo-google-fonts
 export const fonts = {
