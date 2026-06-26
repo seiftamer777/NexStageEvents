@@ -69,6 +69,8 @@
   .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; }
   .nav-badge { margin-left: auto; background: var(--bg3); color: var(--text2); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
   .nav-item.active .nav-badge { background: rgba(232,113,74,0.15); color: var(--accent); }
+  .nav-badge.badge-pulse { background: var(--accent); color: #fff; animation: badgePulse 0.6s ease-in-out 3; }
+  @keyframes badgePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.22); } }
   .sidebar-footer { padding: 16px 12px; border-top: 1px solid var(--border); }
   .admin-info { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 9px; background: var(--bg3); }
   .admin-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #F5A882); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
@@ -256,6 +258,11 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M8 9V6a4 4 0 018 0v3"/><path d="M12 14v3"/></svg>
         Venues
         <span class="nav-badge" id="nav-venues-count">—</span>
+      </div>
+      <div class="nav-item" onclick="showPage('managers')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M5 17c0-2 1.8-3.5 4-3.5s4 1.5 4 3.5"/><path d="M14 8h5M14 12h5M14 16h3"/></svg>
+        Project Managers
+        <span class="nav-badge" id="nav-managers-count">—</span>
       </div>
       <div class="nav-item" onclick="showPage('orders')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
@@ -466,6 +473,30 @@
       </div>
 
       <!-- ORDERS PAGE -->
+      <div class="page" id="page-managers">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Project Managers</span>
+            <div class="toolbar">
+              <div class="search-box">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" placeholder="Search project managers…" oninput="filterManagers(this.value)">
+              </div>
+              <button class="btn btn-accent btn-sm" onclick="openManagerModal()">+ Add Project Manager</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Photo</th><th>Name</th><th>Phone</th><th>Email</th><th>Address</th><th>Assigned Projects</th><th>Actions</th></tr></thead>
+                <tbody id="managers-body"><tr><td colspan="7" class="empty-row"><span class="loading"></span></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDERS PAGE -->
       <div class="page" id="page-orders">
         <div class="card">
           <div class="card-header">
@@ -487,8 +518,8 @@
           <div class="card-body">
             <div class="table-wrap">
               <table>
-                <thead><tr><th>ID</th><th>User ID</th><th>Status</th><th>Total (EGP)</th><th>Event Date</th><th>Notes</th><th>Created</th><th>Actions</th></tr></thead>
-                <tbody id="orders-body"><tr><td colspan="8" class="empty-row"><span class="loading"></span></td></tr></tbody>
+                <thead><tr><th>ID</th><th>User ID</th><th>Status</th><th>Total (EGP)</th><th>Event Date</th><th>Project Manager</th><th>Notes</th><th>Created</th><th>Actions</th></tr></thead>
+                <tbody id="orders-body"><tr><td colspan="9" class="empty-row"><span class="loading"></span></td></tr></tbody>
               </table>
             </div>
           </div>
@@ -657,6 +688,38 @@
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('venue-modal')">Cancel</button>
       <button class="btn btn-accent" onclick="saveVenue()">Save Venue</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECT MANAGER MODAL -->
+<div class="modal-overlay" id="manager-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="manager-modal-title">Add Project Manager</div>
+      <button class="modal-close" onclick="closeModal('manager-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="manager-edit-id">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px">
+        <div id="manager-photo-preview"><div class="avatar-sm" style="width:64px;height:64px;font-size:22px">?</div></div>
+        <div style="flex:1">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">Photo</label>
+          <input type="file" id="manager-photo-file" accept="image/*">
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">Or paste a photo URL below instead of uploading.</div>
+        </div>
+      </div>
+      <div class="field"><label>Photo URL</label><input type="text" id="manager-photo-url" placeholder="https://… (optional if uploading a file)" oninput="updateManagerPhotoPreview(this.value)"></div>
+      <div class="field-row">
+        <div class="field"><label>Full Name</label><input type="text" id="manager-name" placeholder="e.g. Ahmed Hassan"></div>
+        <div class="field"><label>Phone</label><input type="text" id="manager-phone" placeholder="+20 1xx xxx xxxx"></div>
+      </div>
+      <div class="field"><label>Email</label><input type="email" id="manager-email" placeholder="name@example.com"></div>
+      <div class="field"><label>Address</label><input type="text" id="manager-address" placeholder="Full address"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('manager-modal')">Cancel</button>
+      <button class="btn btn-accent" id="manager-save-btn" onclick="saveManager()">Save Project Manager</button>
     </div>
   </div>
 </div>
@@ -847,7 +910,12 @@
         </div>
         <div class="field"><label>Total (EGP)</label><input type="number" id="order-total" min="0" placeholder="0"></div>
       </div>
-      <div class="field"><label>Event Date</label><input type="date" id="order-event-date"></div>
+      <div class="field-row">
+        <div class="field"><label>Event Date</label><input type="date" id="order-event-date"></div>
+        <div class="field"><label>Project Manager</label>
+          <select id="order-pm"><option value="">Unassigned</option></select>
+        </div>
+      </div>
       <div class="field"><label>Notes</label><textarea id="order-notes" placeholder="Order notes…"></textarea></div>
     </div>
     <div class="modal-footer">
@@ -942,6 +1010,7 @@ let currentAdmin = null;
 let currentPage  = 'overview';
 let allProfiles = [], allVenues = [], allOrders = [];
 let allRestaurants = [], allPhotographers = [], allAV = [], allPrinting = [], allTickets = [];
+let allManagers = [];
 let loadErrors = [];
 
 // ── Clock ─────────────────────────────────────────────────────────────────────
@@ -974,10 +1043,12 @@ function doLogin() {
   document.getElementById('admin-avatar').textContent = admin.username[0].toUpperCase();
   document.getElementById('admin-badge').textContent = capitalize(admin.username);
   loadAll();
+  startRealtime();
 }
 
 function logout() {
   currentAdmin = null;
+  stopRealtime();
   document.getElementById('dashboard').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('login-user').value = '';
@@ -987,7 +1058,7 @@ function logout() {
 
 // ── Navigation ────────────────────────────────────────────────────────────────
 const PAGE_TITLES = {
-  overview:'Overview', profiles:'User Profiles', venues:'Venues',
+  overview:'Overview', profiles:'User Profiles', venues:'Venues', managers:'Project Managers',
   orders:'Orders', restaurants:'Restaurants', photographers:'Photographers',
   av:'AV Equipment', printing:'Printing Items', tickets:'Support Tickets'
 };
@@ -999,10 +1070,11 @@ function showPage(name) {
   currentPage = name;
   document.getElementById('page-title').textContent = PAGE_TITLES[name] || name;
   const navItems = document.querySelectorAll('.nav-item');
-  const navMap = { overview:0, profiles:1, venues:2, orders:3, restaurants:4, photographers:5, av:6, printing:7, tickets:8 };
+  const navMap = { overview:0, profiles:1, venues:2, managers:3, orders:4, restaurants:5, photographers:6, av:7, printing:8, tickets:9 };
   if (navItems[navMap[name]]) navItems[navMap[name]].classList.add('active');
   if (name==='profiles')     renderProfiles();
   if (name==='venues')       renderVenues();
+  if (name==='managers')     renderManagers();
   if (name==='orders')       renderOrders(allOrders);
   if (name==='restaurants')  renderRestaurants();
   if (name==='photographers') renderPhotographers();
@@ -1024,9 +1096,13 @@ async function loadAll() {
   document.getElementById('conn-label').textContent = 'Loading…';
 
   await Promise.all([
-    loadProfiles(), loadVenues(), loadOrders(),
+    loadProfiles(), loadVenues(), loadManagers(), loadOrders(),
     loadRestaurants(), loadPhotographers(), loadAV(), loadPrinting(), loadTickets()
   ]);
+
+  // Orders render PM names by looking up allManagers; re-render once everything
+  // has loaded in case orders resolved before managers did.
+  if (currentPage === 'orders') renderOrders(allOrders);
 
   updateOverviewStats();
   renderOverviewRecent();
@@ -1180,6 +1256,138 @@ async function saveVenue() {
   await loadVenues(); updateOverviewStats();
 }
 
+// ── Project Managers ──────────────────────────────────────────────────────────
+async function loadManagers() {
+  allManagers = await fetchTable('project_managers', { order: 'full_name' });
+  document.getElementById('nav-managers-count').textContent = allManagers.length;
+  if (currentPage === 'managers') renderManagers();
+}
+function managerProjectCount(pmId) {
+  return allOrders.filter(o => o.project_manager_id === pmId).length;
+}
+function renderManagers(filtered) {
+  const data  = filtered ?? allManagers;
+  const tbody = document.getElementById('managers-body');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-row">No project managers found.</td></tr>'; return; }
+  tbody.innerHTML = data.map(m => `
+    <tr>
+      <td>${m.photo_url
+        ? `<img src="${esc(m.photo_url)}" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;display:block">`
+        : `<div class="avatar-sm">${(m.full_name||'?')[0].toUpperCase()}</div>`}</td>
+      <td><strong>${esc(m.full_name||'—')}</strong></td>
+      <td style="color:var(--text2)">${esc(m.phone||'—')}</td>
+      <td style="color:var(--text2);font-size:12.5px">${esc(m.email||'—')}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12.5px">${esc(m.address||'—')}</td>
+      <td><span class="badge badge-teal">${managerProjectCount(m.id)}</span></td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-outline btn-sm" onclick="editManager('${m.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('project_managers','${m.id}','Delete this project manager? Any projects assigned to them will become unassigned.')">Del</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+function filterManagers(q) {
+  const s = q.toLowerCase();
+  renderManagers(allManagers.filter(m =>
+    (m.full_name||'').toLowerCase().includes(s) ||
+    (m.phone||'').includes(s) ||
+    (m.email||'').toLowerCase().includes(s)
+  ));
+}
+function openManagerModal() {
+  clearManagerForm();
+  openModal('manager-modal');
+}
+function editManager(id) {
+  const m = allManagers.find(x => x.id === id);
+  if (!m) return;
+  document.getElementById('manager-edit-id').value   = m.id;
+  document.getElementById('manager-name').value      = m.full_name||'';
+  document.getElementById('manager-phone').value     = m.phone||'';
+  document.getElementById('manager-email').value     = m.email||'';
+  document.getElementById('manager-address').value   = m.address||'';
+  document.getElementById('manager-photo-url').value = m.photo_url||'';
+  document.getElementById('manager-photo-file').value = '';
+  updateManagerPhotoPreview(m.photo_url||'');
+  document.getElementById('manager-modal-title').textContent = 'Edit Project Manager';
+  openModal('manager-modal');
+}
+function clearManagerForm() {
+  ['manager-edit-id','manager-name','manager-phone','manager-email','manager-address','manager-photo-url']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('manager-photo-file').value = '';
+  updateManagerPhotoPreview('');
+  document.getElementById('manager-modal-title').textContent = 'Add Project Manager';
+}
+function updateManagerPhotoPreview(url) {
+  const preview = document.getElementById('manager-photo-preview');
+  if (url) {
+    preview.innerHTML = `<img src="${esc(url)}" alt="" style="width:64px;height:64px;border-radius:50%;object-fit:cover">`;
+  } else {
+    preview.innerHTML = `<div class="avatar-sm" style="width:64px;height:64px;font-size:22px">?</div>`;
+  }
+}
+document.getElementById('manager-photo-file').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => updateManagerPhotoPreview(ev.target.result);
+  reader.readAsDataURL(file);
+});
+async function uploadManagerPhoto(file) {
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const uid = (window.crypto && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const path = `${uid}.${ext}`;
+  const { error } = await sb.storage.from('project-manager-photos').upload(path, file, {
+    cacheControl: '3600',
+    upsert: false,
+  });
+  if (error) throw error;
+  const { data } = sb.storage.from('project-manager-photos').getPublicUrl(path);
+  return data.publicUrl;
+}
+async function saveManager() {
+  const id = document.getElementById('manager-edit-id').value;
+  const file = document.getElementById('manager-photo-file').files[0];
+  let photoUrl = document.getElementById('manager-photo-url').value.trim() || null;
+
+  const saveBtn = document.getElementById('manager-save-btn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = file ? 'Uploading photo…' : 'Saving…';
+
+  try {
+    if (file) {
+      photoUrl = await uploadManagerPhoto(file);
+    }
+    const payload = {
+      full_name: document.getElementById('manager-name').value.trim(),
+      phone:     document.getElementById('manager-phone').value.trim() || null,
+      email:     document.getElementById('manager-email').value.trim() || null,
+      address:   document.getElementById('manager-address').value.trim() || null,
+      photo_url: photoUrl,
+    };
+    if (!payload.full_name) { showToast('Name is required.', 'error'); return; }
+
+    let err;
+    if (id) { ({ error: err } = await sb.from('project_managers').update(payload).eq('id', id)); }
+    else    { ({ error: err } = await sb.from('project_managers').insert([payload])); }
+    if (err) { showToast(err.message, 'error'); return; }
+
+    showToast(id ? 'Project manager updated!' : 'Project manager added!', 'success');
+    closeModal('manager-modal');
+    await loadManagers();
+    if (currentPage === 'orders') renderOrders(allOrders); // PM names may have changed
+  } catch (e) {
+    showToast(e.message || 'Failed to upload photo.', 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save Project Manager';
+  }
+}
+
 // ── Orders ────────────────────────────────────────────────────────────────────
 async function loadOrders() {
   allOrders = await fetchTable('orders', { order: 'created_at', ascending: false, extra: '*, order_items(*)' });
@@ -1188,7 +1396,7 @@ async function loadOrders() {
 }
 function renderOrders(data) {
   const tbody = document.getElementById('orders-body');
-  if (!data||!data.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty-row">No orders found.</td></tr>'; return; }
+  if (!data||!data.length) { tbody.innerHTML = '<tr><td colspan="9" class="empty-row">No orders found.</td></tr>'; return; }
   tbody.innerHTML = data.map(o => `
     <tr>
       <td style="color:var(--text2);font-size:11.5px;font-family:'DM Mono',monospace">#${o.id.slice(0,8)}…</td>
@@ -1196,6 +1404,7 @@ function renderOrders(data) {
       <td>${orderStatusBadge(o.status)}</td>
       <td><strong style="color:var(--accent)">${o.total_egp != null ? Number(o.total_egp).toLocaleString() : '—'}</strong></td>
       <td>${fmtDate(o.event_date)||'—'}</td>
+      <td>${pmBadge(o.project_manager_id)}</td>
       <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12px">${esc(o.notes||'—')}</td>
       <td style="color:var(--text2);font-size:12px;white-space:nowrap">${fmtDate(o.created_at)}</td>
       <td>
@@ -1227,6 +1436,7 @@ async function viewOrder(id) {
       <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;font-weight:700">Status</div>${orderStatusBadge(order.status)}</div>
       <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;font-weight:700">Total</div><div style="font-size:22px;font-weight:700;color:var(--accent)">${order.total_egp != null ? Number(order.total_egp).toLocaleString() : '—'} EGP</div></div>
       <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;font-weight:700">Event Date</div><div style="font-weight:600">${fmtDate(order.event_date)||'—'}</div></div>
+      <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;font-weight:700">Project Manager</div>${pmBadge(order.project_manager_id)}</div>
       <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;font-weight:700">Created</div><div style="font-size:12px;color:var(--text2)">${fmtDate(order.created_at)}</div></div>
       <div><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;font-weight:700">Notes</div><div style="font-size:13px;color:var(--text2)">${esc(order.notes||'—')}</div></div>
     </div>
@@ -1252,6 +1462,197 @@ async function viewOrder(id) {
     </div>` : '<div style="color:var(--text2);font-size:13px;padding:16px 0">No order items found.</div>'}
   `;
   openModal('order-detail-modal');
+}
+
+// ── Realtime (live everywhere, no refresh needed) ──────────────────────────────
+// Generic config for every table the dashboard tracks. Each entry knows how to
+// mutate its own in-memory array, which nav badge to update, which filter
+// function re-renders its page, and whether new rows deserve a loud alert
+// (orders/tickets) or a quiet one (catalog/admin tables).
+const REALTIME_TABLES = {
+  profiles: {
+    getArr: () => allProfiles, setArr: (a) => (allProfiles = a),
+    navCount: 'nav-profiles-count', filterFn: () => filterProfiles(searchValue('profiles')),
+    page: 'profiles', loud: false, label: 'Profile',
+  },
+  venues: {
+    getArr: () => allVenues, setArr: (a) => (allVenues = a),
+    navCount: 'nav-venues-count', filterFn: () => filterVenues(searchValue('venues')),
+    page: 'venues', loud: false, label: 'Venue',
+  },
+  project_managers: {
+    getArr: () => allManagers, setArr: (a) => (allManagers = a),
+    navCount: 'nav-managers-count', filterFn: () => filterManagers(searchValue('managers')),
+    page: 'managers', loud: false, label: 'Project Manager',
+    // Orders display PM names via a live lookup, so refresh that page too if it's open
+    also: () => { if (currentPage === 'orders') renderOrders(allOrders); },
+  },
+  orders: {
+    getArr: () => allOrders, setArr: (a) => (allOrders = a),
+    navCount: 'nav-orders-count', filterFn: () => filterOrders(searchValue('orders')),
+    page: 'orders', loud: true, label: 'Order',
+    selectExtra: '*, order_items(*)',
+    describe: (o) => o.total_egp != null ? `${Number(o.total_egp).toLocaleString()} EGP` : '',
+  },
+  restaurants: {
+    getArr: () => allRestaurants, setArr: (a) => (allRestaurants = a),
+    navCount: 'nav-restaurants-count', filterFn: () => filterRestaurants(searchValue('restaurants')),
+    page: 'restaurants', loud: false, label: 'Restaurant',
+  },
+  photographers: {
+    getArr: () => allPhotographers, setArr: (a) => (allPhotographers = a),
+    navCount: 'nav-photographers-count', filterFn: () => filterPhotographers(searchValue('photographers')),
+    page: 'photographers', loud: false, label: 'Photographer',
+  },
+  av_equipment: {
+    getArr: () => allAV, setArr: (a) => (allAV = a),
+    navCount: 'nav-av-count', filterFn: () => filterAV(searchValue('av')),
+    page: 'av', loud: false, label: 'AV Equipment',
+  },
+  printing_items: {
+    getArr: () => allPrinting, setArr: (a) => (allPrinting = a),
+    navCount: 'nav-printing-count', filterFn: () => filterPrinting(searchValue('printing')),
+    page: 'printing', loud: false, label: 'Printing Item',
+  },
+  support_tickets: {
+    getArr: () => allTickets, setArr: (a) => (allTickets = a),
+    navCount: 'nav-tickets-count', filterFn: () => filterTickets(searchValue('tickets')),
+    page: 'tickets', loud: true, label: 'Support Ticket',
+    describe: (t) => t.subject ? `"${t.subject}"` : '',
+  },
+};
+
+function searchValue(pageName) {
+  return document.querySelector(`#page-${pageName} input[type="text"]`)?.value || '';
+}
+
+let realtimeChannel = null;
+const badgeBlinkTimers = {};
+
+function startRealtime() {
+  if (realtimeChannel) return; // already running
+
+  realtimeChannel = sb.channel('admin-live-all');
+
+  Object.keys(REALTIME_TABLES).forEach((table) => {
+    realtimeChannel
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table }, (payload) => handleLiveInsert(table, payload))
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table }, (payload) => handleLiveUpdate(table, payload))
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table }, (payload) => handleLiveDelete(table, payload));
+  });
+
+  realtimeChannel.subscribe((status) => {
+    if (status === 'SUBSCRIBED')        setLiveStatus('live');
+    else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') setLiveStatus('error');
+    else if (status === 'CLOSED')       setLiveStatus('off');
+  });
+}
+
+function stopRealtime() {
+  if (realtimeChannel) {
+    sb.removeChannel(realtimeChannel);
+    realtimeChannel = null;
+  }
+  setLiveStatus('off');
+}
+
+function setLiveStatus(state) {
+  const dot   = document.getElementById('conn-dot');
+  const label = document.getElementById('conn-label');
+  if (!dot || !label) return;
+  // Don't override an active load-error state from loadAll()'s own checks
+  if (loadErrors.length > 0 && state !== 'error') return;
+  if (state === 'live') {
+    dot.className = 'conn-dot';
+    label.textContent = 'Live';
+  } else if (state === 'error') {
+    dot.className = 'conn-dot error';
+    label.textContent = 'Reconnecting…';
+    // Supabase client auto-retries; nudge a manual resubscribe as a fallback
+    setTimeout(() => { if (currentAdmin) { stopRealtime(); startRealtime(); } }, 4000);
+  } else {
+    dot.className = 'conn-dot connecting';
+    label.textContent = 'Offline';
+  }
+}
+
+function afterLiveChange(cfg) {
+  document.getElementById(cfg.navCount).textContent = cfg.getArr().length;
+  if (currentPage === cfg.page) cfg.filterFn();
+  if (cfg.also) cfg.also();
+  updateOverviewStats();
+  renderOverviewRecent();
+}
+
+async function handleLiveInsert(table, payload) {
+  const cfg = REALTIME_TABLES[table];
+  const arr = cfg.getArr();
+  let row = payload.new;
+
+  // For tables with joined data (orders → order_items), fetch the full row
+  if (cfg.selectExtra) {
+    const { data, error } = await sb.from(table).select(cfg.selectExtra).eq('id', row.id).single();
+    if (!error && data) row = data;
+  }
+
+  if (!arr.some((r) => r.id === row.id)) {
+    arr.unshift(row);
+    cfg.setArr(arr);
+  }
+
+  afterLiveChange(cfg);
+  flashBadge(cfg.navCount);
+
+  if (cfg.loud) {
+    const detail = cfg.describe ? cfg.describe(row) : '';
+    showToast(`New ${cfg.label.toLowerCase()}${detail ? ' — ' + detail : ''}`, 'success');
+    playPingSound();
+  } else {
+    showToast(`${cfg.label} added`, 'success');
+  }
+}
+
+function handleLiveUpdate(table, payload) {
+  const cfg = REALTIME_TABLES[table];
+  const arr = cfg.getArr();
+  const idx = arr.findIndex((r) => r.id === payload.new.id);
+  if (idx !== -1) {
+    // Merge so any already-loaded joined data (e.g. order_items) survives
+    arr[idx] = { ...arr[idx], ...payload.new };
+    cfg.setArr(arr);
+  }
+  afterLiveChange(cfg);
+}
+
+function handleLiveDelete(table, payload) {
+  const cfg = REALTIME_TABLES[table];
+  cfg.setArr(cfg.getArr().filter((r) => r.id !== payload.old.id));
+  afterLiveChange(cfg);
+}
+
+function flashBadge(navCountId) {
+  const badge = document.getElementById(navCountId);
+  if (!badge) return;
+  badge.classList.add('badge-pulse');
+  clearTimeout(badgeBlinkTimers[navCountId]);
+  badgeBlinkTimers[navCountId] = setTimeout(() => badge.classList.remove('badge-pulse'), 2200);
+}
+
+function playPingSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.setValueAtTime(1180, ctx.currentTime + 0.09);
+    gain.gain.setValueAtTime(0.001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.32);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.34);
+  } catch (e) { /* audio not available, ignore */ }
 }
 
 // ── Restaurants ───────────────────────────────────────────────────────────────
@@ -1653,15 +2054,20 @@ function editOrder(id) {
   document.getElementById('order-total').value      = o.total_egp||'';
   document.getElementById('order-event-date').value = o.event_date||'';
   document.getElementById('order-notes').value      = o.notes||'';
+  const pmSelect = document.getElementById('order-pm');
+  pmSelect.innerHTML = '<option value="">Unassigned</option>' +
+    allManagers.map(m => `<option value="${m.id}">${esc(m.full_name)}</option>`).join('');
+  pmSelect.value = o.project_manager_id || '';
   openModal('order-edit-modal');
 }
 async function saveOrder() {
   const id = document.getElementById('order-edit-id').value;
   const payload = {
-    status:     document.getElementById('order-status').value,
-    total_egp:  parseFloat(document.getElementById('order-total').value) || null,
-    event_date: document.getElementById('order-event-date').value || null,
-    notes:      document.getElementById('order-notes').value.trim() || null,
+    status:             document.getElementById('order-status').value,
+    total_egp:          parseFloat(document.getElementById('order-total').value) || null,
+    event_date:         document.getElementById('order-event-date').value || null,
+    notes:              document.getElementById('order-notes').value.trim() || null,
+    project_manager_id: document.getElementById('order-pm').value || null,
   };
   const { error } = await sb.from('orders').update(payload).eq('id', id);
   if (error) { showToast(error.message, 'error'); return; }
@@ -1708,8 +2114,10 @@ function confirmDelete(table, id, msg) {
       venues: loadVenues, orders: loadOrders, restaurants: loadRestaurants,
       photographers: loadPhotographers, av_equipment: loadAV,
       printing_items: loadPrinting, support_tickets: loadTickets, profiles: loadProfiles,
+      project_managers: loadManagers,
     };
     if (reloaders[pendingDelete.table]) await reloaders[pendingDelete.table]();
+    if (pendingDelete.table === 'project_managers' && currentPage === 'orders') renderOrders(allOrders);
     updateOverviewStats(); renderOverviewRecent();
     pendingDelete = null;
   };
@@ -1750,6 +2158,12 @@ function fmtDate(s) {
 function orderStatusBadge(status) {
   const map = { pending:'badge-warning', confirmed:'badge-success', completed:'badge-info', cancelled:'badge-danger' };
   return `<span class="badge ${map[status]||'badge-gray'}">${capitalize(status||'unknown')}</span>`;
+}
+function pmBadge(pmId) {
+  if (!pmId) return '<span class="badge badge-gray">Unassigned</span>';
+  const pm = allManagers.find(m => m.id === pmId);
+  if (!pm) return '<span class="badge badge-gray">Unknown</span>';
+  return `<span class="badge badge-teal">${esc(pm.full_name)}</span>`;
 }
 function roleBadge(role) {
   if (role==='admin') return '<span class="badge badge-orange">Admin</span>';
