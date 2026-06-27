@@ -4,22 +4,6 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   TextInput, Platform, ActivityIndicator, Alert,
 } from 'react-native';
-
-// ─── Calendar helpers ──────────────────────────────────────────────────────────
-
-const CALENDAR_DAYS = Array.from({ length: 90 }, (_, i) => {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() + i);
-  return d;
-});
-
-function fmtISO(d: Date) { return d.toISOString().split('T')[0]; }
-function fmtDisplay(iso: string) {
-  return new Date(iso).toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-  });
-}
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -63,7 +47,6 @@ export default function CheckoutScreen() {
 
   // Form state
   const [eventName, setEventName]     = useState('');
-  const [eventDate, setEventDate]     = useState('');
   const [notes, setNotes]             = useState('');
   const [fullName, setFullName]       = useState(user?.user_metadata?.full_name ?? '');
   const [phone, setPhone]             = useState('');
@@ -75,10 +58,6 @@ export default function CheckoutScreen() {
   async function handlePlaceOrder() {
     if (!eventName.trim()) {
       Alert.alert('Missing info', 'Please enter an event name.');
-      return;
-    }
-    if (!eventDate.trim()) {
-      Alert.alert('Missing info', 'Please select your event date.');
       return;
     }
     if (!fullName.trim() || !phone.trim()) {
@@ -99,7 +78,6 @@ export default function CheckoutScreen() {
           user_id:    user?.id,
           status:     'pending',
           total_egp:  totalPrice,
-          event_date: eventDate || null,
           notes:      notes.trim() || null,
         })
         .select()
@@ -228,54 +206,6 @@ export default function CheckoutScreen() {
             value={eventName}
             onChangeText={setEventName}
           />
-
-          <Text style={styles.fieldLabel}>
-            Event Date <Text style={styles.required}>*</Text>
-          </Text>
-
-          {/* Selected date display */}
-          {eventDate ? (
-            <View style={styles.selectedDate}>
-              <Ionicons name="calendar" size={16} color={colors.coral} />
-              <Text style={styles.selectedDateTxt}>{fmtDisplay(eventDate)}</Text>
-              <TouchableOpacity onPress={() => setEventDate('')} hitSlop={8}>
-                <Ionicons name="close-circle" size={18} color={colors.mutedFg} />
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <Text style={styles.calendarHint}>Scroll to pick a date</Text>
-          )}
-
-          {/* Horizontal calendar */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.calendarRow}
-            style={styles.calendarWrap}>
-            {CALENDAR_DAYS.map(day => {
-              const iso      = fmtISO(day);
-              const selected = eventDate === iso;
-              const isToday  = fmtISO(new Date()) === iso;
-              return (
-                <TouchableOpacity
-                  key={iso}
-                  style={[styles.dayBtn, selected && styles.dayBtnActive]}
-                  onPress={() => setEventDate(selected ? '' : iso)}
-                  activeOpacity={0.8}>
-                  <Text style={[styles.dayName, selected && styles.dayTxtActive]}>
-                    {day.toLocaleDateString('en-US', { weekday: 'short' })}
-                  </Text>
-                  <Text style={[styles.dayNum, selected && styles.dayTxtActive]}>
-                    {day.getDate()}
-                  </Text>
-                  <Text style={[styles.dayMon, selected && styles.dayTxtActive]}>
-                    {day.toLocaleDateString('en-US', { month: 'short' })}
-                  </Text>
-                  {isToday && !selected ? <View style={styles.todayDot} /> : null}
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
 
           <Text style={styles.fieldLabel}>Notes (optional)</Text>
           <TextInput
@@ -467,36 +397,6 @@ function makeStyles(colors: AppColors) {
   },
   required: { color: colors.coral, fontWeight: '700' },
 
-  // Calendar
-  calendarHint: {
-    fontSize: fontSizes.xs, color: colors.mutedFg, marginBottom: spacing.sm,
-  },
-  selectedDate: {
-    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
-    backgroundColor: `${colors.coral}12`,
-    borderRadius: radius.lg, borderWidth: 1, borderColor: `${colors.coral}30`,
-    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  selectedDateTxt: {
-    flex: 1, fontSize: fontSizes.sm, fontWeight: '600', color: colors.coral,
-  },
-  calendarWrap: { flexGrow: 0, marginBottom: spacing.sm },
-  calendarRow: { gap: spacing.sm, paddingVertical: spacing.xs },
-  dayBtn: {
-    width: 56, paddingVertical: spacing.md, borderRadius: radius.lg,
-    backgroundColor: colors.secondary, borderWidth: 1, borderColor: colors.border,
-    alignItems: 'center', gap: 2,
-  },
-  dayBtnActive: { backgroundColor: colors.coral, borderColor: colors.coral },
-  dayName: { fontSize: 9, fontWeight: '600', color: colors.mutedFg },
-  dayNum: { fontSize: fontSizes.md, fontWeight: '800', color: colors.charcoal },
-  dayMon: { fontSize: 9, color: colors.mutedFg },
-  dayTxtActive: { color: colors.white },
-  todayDot: {
-    width: 4, height: 4, borderRadius: 2,
-    backgroundColor: colors.coral, marginTop: 1,
-  },
   input: {
     backgroundColor: colors.cream,
     borderWidth: 1,

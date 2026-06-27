@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-  ActivityIndicator, Alert,
+  ActivityIndicator, Alert, Image, Linking,
   Platform, ScrollView, StyleSheet, Text,
   TextInput, TouchableOpacity, View,
 } from 'react-native';
@@ -11,7 +11,7 @@ import { fontSizes, radius, shadows, spacing, colors as staticColors } from '../
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { supabase } from '../../lib/supabase';
-import type { Order, OrderItem } from '../../types';
+import type { Order, OrderItem, ProjectManager } from '../../types';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -56,6 +56,7 @@ export default function OrderDetailScreen() {
 
   const [order,     setOrder]     = useState<Order | null>(null);
   const [items,     setItems]     = useState<OrderItem[]>([]);
+  const [pm,        setPm]        = useState<ProjectManager | null>(null);
   const [loading,   setLoading]   = useState(true);
   const [isNew,     setIsNew]     = useState(false);
   const [cancelling, setCancelling] = useState(false);
@@ -98,6 +99,14 @@ export default function OrderDetailScreen() {
     ]);
     setOrder(orderData);
     setItems(itemsData ?? []);
+    if (orderData?.project_manager_id) {
+      const { data: pmData } = await supabase
+        .from('project_managers')
+        .select('*')
+        .eq('id', orderData.project_manager_id)
+        .single();
+      setPm(pmData ?? null);
+    }
     setLoading(false);
   }
 
@@ -170,8 +179,8 @@ export default function OrderDetailScreen() {
         {/* ── Status Timeline ── */}
         <OrderTimeline status={order.status} colors={colors} styles={styles} />
 
-        {/* ── Contact + What happens next (top, pending & confirmed) ── */}
-        {(order.status === 'pending' || order.status === 'confirmed') ? (
+        {/* ── Pending: what happens next ── */}
+        {order.status === 'pending' ? (
           <View style={styles.card}>
             <View style={styles.contactBanner}>
               <Ionicons name="call-outline" size={18} color={colors.coral} />
@@ -196,6 +205,11 @@ export default function OrderDetailScreen() {
               </View>
             ))}
           </View>
+        ) : null}
+
+        {/* ── Confirmed: project manager card ── */}
+        {order.status === 'confirmed' ? (
+          <ProjectManagerCard pm={pm} colors={colors} styles={styles} />
         ) : null}
 
         {/* ── Order ID + status ── */}
@@ -332,6 +346,113 @@ export default function OrderDetailScreen() {
 
         <View style={{ height: 32 }} />
       </ScrollView>
+    </View>
+  );
+}
+
+// ─── Project Manager Card ─────────────────────────────────────────────────────
+
+function ProjectManagerCard({ pm, colors, styles }: { pm: ProjectManager | null; colors: AppColors; styles: ReturnType<typeof makeStyles> }) {
+  const initials = pm?.full_name
+    .split(' ')
+    .map(w => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase() ?? '?';
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.pmHeader}>
+        <Ionicons name="checkmark-circle" size={16} color={colors.sage} />
+        <Text style={styles.pmHeaderTxt}>Your order has been confirmed</Text>
+      </View>
+
+      <Text style={styles.cardTitle}>Your Project Manager</Text>
+
+      {pm ? (
+        <>
+          {/* Avatar + name row */}
+          <View style={styles.pmProfile}>
+            {pm.photo_url ? (
+              <Image source={{ uri: pm.photo_url }} style={styles.pmAvatar} />
+            ) : (
+              <View style={[styles.pmAvatar, styles.pmAvatarPlaceholder]}>
+                <Text style={styles.pmInitials}>{initials}</Text>
+              </View>
+            )}
+            <View style={{ flex: 1 }}>
+              <Text style={styles.pmName}>{pm.full_name}</Text>
+              <Text style={styles.pmRole}>Project Manager</Text>
+            </View>
+          </View>
+
+          {/* Contact details */}
+          <View style={styles.pmContacts}>
+            {pm.phone ? (
+              <TouchableOpacity style={styles.pmContactRow} onPress={() => Linking.openURL(`tel:${pm.phone}`)}>
+                <View style={[styles.pmContactIcon, { backgroundColor: `${colors.sage}18` }]}>
+                  <Ionicons name="call-outline" size={17} color={colors.sage} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.pmContactLabel}>Phone</Text>
+                  <Text style={styles.pmContactValue}>{pm.phone}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={14} color={colors.mutedFg} />
+              </TouchableOpacity>
+            ) : null}
+
+            {pm.email ? (
+              <TouchableOpacity style={styles.pmContactRow} onPress={() => Linking.openURL(`mailto:${pm.email}`)}>
+                <View style={[styles.pmContactIcon, { backgroundColor: `${colors.coral}18` }]}>
+                  <Ionicons name="mail-outline" size={17} color={colors.coral} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.pmContactLabel}>Email</Text>
+                  <Text style={styles.pmContactValue}>{pm.email}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={14} color={colors.mutedFg} />
+              </TouchableOpacity>
+            ) : null}
+
+            {pm.address ? (
+              <View style={styles.pmContactRow}>
+                <View style={[styles.pmContactIcon, { backgroundColor: `${colors.gold}18` }]}>
+                  <Ionicons name="location-outline" size={17} color={colors.gold} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.pmContactLabel}>Office</Text>
+                  <Text style={styles.pmContactValue}>{pm.address}</Text>
+                </View>
+              </View>
+            ) : null}
+          </View>
+
+          {/* Action buttons */}
+          <View style={styles.pmActions}>
+            {pm.phone ? (
+              <TouchableOpacity
+                style={[styles.pmActionBtn, { backgroundColor: colors.sage }]}
+                onPress={() => Linking.openURL(`tel:${pm.phone}`)}>
+                <Ionicons name="call" size={16} color="#fff" />
+                <Text style={styles.pmActionBtnTxt}>Call Now</Text>
+              </TouchableOpacity>
+            ) : null}
+            {pm.email ? (
+              <TouchableOpacity
+                style={[styles.pmActionBtn, { backgroundColor: colors.coral }]}
+                onPress={() => Linking.openURL(`mailto:${pm.email}`)}>
+                <Ionicons name="mail" size={16} color="#fff" />
+                <Text style={styles.pmActionBtnTxt}>Send Email</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
+        </>
+      ) : (
+        <View style={styles.pmUnassigned}>
+          <Ionicons name="person-circle-outline" size={36} color={colors.mutedFg} />
+          <Text style={styles.pmUnassignedTxt}>A project manager will be assigned to your order shortly.</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -648,6 +769,56 @@ function makeStyles(colors: AppColors) {
   },
   statDivider: {
     width: 1, backgroundColor: colors.border, marginVertical: spacing.xs,
+  },
+
+  // Project Manager card
+  pmHeader: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
+    backgroundColor: `${colors.sage}12`,
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+    borderLeftWidth: 3, borderLeftColor: colors.sage,
+  },
+  pmHeaderTxt: { flex: 1, fontSize: fontSizes.sm, fontWeight: '600', color: colors.sage },
+  pmProfile: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
+  pmAvatar: {
+    width: 70, height: 70, borderRadius: 35,
+    backgroundColor: colors.muted,
+  },
+  pmAvatarPlaceholder: {
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: `${colors.coral}20`,
+  },
+  pmInitials: { fontSize: fontSizes.xl, fontWeight: '800', color: colors.coral },
+  pmName: { fontSize: fontSizes.lg, fontWeight: '800', color: colors.charcoal },
+  pmRole: { fontSize: fontSizes.xs, fontWeight: '600', color: colors.mutedFg, marginTop: 3 },
+  pmContacts: { gap: spacing.sm },
+  pmContactRow: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
+    paddingVertical: spacing.sm, paddingHorizontal: spacing.sm,
+    backgroundColor: colors.cream, borderRadius: radius.lg,
+  },
+  pmContactIcon: {
+    width: 36, height: 36, borderRadius: radius.md,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  pmContactLabel: { fontSize: fontSizes.xs, color: colors.mutedFg, fontWeight: '500' },
+  pmContactValue: { fontSize: fontSizes.sm, fontWeight: '700', color: colors.charcoal, marginTop: 2 },
+  pmActions: { flexDirection: 'row', gap: spacing.md },
+  pmActionBtn: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: spacing.sm, paddingVertical: spacing.md, borderRadius: radius.lg,
+  },
+  pmActionBtnTxt: { color: '#fff', fontSize: fontSizes.sm, fontWeight: '700' },
+  pmUnassigned: {
+    alignItems: 'center', gap: spacing.md,
+    paddingVertical: spacing.xl,
+  },
+  pmUnassignedTxt: {
+    fontSize: fontSizes.sm, color: colors.mutedFg, textAlign: 'center', lineHeight: 20,
   },
 
   // Contact banner

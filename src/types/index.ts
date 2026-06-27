@@ -79,7 +79,18 @@ export type Order = {
   event_date: string;
   notes: string;
   created_at: string;
+  project_manager_id: string | null;
   order_items?: OrderItem[];
+};
+
+export type ProjectManager = {
+  id: string;
+  full_name: string;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  photo_url: string | null;
+  created_at: string;
 };
 
 export type OrderItem = {

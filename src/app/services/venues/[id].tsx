@@ -11,6 +11,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useCart } from '../../../context/CartContext';
 import { useTheme } from '../../../context/ThemeContext';
 import { useFavorite } from '../../../hooks/useFavorite';
+import { CalendarGrid } from '../../../components/CalendarGrid';
 import { spacing, radius, shadows, fontSizes } from '../../../constants/theme';
 import type { AppColors } from '../../../constants/theme';
 import type { Venue } from '../../../types';
@@ -18,23 +19,6 @@ import type { Venue } from '../../../types';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function formatDate(date: Date): string {
-  return date.toISOString().split('T')[0];
-}
-
-function buildCalendarDays(): Date[] {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const days: Date[] = [];
-  for (let i = 0; i < 60; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    days.push(d);
-  }
-  return days;
-}
-const calendarDays = buildCalendarDays();
 
 function formatDisplayDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -91,12 +75,13 @@ export default function VenueDetailScreen() {
   );
 
   // Sheet
-  const [sheetOpen, setSheetOpen]       = useState(false);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [added, setAdded]               = useState(false);
+  const [sheetOpen, setSheetOpen]         = useState(false);
+  const [selectedDates, setSelectedDates] = useState<string[]>([]);
+  const [added, setAdded]                 = useState(false);
   const sheetAnim = useRef(new Animated.Value(0)).current;
 
-  const alreadyInCart = venue ? isInCart(venue.id) : false;
+  const alreadyInCart  = venue ? isInCart(venue.id) : false;
+  const hasDateSelected = selectedDates.length > 0;
 
   useEffect(() => {
     if (id) fetchVenue();
@@ -126,26 +111,26 @@ export default function VenueDetailScreen() {
   }
 
   function handleAddToCart() {
-  if (!venue || !selectedDate) return;
-  addItem({
-    serviceType: 'venue',
-    serviceId:   venue.id,
-    serviceName: venue.name,
-    quantity:    1,
-    unitPrice:   venue.price_per_day,
-    subtotal:    venue.price_per_day,
-    metadata: {
-      eventDate: selectedDate,
-      city:      venue.city,
-      area:      venue.area,
-      capacity:  venue.capacity,
-    },
-  });
-  setAdded(true);
-  setTimeout(() => {
-    closeSheet();
-  }, 1200);
-}
+    if (!venue || selectedDates.length === 0) return;
+    const dayCount = selectedDates.length;
+    addItem({
+      serviceType: 'venue',
+      serviceId:   venue.id,
+      serviceName: venue.name,
+      quantity:    dayCount,
+      unitPrice:   venue.price_per_day,
+      subtotal:    venue.price_per_day * dayCount,
+      metadata: {
+        eventDate:  selectedDates[0],
+        eventDates: selectedDates,
+        city:       venue.city,
+        area:       venue.area,
+        capacity:   venue.capacity,
+      },
+    });
+    setAdded(true);
+    setTimeout(() => closeSheet(), 1200);
+  }
 
   const sheetTranslateY = sheetAnim.interpolate({
     inputRange: [0, 1],
@@ -328,86 +313,47 @@ export default function VenueDetailScreen() {
         ) : null}
 
         {/* ── Available dates ── */}
-        {/* ── Available dates ── */}
-<View style={styles.section}>
-  <Text style={styles.sectionTitle}>Available Dates</Text>
-  <Text style={styles.sectionSubtitle}>
-    {availDates.length > 0
-      ? 'Highlighted dates are available — tap to select'
-      : 'All dates available — tap to select'}
-  </Text>
-
-  {/* Selected date display */}
-  {selectedDate ? (
-    <View style={styles.selectedDateRow}>
-      <Ionicons name="calendar" size={16} color={colors.coral} />
-      <Text style={styles.selectedDateText}>
-        {new Date(selectedDate).toLocaleDateString('en-US', {
-          weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-        })}
-      </Text>
-      <TouchableOpacity onPress={() => setSelectedDate(null)}>
-        <Ionicons name="close-circle" size={18} color={colors.mutedFg} />
-      </TouchableOpacity>
-    </View>
-  ) : null}
-
-  <ScrollView
-    horizontal
-    showsHorizontalScrollIndicator={false}
-    contentContainerStyle={styles.calendarRow}>
-    {calendarDays.map((day) => {
-      const dateStr     = formatDate(day);
-      const isSelected  = selectedDate === dateStr;
-      const isToday     = formatDate(new Date()) === dateStr;
-      const isAvailable = availDates.length === 0
-        || availDates.some((d) => d.startsWith(dateStr));
-      const isPast      = day < new Date(new Date().setHours(0,0,0,0));
-
-      return (
-        <TouchableOpacity
-          key={dateStr}
-          style={[
-            styles.dayBtn,
-            isSelected && styles.dayBtnSelected,
-            !isAvailable && styles.dayBtnUnavailable,
-            isPast && styles.dayBtnPast,
-          ]}
-          onPress={() => {
-            if (!isAvailable || isPast) return;
-            setSelectedDate(isSelected ? null : dateStr);
-          }}
-          activeOpacity={isAvailable && !isPast ? 0.8 : 1}>
-          <Text style={[
-            styles.dayName,
-            isSelected && styles.dayTextSelected,
-            (!isAvailable || isPast) && styles.dayTextDisabled,
-          ]}>
-            {day.toLocaleDateString('en-US', { weekday: 'short' })}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Available Dates</Text>
+          <Text style={styles.sectionSubtitle}>
+            {availDates.length > 0
+              ? 'Tap available dates to select — you can pick multiple'
+              : 'All dates available — tap to select multiple'}
           </Text>
-          <Text style={[
-            styles.dayNum,
-            isSelected && styles.dayTextSelected,
-            (!isAvailable || isPast) && styles.dayTextDisabled,
-          ]}>
-            {day.getDate()}
-          </Text>
-          <Text style={[
-            styles.dayMonth,
-            isSelected && styles.dayTextSelected,
-            (!isAvailable || isPast) && styles.dayTextDisabled,
-          ]}>
-            {day.toLocaleDateString('en-US', { month: 'short' })}
-          </Text>
-          {isToday && !isSelected ? <View style={styles.todayDot} /> : null}
-          {isAvailable && !isPast && !isSelected ? (
-            <View style={styles.availDot} />
+
+          {/* Selected date chips */}
+          {selectedDates.length > 0 ? (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.selChipsWrap}
+              contentContainerStyle={{ gap: spacing.sm }}>
+              {selectedDates.map((d) => (
+                <TouchableOpacity
+                  key={d}
+                  style={styles.selChip}
+                  onPress={() => setSelectedDates((prev) => prev.filter((x) => x !== d))}>
+                  <Ionicons name="calendar" size={11} color={colors.coral} />
+                  <Text style={styles.selChipTxt}>
+                    {new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </Text>
+                  <Ionicons name="close" size={11} color={colors.coral} />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           ) : null}
-        </TouchableOpacity>
-      );
-    })}
-  </ScrollView>
-</View>
+
+          <CalendarGrid
+            selectedDates={selectedDates}
+            onToggle={(d) =>
+              setSelectedDates((prev) =>
+                prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]
+              )
+            }
+            availableDates={availDates}
+            colors={colors}
+          />
+        </View>
 
         <View style={{ height: 110 }} />
       </ScrollView>
@@ -416,32 +362,37 @@ export default function VenueDetailScreen() {
       <View style={styles.bottomBar}>
         <View>
           <Text style={styles.bottomPrice}>
-            {`${venue.price_per_day?.toLocaleString() ?? '—'} EGP`}
+            {`${((venue.price_per_day ?? 0) * Math.max(1, selectedDates.length)).toLocaleString()} EGP`}
           </Text>
           <Text style={styles.bottomSub}>
-            {selectedDate ? formatDisplayDate(selectedDate) : 'per day'}
+            {selectedDates.length === 0
+              ? 'per day'
+              : selectedDates.length === 1
+              ? formatDisplayDate(selectedDates[0])
+              : `${selectedDates.length} days selected`}
           </Text>
         </View>
         <TouchableOpacity
-  style={[
-    styles.bookBtn,
-    alreadyInCart && styles.bookBtnInCart,
-    !selectedDate && !alreadyInCart && styles.bookBtnDisabled,
-  ]}
-  onPress={() => {
-    if (!selectedDate && !alreadyInCart) return; // ← guard
-    openSheet();
-  }}
-  activeOpacity={0.85}>
-  <Ionicons
-    name={alreadyInCart ? 'checkmark-circle-outline' : 'bag-add-outline'}
-    size={20}
-    color={colors.white}
-  />
-  <Text style={styles.bookBtnText}>
-    {alreadyInCart ? 'Update Booking' : selectedDate ? 'Add to Cart' : 'Select a Date First'}
-  </Text>
-</TouchableOpacity>
+          style={[
+            styles.bookBtn,
+            alreadyInCart && hasDateSelected && styles.bookBtnInCart,
+            !hasDateSelected && styles.bookBtnDisabled,
+          ]}
+          onPress={() => { if (hasDateSelected) openSheet(); }}
+          activeOpacity={0.85}>
+          <Ionicons
+            name={alreadyInCart && hasDateSelected ? 'checkmark-circle-outline' : 'bag-add-outline'}
+            size={20}
+            color={colors.white}
+          />
+          <Text style={styles.bookBtnText}>
+            {!hasDateSelected
+              ? 'Select Date(s) First'
+              : alreadyInCart
+              ? `Update Booking (${selectedDates.length})`
+              : `Add to Cart (${selectedDates.length})`}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* ── Booking confirmation sheet ── */}
@@ -462,11 +413,20 @@ export default function VenueDetailScreen() {
           <View style={styles.confirmBox}>
             <View style={styles.confirmRow}>
               <Ionicons name="calendar-outline" size={16} color={colors.mutedFg} />
-              <Text style={styles.confirmLabel}>Event Date</Text>
+              <Text style={styles.confirmLabel}>
+                {selectedDates.length === 1 ? 'Event Date' : `Event Dates (${selectedDates.length})`}
+              </Text>
               <Text style={styles.confirmValue}>
-                {selectedDate ? formatDisplayDate(selectedDate) : '—'}
+                {selectedDates.length === 1 ? formatDisplayDate(selectedDates[0]) : `${selectedDates.length} days`}
               </Text>
             </View>
+            {selectedDates.length > 1 ? (
+              <View style={{ paddingLeft: 28, gap: 3, marginTop: -4 }}>
+                {selectedDates.map((d) => (
+                  <Text key={d} style={styles.confirmSubItem}>· {formatDisplayDate(d)}</Text>
+                ))}
+              </View>
+            ) : null}
             <View style={styles.confirmRow}>
               <Ionicons name="location-outline" size={16} color={colors.mutedFg} />
               <Text style={styles.confirmLabel}>Location</Text>
@@ -486,7 +446,8 @@ export default function VenueDetailScreen() {
               <Ionicons name="cash-outline" size={16} color={colors.mutedFg} />
               <Text style={styles.confirmLabel}>Total</Text>
               <Text style={styles.confirmTotal}>
-                {`${venue.price_per_day?.toLocaleString() ?? '—'} EGP`}
+                {`${((venue.price_per_day ?? 0) * selectedDates.length).toLocaleString()} EGP`}
+                {selectedDates.length > 1 ? ` · ${selectedDates.length} days` : ''}
               </Text>
             </View>
           </View>
@@ -503,7 +464,7 @@ export default function VenueDetailScreen() {
               activeOpacity={0.85}>
               <Ionicons name="bag-add-outline" size={20} color={colors.white} />
               <Text style={styles.addBtnText}>
-                {`Add to Cart — ${venue.price_per_day?.toLocaleString()} EGP`}
+                {`Add to Cart — ${((venue.price_per_day ?? 0) * selectedDates.length).toLocaleString()} EGP`}
               </Text>
             </TouchableOpacity>
           )}
@@ -773,82 +734,31 @@ function makeStyles(colors: AppColors) {
     paddingVertical: spacing.lg, borderRadius: radius.lg,
   },
   addedBtnText: { color: colors.white, fontSize: fontSizes.base, fontWeight: '700' },
-  // Calendar
-selectedDateRow: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: spacing.sm,
-  marginBottom: spacing.lg,
-  paddingHorizontal: spacing.md,
-  paddingVertical: spacing.sm,
-  backgroundColor: `${colors.coral}12`,
-  borderRadius: radius.lg,
-},
-selectedDateText: {
-  flex: 1,
-  fontSize: fontSizes.sm,
-  fontWeight: '600',
-  color: colors.coral,
-},
-calendarRow: {
-  gap: spacing.sm,
-  paddingBottom: spacing.sm,
-},
-dayBtn: {
-  width: 56,
-  paddingVertical: spacing.md,
-  borderRadius: radius.lg,
-  backgroundColor: colors.cream,
-  borderWidth: 1,
-  borderColor: colors.border,
-  alignItems: 'center',
-  gap: 2,
-},
-dayBtnSelected: {
-  backgroundColor: colors.coral,
-  borderColor: colors.coral,
-},
-dayBtnUnavailable: {
-  backgroundColor: colors.muted,
-  borderColor: colors.border,
-  opacity: 0.5,
-},
-dayBtnPast: {
-  opacity: 0.3,
-},
-dayName: {
-  fontSize: 10,
-  fontWeight: '600',
-  color: colors.mutedFg,
-},
-dayNum: {
-  fontSize: fontSizes.md,
-  fontWeight: '800',
-  color: colors.charcoal,
-},
-dayMonth: {
-  fontSize: 10,
-  color: colors.mutedFg,
-},
-dayTextSelected: {
-  color: colors.white,
-},
-dayTextDisabled: {
-  color: colors.border,
-},
-todayDot: {
-  width: 4,
-  height: 4,
-  borderRadius: 2,
-  backgroundColor: colors.coral,
-  marginTop: 2,
-},
-availDot: {
-  width: 4,
-  height: 4,
-  borderRadius: 2,
-  backgroundColor: colors.sage,
-  marginTop: 2,
-},
+  // Selected date chips
+  selChipsWrap: {
+    marginBottom: spacing.md,
+    flexGrow: 0,
+  },
+  selChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 5,
+    backgroundColor: `${colors.coral}12`,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: `${colors.coral}30`,
+  },
+  selChipTxt: {
+    fontSize: fontSizes.xs,
+    fontWeight: '600',
+    color: colors.coral,
+  },
+  confirmSubItem: {
+    fontSize: fontSizes.xs,
+    color: colors.charcoalLight,
+    fontWeight: '500',
+  },
   });
 }

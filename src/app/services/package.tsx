@@ -10,6 +10,7 @@ import { supabase } from '../../lib/supabase';
 import { useCart } from '../../context/CartContext';
 import { colors as staticColors, spacing, radius, shadows, fontSizes } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
+import { CalendarGrid } from '../../components/CalendarGrid';
 import type { AppColors } from '../../constants/theme';
 import type {
   Venue, Restaurant, CateringPackage,
@@ -23,9 +24,9 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 type StepKey = 'venue' | 'catering' | 'av' | 'printings' | 'photography';
 type QtyMap  = Record<string, number>;
 
-type VenueSelection       = { venue: Venue; date: string };
+type VenueSelection       = { venue: Venue; dates: string[] };
 type CateringSelection    = { restaurant: Restaurant; pkg: CateringPackage; guestCount: number };
-type PhotographySelection = { photographer: Photographer; date: string };
+type PhotographySelection = { photographer: Photographer; dates: string[] };
 
 const STEPS: { key: StepKey; label: string; icon: React.ComponentProps<typeof Ionicons>['name']; color: string; required: boolean }[] = [
   { key: 'venue',       label: 'Venue',          icon: 'business-outline',    color: staticColors.coral,  required: true },
@@ -103,9 +104,6 @@ function longDate(s: string): string {
   return new Date(s).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 }
 
-const DAYS = Array.from({ length: 60 }, (_, i) => {
-  const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + i); return d;
-});
 
 // ─── Shared: Sheet wrapper ────────────────────────────────────────────────────
 
@@ -124,61 +122,30 @@ function useSheet() {
   return { open, show, hide, translateY };
 }
 
-// ─── Shared: Horizontal calendar ─────────────────────────────────────────────
-
-function CalendarPicker({ selectedDate, onSelect, availableDates, colors }: {
-  selectedDate: string | null; onSelect: (d: string | null) => void;
-  availableDates?: string[]; colors: AppColors;
-}) {
-  const s = makeStyles(colors);
-  return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.calRow}>
-      {DAYS.map((day) => {
-        const str        = fmtDate(day);
-        const isPast     = day < new Date(new Date().setHours(0,0,0,0));
-        const isAvail    = !availableDates?.length || availableDates.some((d) => d.startsWith(str));
-        const isSelected = selectedDate === str;
-        const disabled   = isPast || !isAvail;
-        return (
-          <TouchableOpacity
-            key={str}
-            style={[s.dayBtn, isSelected && s.dayBtnOn, disabled && s.dayBtnOff]}
-            onPress={() => { if (!disabled) onSelect(isSelected ? null : str); }}
-            activeOpacity={disabled ? 1 : 0.8}>
-            <Text style={[s.dayName, isSelected && s.dayTxtOn, disabled && s.dayTxtOff]}>
-              {day.toLocaleDateString('en-US', { weekday: 'short' })}
-            </Text>
-            <Text style={[s.dayNum, isSelected && s.dayTxtOn, disabled && s.dayTxtOff]}>
-              {day.getDate()}
-            </Text>
-            <Text style={[s.dayMon, isSelected && s.dayTxtOn, disabled && s.dayTxtOff]}>
-              {day.toLocaleDateString('en-US', { month: 'short' })}
-            </Text>
-            {isAvail && !isPast && !isSelected ? <View style={s.availDot} /> : null}
-          </TouchableOpacity>
-        );
-      })}
-    </ScrollView>
-  );
-}
-
 // ─── Shared: Filter chips row ─────────────────────────────────────────────────
 
+type ChipOpt = string | { value: string; label: string };
+
 function FilterChips({ options, active, onSelect, colors }: {
-  options: string[]; active: string; onSelect: (v: string) => void; colors: AppColors;
+  options: ChipOpt[]; active: string; onSelect: (v: string) => void; colors: AppColors;
 }) {
   const s = makeStyles(colors);
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.filterChipsContent} style={s.filterChipsWrap}>
-      {options.map((opt) => (
-        <TouchableOpacity
-          key={opt}
-          style={[s.chip, active === opt && s.chipOn]}
-          onPress={() => onSelect(opt)}
-          activeOpacity={0.8}>
-          <Text style={[s.chipTxt, active === opt && s.chipTxtOn]}>{opt}</Text>
-        </TouchableOpacity>
-      ))}
+      {options.map((opt) => {
+        const value = typeof opt === 'string' ? opt : opt.value;
+        const label = typeof opt === 'string' ? opt : opt.label;
+        const isActive = active === value;
+        return (
+          <TouchableOpacity
+            key={value}
+            style={[s.chip, isActive && s.chipOn]}
+            onPress={() => onSelect(value)}
+            activeOpacity={0.8}>
+            <Text style={[s.chipTxt, isActive && s.chipTxtOn]}>{label}</Text>
+          </TouchableOpacity>
+        );
+      })}
     </ScrollView>
   );
 }
@@ -208,18 +175,26 @@ export default function PackageScreen() {
   }
 
   function handleAddAllToCart() {
-    if (venueSelection) addItem({ serviceType:'venue', serviceId:venueSelection.venue.id, serviceName:venueSelection.venue.name, quantity:1, unitPrice:venueSelection.venue.price_per_day, subtotal:venueSelection.venue.price_per_day, metadata:{ eventDate:venueSelection.date } });
+    if (venueSelection) {
+      const vDays = venueSelection.dates.length;
+      addItem({ serviceType:'venue', serviceId:venueSelection.venue.id, serviceName:venueSelection.venue.name, quantity:vDays, unitPrice:venueSelection.venue.price_per_day, subtotal:venueSelection.venue.price_per_day*vDays, metadata:{ eventDate:venueSelection.dates[0], eventDates:venueSelection.dates } });
+    }
     if (cateringSel) { const t = cateringSel.pkg.price_per_person * cateringSel.guestCount; addItem({ serviceType:'catering', serviceId:cateringSel.pkg.id, serviceName:`${cateringSel.restaurant.name} — ${cateringSel.pkg.name}`, quantity:1, unitPrice:t, subtotal:t, metadata:{ guestCount:cateringSel.guestCount, pricePerPerson:cateringSel.pkg.price_per_person } }); }
     avItems.forEach((i) => { const q = avQty[i.id]??0; if(q>0) addItem({ serviceType:'av', serviceId:i.id, serviceName:i.name, quantity:q, unitPrice:i.price_per_day, subtotal:i.price_per_day*q, metadata:{} }); });
     printItems.forEach((i) => { const q = printQty[i.id]??0; if(q>0) addItem({ serviceType:'printing', serviceId:i.id, serviceName:i.name, quantity:q, unitPrice:i.price_per_unit, subtotal:i.price_per_unit*q, metadata:{} }); });
-    if (photoSel) addItem({ serviceType:'photographer', serviceId:photoSel.photographer.id, serviceName:photoSel.photographer.name, quantity:1, unitPrice:photoSel.photographer.price_per_day, subtotal:photoSel.photographer.price_per_day, metadata:{ eventDate:photoSel.date } });
+    if (photoSel) {
+      const pDays = photoSel.dates.length;
+      addItem({ serviceType:'photographer', serviceId:photoSel.photographer.id, serviceName:photoSel.photographer.name, quantity:pDays, unitPrice:photoSel.photographer.price_per_day, subtotal:photoSel.photographer.price_per_day*pDays, metadata:{ eventDate:photoSel.dates[0], eventDates:photoSel.dates } });
+    }
     router.push('/(tabs)/cart' as any);
   }
 
+  const vDays      = venueSelection?.dates.length ?? 0;
+  const pDays      = photoSel?.dates.length ?? 0;
   const avTotal    = avItems.reduce((s,i) => s + i.price_per_day*(avQty[i.id]??0), 0);
   const printTotal = printItems.reduce((s,i) => s + i.price_per_unit*(printQty[i.id]??0), 0);
   const cTotal     = cateringSel ? cateringSel.pkg.price_per_person * cateringSel.guestCount : 0;
-  const grandTotal = (venueSelection?.venue.price_per_day??0) + cTotal + avTotal + printTotal + (photoSel?.photographer.price_per_day??0);
+  const grandTotal = (venueSelection?.venue.price_per_day??0)*vDays + cTotal + avTotal + printTotal + (photoSel?.photographer.price_per_day??0)*pDays;
 
   return (
     <View style={s.root}>
@@ -263,7 +238,7 @@ export default function PackageScreen() {
          step === 1  ? <CateringStep    colors={colors} selection={cateringSel}    onSelect={setCateringSel}    /> :
          step === 2  ? <AVStep          colors={colors} qty={avQty} setQty={setAvQty} items={avItems} setItems={setAvItems} /> :
          step === 3  ? <PrintingsStep   colors={colors} qty={printQty} setQty={setPrintQty} items={printItems} setItems={setPrintItems} /> :
-                       <PhotographyStep colors={colors} selection={photoSel}        onSelect={setPhotoSel}       />}
+                       <PhotographyStep colors={colors} selection={photoSel} onSelect={setPhotoSel} venueDates={venueSelection?.dates ?? []} />}
       </View>
 
       {/* Bottom bar */}
@@ -308,7 +283,7 @@ function VenueStep({ selection, onSelect, colors }: { selection: VenueSelection|
   const [search, setSearch]   = useState('');
   const [locType, setLocType] = useState<'All'|'Indoor'|'Outdoor'>('All');
   const [detail, setDetail]   = useState<Venue|null>(null);
-  const [date, setDate]       = useState<string|null>(null);
+  const [dates, setDates]     = useState<string[]>([]);
 
   // Filter state (applied)
   const [sortBy, setSortBy]           = useState<VenueSortValue>('price_asc');
@@ -327,8 +302,8 @@ function VenueStep({ selection, onSelect, colors }: { selection: VenueSelection|
       .then(({ data }) => { setVenues(data ?? []); setLoading(false); });
   }, []);
 
-  function openDetail(v: Venue) { setDetail(v); setDate(null); detailSheet.show(); }
-  function confirm() { if (!detail || !date) return; onSelect({ venue: detail, date }); detailSheet.hide(); }
+  function openDetail(v: Venue) { setDetail(v); setDates([]); detailSheet.show(); }
+  function confirm() { if (!detail || dates.length === 0) return; onSelect({ venue: detail, dates }); detailSheet.hide(); }
 
   function openFilter() {
     setTmpSort(sortBy); setTmpCapIdx(capacityIdx); setTmpArea(area);
@@ -364,7 +339,7 @@ function VenueStep({ selection, onSelect, colors }: { selection: VenueSelection|
           <Ionicons name="checkmark-circle" size={18} color={colors.coral} />
           <View style={{flex:1}}>
             <Text style={s.selName}>{selection.venue.name}</Text>
-            <Text style={s.selSub}>{`${dispDate(selection.date)} · ${selection.venue.city}`}</Text>
+            <Text style={s.selSub}>{`${selection.dates.length === 1 ? dispDate(selection.dates[0]) : `${selection.dates.length} days`} · ${selection.venue.city}`}</Text>
           </View>
           <TouchableOpacity onPress={() => openDetail(selection.venue)}>
             <Text style={s.changeBtn}>Change</Text>
@@ -386,7 +361,7 @@ function VenueStep({ selection, onSelect, colors }: { selection: VenueSelection|
         </View>
         <TouchableOpacity style={[s.filterBtn, activeFilterCount > 0 && s.filterBtnActive]} onPress={openFilter}>
           <Ionicons name="options-outline" size={18} color={activeFilterCount > 0 ? colors.white : colors.charcoal} />
-          {activeFilterCount > 0 ? <Text style={s.filterBtnTxt}>{activeFilterCount}</Text> : null}
+          {activeFilterCount > 0 ? <Text style={s.filterBtnTxt}>{activeFilterCount}</Text> : <Text style={s.filterLabelTxt}>Filter</Text>}
         </TouchableOpacity>
       </View>
 
@@ -399,8 +374,15 @@ function VenueStep({ selection, onSelect, colors }: { selection: VenueSelection|
       />
 
       {/* Active filter pills */}
-      {(area !== 'Any' || capacityIdx !== 0) ? (
+      {(area !== 'Any' || capacityIdx !== 0 || sortBy !== 'price_asc') ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.activePills} style={{flexGrow:0, marginBottom:spacing.sm}}>
+          {sortBy !== 'price_asc' ? (
+            <TouchableOpacity style={s.activePill} onPress={() => setSortBy('price_asc')}>
+              <Ionicons name="funnel" size={11} color={colors.coral} />
+              <Text style={s.activePillTxt}>{VENUE_SORT_OPTIONS.find(o => o.value === sortBy)?.label}</Text>
+              <Ionicons name="close" size={11} color={colors.coral} />
+            </TouchableOpacity>
+          ) : null}
           {area !== 'Any' ? (
             <TouchableOpacity style={s.activePill} onPress={() => setArea('Any')}>
               <Ionicons name="location" size={11} color={colors.coral} />
@@ -418,7 +400,14 @@ function VenueStep({ selection, onSelect, colors }: { selection: VenueSelection|
         </ScrollView>
       ) : null}
 
-      <Text style={s.resultCount}>{`${filtered.length} venue${filtered.length !== 1 ? 's' : ''} found`}</Text>
+      <View style={s.resultRow}>
+        <Text style={s.resultCount}>{`${filtered.length} venue${filtered.length !== 1 ? 's' : ''}`}</Text>
+        {activeFilterCount > 0 ? (
+          <TouchableOpacity onPress={() => { setSortBy('price_asc'); setCapacityIdx(0); setArea('Any'); }}>
+            <Text style={s.clearAllTxt}>Clear all</Text>
+          </TouchableOpacity>
+        ) : null}
+      </View>
 
       {loading
         ? <ActivityIndicator color={colors.coral} style={{marginTop:40}} />
@@ -427,6 +416,13 @@ function VenueStep({ selection, onSelect, colors }: { selection: VenueSelection|
             keyExtractor={i => i.id}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{gap:spacing.md, paddingBottom:16}}
+            ListEmptyComponent={
+              <View style={s.emptyState}>
+                <Ionicons name="business-outline" size={40} color={colors.mutedFg} />
+                <Text style={s.emptyStateTitle}>No venues found</Text>
+                <Text style={s.emptyStateSub}>Try adjusting your search or filters</Text>
+              </View>
+            }
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={[s.venueCard, selection?.venue.id === item.id && s.cardSelected]}
@@ -495,20 +491,29 @@ function VenueStep({ selection, onSelect, colors }: { selection: VenueSelection|
                   </View>
                 </View>
               ) : null}
-              <Text style={s.detailSectionTitle}>Select Date</Text>
-              {date ? (
-                <View style={s.selDateRow}>
-                  <Ionicons name="calendar" size={15} color={colors.coral}/>
-                  <Text style={s.selDateTxt}>{longDate(date)}</Text>
-                  <TouchableOpacity onPress={() => setDate(null)}><Ionicons name="close-circle" size={17} color={colors.mutedFg}/></TouchableOpacity>
-                </View>
+              <Text style={s.detailSectionTitle}>Select Date(s)</Text>
+              {dates.length > 0 ? (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.pkgChipsWrap} contentContainerStyle={{ gap: spacing.sm }}>
+                  {dates.map((d) => (
+                    <TouchableOpacity key={d} style={s.pkgDateChip} onPress={() => setDates((p) => p.filter((x) => x !== d))}>
+                      <Ionicons name="calendar" size={11} color={colors.coral} />
+                      <Text style={s.pkgDateChipTxt}>{new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
+                      <Ionicons name="close" size={11} color={colors.coral} />
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
               ) : null}
-              <CalendarPicker selectedDate={date} onSelect={setDate} availableDates={avail} colors={colors} />
+              <CalendarGrid
+                selectedDates={dates}
+                onToggle={(d) => setDates((p) => p.includes(d) ? p.filter((x) => x !== d) : [...p, d])}
+                availableDates={avail}
+                colors={colors}
+              />
             </View>
             <View style={{height:16}}/>
           </ScrollView>
-          <TouchableOpacity style={[s.confirmBtn, !date && s.confirmBtnOff]} onPress={confirm} disabled={!date} activeOpacity={0.85}>
-            <Text style={s.confirmBtnTxt}>{date ? `Select Venue — ${detail?.price_per_day?.toLocaleString()} EGP` : 'Pick a date to continue'}</Text>
+          <TouchableOpacity style={[s.confirmBtn, dates.length === 0 && s.confirmBtnOff]} onPress={confirm} disabled={dates.length === 0} activeOpacity={0.85}>
+            <Text style={s.confirmBtnTxt}>{dates.length > 0 ? `Select Venue — ${((detail?.price_per_day??0)*dates.length).toLocaleString()} EGP (${dates.length} day${dates.length>1?'s':''})` : 'Pick at least one date'}</Text>
           </TouchableOpacity>
         </Animated.View>
       </Modal>
@@ -621,7 +626,7 @@ function CateringStep({ selection, onSelect, colors }: { selection:CateringSelec
       {/* Cuisine filter chips */}
       <FilterChips colors={colors} options={CUISINE_CATS} active={cuisine} onSelect={setCuisine} />
 
-      <Text style={s.resultCount}>{`${filtered.length} restaurant${filtered.length !== 1 ? 's' : ''} found`}</Text>
+      <Text style={s.resultCount}>{`${filtered.length} restaurant${filtered.length !== 1 ? 's' : ''}`}</Text>
 
       {loading
         ? <ActivityIndicator color={colors.coral} style={{marginTop:40}}/>
@@ -629,6 +634,13 @@ function CateringStep({ selection, onSelect, colors }: { selection:CateringSelec
             data={filtered} keyExtractor={i => i.id}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{gap:spacing.md, paddingBottom:16}}
+            ListEmptyComponent={
+              <View style={s.emptyState}>
+                <Ionicons name="restaurant-outline" size={40} color={colors.mutedFg} />
+                <Text style={s.emptyStateTitle}>No restaurants found</Text>
+                <Text style={s.emptyStateSub}>Try a different search term</Text>
+              </View>
+            }
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={[s.venueCard, selection?.restaurant.id === item.id && s.cardSelected]}
@@ -756,13 +768,20 @@ function AVStep({ qty, setQty, items, setItems, colors }: { qty:QtyMap; setQty:(
       </View>
 
       {/* Category chips */}
-      <FilterChips colors={colors} options={AV_CATS.map(c => c.key)} active={category} onSelect={setCategory} />
+      <FilterChips colors={colors} options={AV_CATS.map(c => ({ value: c.key, label: c.label }))} active={category} onSelect={setCategory} />
 
       <Text style={s.resultCount}>{`${filtered.length} item${filtered.length !== 1 ? 's' : ''}`}</Text>
 
       {loading ? <ActivityIndicator color={colors.coral} style={{marginTop:40}}/> :
         <FlatList data={filtered} keyExtractor={i => i.id} showsVerticalScrollIndicator={false}
           contentContainerStyle={{gap:spacing.sm, paddingBottom:16}}
+          ListEmptyComponent={
+            <View style={s.emptyState}>
+              <Ionicons name="volume-high-outline" size={40} color={colors.mutedFg} />
+              <Text style={s.emptyStateTitle}>No equipment found</Text>
+              <Text style={s.emptyStateSub}>Try a different category or search term</Text>
+            </View>
+          }
           renderItem={({ item }) => {
             const q = qty[item.id] ?? 0; const on = q > 0;
             return (
@@ -822,13 +841,20 @@ function PrintingsStep({ qty, setQty, items, setItems, colors }: { qty:QtyMap; s
       </View>
 
       {/* Category chips */}
-      <FilterChips colors={colors} options={PRINT_CATS.map(c => c.key)} active={category} onSelect={setCategory} />
+      <FilterChips colors={colors} options={PRINT_CATS.map(c => ({ value: c.key, label: c.label }))} active={category} onSelect={setCategory} />
 
       <Text style={s.resultCount}>{`${filtered.length} item${filtered.length !== 1 ? 's' : ''}`}</Text>
 
       {loading ? <ActivityIndicator color={colors.coral} style={{marginTop:40}}/> :
         <FlatList data={filtered} keyExtractor={i => i.id} showsVerticalScrollIndicator={false}
           contentContainerStyle={{gap:spacing.sm, paddingBottom:16}}
+          ListEmptyComponent={
+            <View style={s.emptyState}>
+              <Ionicons name="print-outline" size={40} color={colors.mutedFg} />
+              <Text style={s.emptyStateTitle}>No items found</Text>
+              <Text style={s.emptyStateSub}>Try a different category or search term</Text>
+            </View>
+          }
           renderItem={({ item }) => {
             const q = qty[item.id] ?? 0; const on = q > 0;
             return (
@@ -859,7 +885,7 @@ function PrintingsStep({ qty, setQty, items, setItems, colors }: { qty:QtyMap; s
 
 // ─── Step 5: Photography ──────────────────────────────────────────────────────
 
-function PhotographyStep({ selection, onSelect, colors }: { selection:PhotographySelection|null; onSelect:(s:PhotographySelection|null)=>void; colors: AppColors }) {
+function PhotographyStep({ selection, onSelect, colors, venueDates }: { selection:PhotographySelection|null; onSelect:(s:PhotographySelection|null)=>void; colors: AppColors; venueDates: string[] }) {
   const s = makeStyles(colors);
   const [photographers, setPhotographers] = useState<Photographer[]>([]);
   const [loading,       setLoading]       = useState(true);
@@ -868,7 +894,7 @@ function PhotographyStep({ selection, onSelect, colors }: { selection:Photograph
   const [sortBy,        setSortBy]        = useState<PhotoSortValue>('price_asc');
   const [priceIdx,      setPriceIdx]      = useState(0);
   const [detail,        setDetail]        = useState<Photographer|null>(null);
-  const [date,          setDate]          = useState<string|null>(null);
+  const [dates,         setDates]         = useState<string[]>([]);
 
   const detailSheet = useSheet();
   const filterSheet = useSheet();
@@ -880,8 +906,14 @@ function PhotographyStep({ selection, onSelect, colors }: { selection:Photograph
     supabase.from('photographers').select('*').order('rating', { ascending: false }).then(({ data }) => { setPhotographers(data ?? []); setLoading(false); });
   }, []);
 
-  function openDetail(p: Photographer) { setDetail(p); setDate(null); detailSheet.show(); }
-  function confirm() { if (!detail || !date) return; onSelect({ photographer: detail, date }); detailSheet.hide(); }
+  function openDetail(p: Photographer) { setDetail(p); setDates(venueDates.length > 0 ? [] : []); detailSheet.show(); }
+  function confirm() {
+    if (!detail) return;
+    const finalDates = venueDates.length > 0 ? venueDates : dates;
+    if (finalDates.length === 0) return;
+    onSelect({ photographer: detail, dates: finalDates });
+    detailSheet.hide();
+  }
 
   function openFilter() { setTmpSort(sortBy); setTmpPriceIdx(priceIdx); filterSheet.show(); }
   function applyFilter() { setSortBy(tmpSort); setPriceIdx(tmpPriceIdx); filterSheet.hide(); }
@@ -908,7 +940,7 @@ function PhotographyStep({ selection, onSelect, colors }: { selection:Photograph
           <Ionicons name="checkmark-circle" size={18} color={colors.sage}/>
           <View style={{flex:1}}>
             <Text style={s.selName}>{selection.photographer.name}</Text>
-            <Text style={s.selSub}>{`${dispDate(selection.date)} · ${selection.photographer.price_per_day?.toLocaleString()} EGP`}</Text>
+            <Text style={s.selSub}>{`${selection.dates.length === 1 ? dispDate(selection.dates[0]) : `${selection.dates.length} days`} · ${(selection.photographer.price_per_day*selection.dates.length).toLocaleString()} EGP`}</Text>
           </View>
           <TouchableOpacity onPress={() => onSelect(null)}><Text style={[s.changeBtn, {color:colors.sage}]}>Remove</Text></TouchableOpacity>
         </View>
@@ -923,28 +955,51 @@ function PhotographyStep({ selection, onSelect, colors }: { selection:Photograph
         </View>
         <TouchableOpacity style={[s.filterBtn, activeFilterCount > 0 && s.filterBtnActive]} onPress={openFilter}>
           <Ionicons name="options-outline" size={18} color={activeFilterCount > 0 ? colors.white : colors.charcoal} />
-          {activeFilterCount > 0 ? <Text style={s.filterBtnTxt}>{activeFilterCount}</Text> : null}
+          {activeFilterCount > 0 ? <Text style={s.filterBtnTxt}>{activeFilterCount}</Text> : <Text style={s.filterLabelTxt}>Filter</Text>}
         </TouchableOpacity>
       </View>
 
       {/* Type chips */}
       <FilterChips colors={colors} options={['All','Individual','Company']} active={typeFilter} onSelect={(v) => setTypeFilter(v as any)} />
 
-      {priceIdx !== 0 ? (
+      {(priceIdx !== 0 || sortBy !== 'price_asc') ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.activePills} style={{flexGrow:0, marginBottom:spacing.sm}}>
-          <TouchableOpacity style={s.activePill} onPress={() => setPriceIdx(0)}>
-            <Ionicons name="cash" size={11} color={colors.coral} />
-            <Text style={s.activePillTxt}>{PRICE_OPTIONS[priceIdx].label}</Text>
-            <Ionicons name="close" size={11} color={colors.coral} />
-          </TouchableOpacity>
+          {sortBy !== 'price_asc' ? (
+            <TouchableOpacity style={s.activePill} onPress={() => setSortBy('price_asc')}>
+              <Ionicons name="funnel" size={11} color={colors.coral} />
+              <Text style={s.activePillTxt}>{PHOTO_SORT_OPTIONS.find(o => o.value === sortBy)?.label}</Text>
+              <Ionicons name="close" size={11} color={colors.coral} />
+            </TouchableOpacity>
+          ) : null}
+          {priceIdx !== 0 ? (
+            <TouchableOpacity style={s.activePill} onPress={() => setPriceIdx(0)}>
+              <Ionicons name="cash" size={11} color={colors.coral} />
+              <Text style={s.activePillTxt}>{PRICE_OPTIONS[priceIdx].label}</Text>
+              <Ionicons name="close" size={11} color={colors.coral} />
+            </TouchableOpacity>
+          ) : null}
         </ScrollView>
       ) : null}
 
-      <Text style={s.resultCount}>{`${filtered.length} photographer${filtered.length !== 1 ? 's' : ''} found`}</Text>
+      <View style={s.resultRow}>
+        <Text style={s.resultCount}>{`${filtered.length} photographer${filtered.length !== 1 ? 's' : ''}`}</Text>
+        {activeFilterCount > 0 ? (
+          <TouchableOpacity onPress={() => { setSortBy('price_asc'); setPriceIdx(0); }}>
+            <Text style={s.clearAllTxt}>Clear all</Text>
+          </TouchableOpacity>
+        ) : null}
+      </View>
 
       {loading ? <ActivityIndicator color={colors.coral} style={{marginTop:40}}/> :
         <FlatList data={filtered} keyExtractor={i => i.id} showsVerticalScrollIndicator={false}
           contentContainerStyle={{gap:spacing.md, paddingBottom:16}}
+          ListEmptyComponent={
+            <View style={s.emptyState}>
+              <Ionicons name="camera-outline" size={40} color={colors.mutedFg} />
+              <Text style={s.emptyStateTitle}>No photographers found</Text>
+              <Text style={s.emptyStateSub}>Try adjusting your search or filters</Text>
+            </View>
+          }
           renderItem={({ item }) => (
             <TouchableOpacity style={[s.venueCard, selection?.photographer.id === item.id && s.cardSelected]} onPress={() => openDetail(item)} activeOpacity={0.9}>
               <View style={[s.venueImgWrap,{height:160}]}>
@@ -999,21 +1054,51 @@ function PhotographyStep({ selection, onSelect, colors }: { selection:Photograph
                 <View style={s.detailMetaItem}><Ionicons name="cash-outline" size={15} color={colors.coral}/><Text style={s.detailMetaTxt}>{`${detail?.price_per_day?.toLocaleString()} EGP / day`}</Text></View>
               </View>
               <Text style={s.detailDesc}>{detail?.bio}</Text>
-              <Text style={s.detailSectionTitle}>Select Event Date</Text>
-              {date ? (
-                <View style={s.selDateRow}>
-                  <Ionicons name="calendar" size={15} color={colors.coral}/>
-                  <Text style={s.selDateTxt}>{longDate(date)}</Text>
-                  <TouchableOpacity onPress={() => setDate(null)}><Ionicons name="close-circle" size={17} color={colors.mutedFg}/></TouchableOpacity>
+              <Text style={s.detailSectionTitle}>Event Date(s)</Text>
+              {venueDates.length > 0 ? (
+                <View style={s.lockedDateBanner}>
+                  <Ionicons name="lock-closed-outline" size={15} color={colors.sage} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.lockedDateTitle}>Using your venue dates</Text>
+                    <Text style={s.lockedDateSub}>
+                      {venueDates.length === 1 ? longDate(venueDates[0]) : `${venueDates.length} days selected at venue`}
+                    </Text>
+                  </View>
+                  <Ionicons name="checkmark-circle" size={18} color={colors.sage} />
                 </View>
-              ) : null}
-              <CalendarPicker selectedDate={date} onSelect={setDate} colors={colors}/>
+              ) : (
+                <>
+                  {dates.length > 0 ? (
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.pkgChipsWrap} contentContainerStyle={{ gap: spacing.sm }}>
+                      {dates.map((d) => (
+                        <TouchableOpacity key={d} style={s.pkgDateChip} onPress={() => setDates((p) => p.filter((x) => x !== d))}>
+                          <Ionicons name="calendar" size={11} color={colors.coral} />
+                          <Text style={s.pkgDateChipTxt}>{new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
+                          <Ionicons name="close" size={11} color={colors.coral} />
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  ) : null}
+                  <CalendarGrid
+                    selectedDates={dates}
+                    onToggle={(d) => setDates((p) => p.includes(d) ? p.filter((x) => x !== d) : [...p, d])}
+                    colors={colors}
+                  />
+                </>
+              )}
               <View style={{height:16}}/>
             </View>
           </ScrollView>
-          <TouchableOpacity style={[s.confirmBtn, !date && s.confirmBtnOff]} onPress={confirm} disabled={!date}>
-            <Text style={s.confirmBtnTxt}>{date ? `Select Photographer — ${detail?.price_per_day?.toLocaleString()} EGP` : 'Pick a date to continue'}</Text>
-          </TouchableOpacity>
+          {(() => {
+            const finalDates = venueDates.length > 0 ? venueDates : dates;
+            const total = (detail?.price_per_day ?? 0) * (finalDates.length || 1);
+            const ready = finalDates.length > 0;
+            return (
+              <TouchableOpacity style={[s.confirmBtn, !ready && s.confirmBtnOff]} onPress={confirm} disabled={!ready}>
+                <Text style={s.confirmBtnTxt}>{ready ? `Select Photographer — ${total.toLocaleString()} EGP${finalDates.length > 1 ? ` (${finalDates.length} days)` : ''}` : 'Pick at least one date'}</Text>
+              </TouchableOpacity>
+            );
+          })()}
         </Animated.View>
       </Modal>
 
@@ -1069,11 +1154,11 @@ function SummaryStep({ venueSelection,cateringSel,avItems,avQty,printItems,print
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{gap:spacing.md, paddingBottom:16}}>
       <Text style={s.summaryHeading}>Your Event Package</Text>
-      {venueSelection ? <SumCard colors={colors} icon="business-outline" color={colors.coral} title={venueSelection.venue.name} sub={`${dispDate(venueSelection.date)} · ${venueSelection.venue.city}`} price={venueSelection.venue.price_per_day}/> : null}
+      {venueSelection ? <SumCard colors={colors} icon="business-outline" color={colors.coral} title={venueSelection.venue.name} sub={`${venueSelection.dates.length === 1 ? dispDate(venueSelection.dates[0]) : `${venueSelection.dates.length} days`} · ${venueSelection.venue.city}`} price={venueSelection.venue.price_per_day * venueSelection.dates.length}/> : null}
       {cateringSel ? <SumCard colors={colors} icon="restaurant-outline" color="#C2773F" title={cateringSel.pkg.name} sub={`${cateringSel.restaurant.name} · ${cateringSel.guestCount} guests`} price={cTotal}/> : <SumSkipped colors={colors} icon="restaurant-outline" label="Catering"/>}
       {avSel.length > 0 ? <SumCard colors={colors} icon="volume-high-outline" color="#7B68C8" title={`Audio & Visual (${avSel.length} items)`} sub={avSel.map(i => `${i.name} ×${avQty[i.id]}`).join(', ')} price={avTotal}/> : <SumSkipped colors={colors} icon="volume-high-outline" label="Audio & Visual"/>}
       {printSel.length > 0 ? <SumCard colors={colors} icon="print-outline" color={colors.gold} title={`Printings (${printSel.length} types)`} sub={printSel.map(i => `${i.name} ×${printQty[i.id]}`).join(', ')} price={pTotal}/> : <SumSkipped colors={colors} icon="print-outline" label="Printings"/>}
-      {photoSel ? <SumCard colors={colors} icon="camera-outline" color={colors.sage} title={photoSel.photographer.name} sub={`${photoSel.photographer.type==='company'?'Company':'Individual'} · ${dispDate(photoSel.date)}`} price={photoSel.photographer.price_per_day}/> : <SumSkipped colors={colors} icon="camera-outline" label="Photography"/>}
+      {photoSel ? <SumCard colors={colors} icon="camera-outline" color={colors.sage} title={photoSel.photographer.name} sub={`${photoSel.photographer.type==='company'?'Company':'Individual'} · ${photoSel.dates.length === 1 ? dispDate(photoSel.dates[0]) : `${photoSel.dates.length} days`}`} price={photoSel.photographer.price_per_day * photoSel.dates.length}/> : <SumSkipped colors={colors} icon="camera-outline" label="Photography"/>}
       <View style={s.totalCard}>
         <Text style={s.totalLbl}>Package Total</Text>
         <Text style={s.totalVal}>{`${grandTotal.toLocaleString()} EGP`}</Text>
@@ -1124,16 +1209,24 @@ function makeStyles(colors: AppColors) {
 
   // Search + filter row
   searchFilterRow: { flexDirection:'row', alignItems:'center', gap:spacing.sm, marginBottom:spacing.md },
-  filterBtn: { width:44, height:44, borderRadius:radius.lg, backgroundColor:colors.white, alignItems:'center', justifyContent:'center', flexDirection:'row', gap:4, ...shadows.sm },
+  filterBtn: { height:44, paddingHorizontal:spacing.md, borderRadius:radius.lg, backgroundColor:colors.white, alignItems:'center', justifyContent:'center', flexDirection:'row', gap:4, ...shadows.sm },
   filterBtnActive: { backgroundColor:colors.coral },
   filterBtnTxt: { fontSize:fontSizes.xs, fontWeight:'800', color:colors.white },
+  filterLabelTxt: { fontSize:fontSizes.xs, fontWeight:'600', color:colors.charcoalLight },
 
   // Filter chips
   filterChipsWrap: { flexGrow:0, marginBottom:spacing.sm },
   filterChipsContent: { gap:spacing.sm, paddingBottom:2 },
 
-  // Result count
-  resultCount: { fontSize:fontSizes.xs, color:colors.mutedFg, fontWeight:'500', marginBottom:spacing.sm },
+  // Result count row
+  resultRow: { flexDirection:'row', alignItems:'center', justifyContent:'space-between', marginBottom:spacing.sm },
+  resultCount: { fontSize:fontSizes.xs, color:colors.mutedFg, fontWeight:'500' },
+  clearAllTxt: { fontSize:fontSizes.xs, fontWeight:'700', color:colors.coral },
+
+  // Empty state
+  emptyState: { alignItems:'center', paddingVertical:spacing['2xl']*2, gap:spacing.md },
+  emptyStateTitle: { fontSize:fontSizes.base, fontWeight:'700', color:colors.charcoal },
+  emptyStateSub: { fontSize:fontSizes.sm, color:colors.mutedFg, textAlign:'center' },
 
   // Active filter pills
   activePills: { gap:spacing.sm },
@@ -1145,7 +1238,7 @@ function makeStyles(colors: AppColors) {
   filterSheetHeader: { flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:spacing.xl },
   filterSheetTitle: { fontSize:fontSizes.lg, fontWeight:'700', color:colors.charcoal },
   resetTxt: { fontSize:fontSizes.sm, fontWeight:'600', color:colors.coral },
-  filterSection: { fontSize:fontSizes.xs, fontWeight:'700', color:colors.mutedFg, textTransform:'uppercase', letterSpacing:0.8, marginBottom:spacing.md, marginTop:spacing.lg },
+  filterSection: { fontSize:fontSizes.xs, fontWeight:'700', color:colors.mutedFg, textTransform:'uppercase', letterSpacing:0.8, marginBottom:spacing.md, marginTop:spacing.lg, paddingTop:spacing.lg, borderTopWidth:1, borderTopColor:colors.border },
   filterOption: { flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingVertical:spacing.md, paddingHorizontal:spacing.lg, borderRadius:radius.lg, marginBottom:spacing.sm, backgroundColor:colors.cream },
   filterOptionOn: { backgroundColor:`${colors.coral}12` },
   filterOptionTxt: { fontSize:fontSizes.base, fontWeight:'500', color:colors.charcoal },
@@ -1242,18 +1335,14 @@ function makeStyles(colors: AppColors) {
   amenGridTxt: { fontSize:fontSizes.xs, color:colors.charcoal, fontWeight:'500', flex:1 },
   thumbImg: { width:90, height:90, borderRadius:radius.lg, resizeMode:'cover' },
 
-  calRow: { gap:spacing.sm, paddingBottom:spacing.sm },
-  dayBtn: { width:52, paddingVertical:spacing.md, borderRadius:radius.lg, backgroundColor:colors.cream, borderWidth:1, borderColor:colors.border, alignItems:'center', gap:2 },
-  dayBtnOn: { backgroundColor:colors.coral, borderColor:colors.coral },
-  dayBtnOff: { opacity:0.35 },
-  dayName: { fontSize:9, fontWeight:'600', color:colors.mutedFg },
-  dayNum: { fontSize:fontSizes.md, fontWeight:'800', color:colors.charcoal },
-  dayMon: { fontSize:9, color:colors.mutedFg },
-  dayTxtOn: { color:colors.white },
-  dayTxtOff: { color:colors.border },
-  availDot: { width:4, height:4, borderRadius:2, backgroundColor:colors.sage, marginTop:1 },
   selDateRow: { flexDirection:'row', alignItems:'center', gap:spacing.sm, marginBottom:spacing.md, paddingHorizontal:spacing.md, paddingVertical:spacing.sm, backgroundColor:`${colors.coral}12`, borderRadius:radius.lg },
   selDateTxt: { flex:1, fontSize:fontSizes.sm, fontWeight:'600', color:colors.coral },
+  lockedDateBanner: { flexDirection:'row', alignItems:'center', gap:spacing.sm, paddingHorizontal:spacing.md, paddingVertical:spacing.md, backgroundColor:`${colors.sage}12`, borderRadius:radius.lg, borderWidth:1, borderColor:`${colors.sage}30`, marginBottom:spacing.md },
+  lockedDateTitle: { fontSize:fontSizes.xs, fontWeight:'600', color:colors.sage },
+  lockedDateSub: { fontSize:fontSizes.sm, fontWeight:'700', color:colors.charcoal, marginTop:2 },
+  pkgChipsWrap: { flexGrow:0, marginBottom:spacing.md },
+  pkgDateChip: { flexDirection:'row', alignItems:'center', gap:4, paddingHorizontal:spacing.sm, paddingVertical:5, backgroundColor:`${colors.coral}12`, borderRadius:radius.full, borderWidth:1, borderColor:`${colors.coral}30` },
+  pkgDateChipTxt: { fontSize:fontSizes.xs, fontWeight:'600', color:colors.coral },
 
   confirmBtn: { backgroundColor:colors.coral, borderRadius:radius.lg, paddingVertical:spacing.lg, alignItems:'center', marginHorizontal:spacing['2xl'], marginTop:spacing.md },
   confirmBtnOff: { backgroundColor:colors.mutedFg, opacity:0.5 },

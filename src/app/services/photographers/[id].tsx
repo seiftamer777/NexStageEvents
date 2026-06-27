@@ -10,27 +10,12 @@ import { supabase } from '../../../lib/supabase';
 import { useCart } from '../../../context/CartContext';
 import { useTheme } from '../../../context/ThemeContext';
 import { useFavorite } from '../../../hooks/useFavorite';
+import { CalendarGrid } from '../../../components/CalendarGrid';
 import { spacing, radius, shadows, fontSizes } from '../../../constants/theme';
 import type { AppColors } from '../../../constants/theme';
 import type { Photographer } from '../../../types';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-function formatDate(date: Date): string {
-  return date.toISOString().split('T')[0];
-}
-
-function buildCalendarDays(): Date[] {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const days: Date[] = [];
-  for (let i = 0; i < 60; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    days.push(d);
-  }
-  return days;
-}
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
@@ -50,11 +35,10 @@ export default function PhotographerDetailScreen() {
   );
 
   // Sheet
-  const [sheetOpen, setSheetOpen]       = useState(false);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [added, setAdded]               = useState(false);
-  const sheetAnim                       = useRef(new Animated.Value(0)).current;
-  const calendarDays                    = buildCalendarDays();
+  const [sheetOpen, setSheetOpen]         = useState(false);
+  const [selectedDates, setSelectedDates] = useState<string[]>([]);
+  const [added, setAdded]                 = useState(false);
+  const sheetAnim                         = useRef(new Animated.Value(0)).current;
 
   const alreadyInCart = photographer ? isInCart(photographer.id) : false;
 
@@ -77,7 +61,7 @@ export default function PhotographerDetailScreen() {
 
   function openSheet() {
     setAdded(false);
-    setSelectedDate(null);
+    setSelectedDates([]);
     setSheetOpen(true);
     Animated.spring(sheetAnim, {
       toValue: 1, useNativeDriver: true, damping: 20, stiffness: 200,
@@ -91,17 +75,19 @@ export default function PhotographerDetailScreen() {
   }
 
   function handleAddToCart() {
-    if (!photographer) return;
+    if (!photographer || selectedDates.length === 0) return;
+    const dayCount = selectedDates.length;
     addItem({
       serviceType: 'photographer',
-      serviceId: photographer.id,
+      serviceId:   photographer.id,
       serviceName: photographer.name,
-      quantity: 1,
-      unitPrice: photographer.price_per_day,
-      subtotal: photographer.price_per_day,
+      quantity:    dayCount,
+      unitPrice:   photographer.price_per_day,
+      subtotal:    photographer.price_per_day * dayCount,
       metadata: {
         photographerType: photographer.type,
-        eventDate: selectedDate,
+        eventDate:        selectedDates[0],
+        eventDates:       selectedDates,
       },
     });
     setAdded(true);
@@ -287,79 +273,72 @@ export default function PhotographerDetailScreen() {
 
           <View style={styles.sheetHandle} />
           <Text style={styles.sheetTitle}>Book {photographer.name}</Text>
-          <Text style={styles.sheetSub}>Select a date for your event</Text>
+          <Text style={styles.sheetSub}>Select one or more dates for your event</Text>
 
-          {/* Selected date display */}
-          {selectedDate ? (
-            <View style={styles.selectedDateRow}>
-              <Ionicons name="calendar" size={16} color={colors.coral} />
-              <Text style={styles.selectedDateText}>
-                {new Date(selectedDate).toLocaleDateString('en-US', {
-                  weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-                })}
-              </Text>
-              <TouchableOpacity onPress={() => setSelectedDate(null)}>
-                <Ionicons name="close-circle" size={18} color={colors.mutedFg} />
-              </TouchableOpacity>
-            </View>
-          ) : null}
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {/* Selected date chips */}
+            {selectedDates.length > 0 ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.selChipsWrap}
+                contentContainerStyle={{ gap: spacing.sm }}>
+                {selectedDates.map((d) => (
+                  <TouchableOpacity
+                    key={d}
+                    style={styles.selChip}
+                    onPress={() => setSelectedDates((prev) => prev.filter((x) => x !== d))}>
+                    <Ionicons name="calendar" size={11} color={colors.coral} />
+                    <Text style={styles.selChipTxt}>
+                      {new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </Text>
+                    <Ionicons name="close" size={11} color={colors.coral} />
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            ) : null}
 
-          {/* Calendar */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.calendarRow}>
-            {calendarDays.map((day) => {
-              const dateStr = formatDate(day);
-              const isSelected = selectedDate === dateStr;
-              const isToday = formatDate(new Date()) === dateStr;
-              return (
-                <TouchableOpacity
-                  key={dateStr}
-                  style={[styles.dayBtn, isSelected && styles.dayBtnActive]}
-                  onPress={() => setSelectedDate(isSelected ? null : dateStr)}
-                  activeOpacity={0.8}>
-                  <Text style={[styles.dayName, isSelected && styles.dayTextActive]}>
-                    {day.toLocaleDateString('en-US', { weekday: 'short' })}
-                  </Text>
-                  <Text style={[styles.dayNum, isSelected && styles.dayTextActive]}>
-                    {day.getDate()}
-                  </Text>
-                  <Text style={[styles.dayMonth, isSelected && styles.dayTextActive]}>
-                    {day.toLocaleDateString('en-US', { month: 'short' })}
-                  </Text>
-                  {isToday ? <View style={styles.todayDot} /> : null}
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
+            {/* Calendar grid */}
+            <CalendarGrid
+              selectedDates={selectedDates}
+              onToggle={(d) =>
+                setSelectedDates((prev) =>
+                  prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]
+                )
+              }
+              colors={colors}
+            />
 
-          {/* Summary */}
-          <View style={styles.summaryBox}>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Day rate</Text>
-              <Text style={styles.summaryValue}>
-                {`${photographer.price_per_day?.toLocaleString() ?? '—'} EGP`}
-              </Text>
-            </View>
-            {selectedDate ? (
+            {/* Summary */}
+            <View style={[styles.summaryBox, { marginTop: spacing.lg }]}>
               <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Event date</Text>
+                <Text style={styles.summaryLabel}>Day rate</Text>
                 <Text style={styles.summaryValue}>
-                  {new Date(selectedDate).toLocaleDateString('en-US', {
-                    month: 'short', day: 'numeric', year: 'numeric',
-                  })}
+                  {`${photographer.price_per_day?.toLocaleString() ?? '—'} EGP`}
                 </Text>
               </View>
-            ) : null}
-            <View style={styles.divider} />
-            <View style={styles.summaryRow}>
-              <Text style={styles.totalLabel}>Total</Text>
-              <Text style={styles.totalValue}>
-                {`${photographer.price_per_day?.toLocaleString() ?? '—'} EGP`}
-              </Text>
+              {selectedDates.length > 0 ? (
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>
+                    {selectedDates.length === 1 ? 'Event date' : `${selectedDates.length} days`}
+                  </Text>
+                  <Text style={styles.summaryValue}>
+                    {selectedDates.length === 1
+                      ? new Date(selectedDates[0]).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                      : `× ${selectedDates.length}`}
+                  </Text>
+                </View>
+              ) : null}
+              <View style={styles.divider} />
+              <View style={styles.summaryRow}>
+                <Text style={styles.totalLabel}>Total</Text>
+                <Text style={styles.totalValue}>
+                  {`${((photographer.price_per_day ?? 0) * Math.max(1, selectedDates.length)).toLocaleString()} EGP`}
+                </Text>
+              </View>
             </View>
-          </View>
+            <View style={{ height: 16 }} />
+          </ScrollView>
 
           {added ? (
             <View style={styles.addedBtn}>
@@ -368,14 +347,14 @@ export default function PhotographerDetailScreen() {
             </View>
           ) : (
             <TouchableOpacity
-              style={[styles.addBtn, !selectedDate && styles.addBtnDisabled]}
+              style={[styles.addBtn, selectedDates.length === 0 && styles.addBtnDisabled]}
               onPress={handleAddToCart}
-              disabled={!selectedDate}
+              disabled={selectedDates.length === 0}
               activeOpacity={0.85}>
               <Ionicons name="bag-add-outline" size={20} color={colors.white} />
               <Text style={styles.addBtnText}>
-                {selectedDate
-                  ? `Add to Cart — ${photographer.price_per_day?.toLocaleString()} EGP`
+                {selectedDates.length > 0
+                  ? `Add to Cart — ${((photographer.price_per_day ?? 0) * selectedDates.length).toLocaleString()} EGP`
                   : 'Select a date first'}
               </Text>
             </TouchableOpacity>
@@ -527,25 +506,14 @@ function makeStyles(colors: AppColors) {
   },
   sheetTitle: { fontSize: fontSizes.xl, fontWeight: '800', color: colors.charcoal },
   sheetSub: { fontSize: fontSizes.sm, color: colors.mutedFg, marginTop: 4, marginBottom: spacing.lg },
-  selectedDateRow: {
-    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
-    marginBottom: spacing.md,
-    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
-    backgroundColor: `${colors.coral}12`, borderRadius: radius.lg,
+  selChipsWrap: { marginBottom: spacing.md, flexGrow: 0 },
+  selChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    paddingHorizontal: spacing.sm, paddingVertical: 5,
+    backgroundColor: `${colors.coral}12`, borderRadius: radius.full,
+    borderWidth: 1, borderColor: `${colors.coral}30`,
   },
-  selectedDateText: { flex: 1, fontSize: fontSizes.sm, fontWeight: '600', color: colors.coral },
-  calendarRow: { gap: spacing.sm, paddingBottom: spacing.lg },
-  dayBtn: {
-    width: 56, paddingVertical: spacing.md, borderRadius: radius.lg,
-    backgroundColor: colors.cream, borderWidth: 1, borderColor: colors.border,
-    alignItems: 'center', gap: 2,
-  },
-  dayBtnActive: { backgroundColor: colors.coral, borderColor: colors.coral },
-  dayName: { fontSize: 10, fontWeight: '600', color: colors.mutedFg },
-  dayNum: { fontSize: fontSizes.md, fontWeight: '800', color: colors.charcoal },
-  dayMonth: { fontSize: 10, color: colors.mutedFg },
-  dayTextActive: { color: colors.white },
-  todayDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.coral, marginTop: 2 },
+  selChipTxt: { fontSize: fontSizes.xs, fontWeight: '600', color: colors.coral },
   summaryBox: {
     backgroundColor: colors.cream, borderRadius: radius.lg,
     padding: spacing.lg, gap: spacing.sm, marginBottom: spacing.xl,
